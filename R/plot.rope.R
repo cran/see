@@ -5,6 +5,15 @@ data_plot.rope <- function(x, data = NULL, ...){
     data <- .retrieve_data(x)
   }
 
+  if (inherits(data, "emmGrid")) {
+    if (!requireNamespace("emmeans", quietly = TRUE)) {
+      stop("Package 'emmeans' required for this function to work. Please install it.", call. = FALSE)
+    }
+    data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
+  } else {
+    data <- as.data.frame(data)
+  }
+
   # Recontruct hdi
   hdi <- attributes(x)$HDI_area
 

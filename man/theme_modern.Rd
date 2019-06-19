@@ -4,14 +4,19 @@
 \alias{theme_modern}
 \title{The easystats' minimal theme}
 \usage{
-theme_modern(plot.title.size = 15, plot.title.face = "plain",
-  plot.title.space = 20, legend.position = "right",
-  axis.title.space = 20, legend.title.size = 13,
-  legend.text.size = 12, axis.title.size = 13,
-  axis.title.face = "plain", axis.text.size = 12,
-  axis.text.angle = NULL, tags.size = 15, tags.face = "bold")
+theme_modern(base_size = 11, base_family = "", plot.title.size = 15,
+  plot.title.face = "plain", plot.title.space = 20,
+  legend.position = "right", axis.title.space = 20,
+  legend.title.size = 13, legend.text.size = 12,
+  axis.title.size = 13, axis.title.face = "plain",
+  axis.text.size = 12, axis.text.angle = NULL, tags.size = 15,
+  tags.face = "bold")
 }
 \arguments{
+\item{base_size}{base font size}
+
+\item{base_family}{base font family}
+
 \item{plot.title.size}{Title size in pts. Can be "none".}
 
 \item{plot.title.face}{Title font face ("plain", "italic", "bold", "bold.italic").}

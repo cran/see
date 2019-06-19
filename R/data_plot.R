@@ -34,21 +34,25 @@
 #'   \item \code{bayestestR::bayesfactor_savagedickey()}
 #'   \item \code{bayestestR::ci()}
 #'   \item \code{bayestestR::equivalence_test()}
+#'   \item \code{bayestestR::estimate_density()}
 #'   \item \code{bayestestR::hdi()}
 #'   \item \code{bayestestR::p_direction()}
 #'   \item \code{bayestestR::rope()}
 #'   \item \code{estimate::estimateContrasts()}
 #'   \item \code{performance::binned_residuals()}
-#'   \item \code{performance::roc()}
+#'   \item \code{performance::check_collinearity()}
+#'   \item \code{performance::check_distribution()}
+#'   \item \code{performance::check_heteroscedasticity()}
+#'   \item \code{performance::check_homogeneity()}
+#'   \item \code{performance::check_model()}
+#'   \item \code{performance::check_normality()}
+#'   \item \code{performance::check_outliers()}
+#'   \item \code{performance::performance_roc()}
 #' }
 #'
 #' @examples
 #' library(bayestestR)
 #' library(rstanarm)
-#'
-#' data <- rnorm(1000, 1)
-#' x <- rope(data, ci = c(0.8, 0.9))
-#' plot(x)
 #'
 #' model <- stan_glm(
 #'   Sepal.Length ~ Petal.Width * Species,
@@ -56,34 +60,28 @@
 #'   chains = 2, iter = 200
 #' )
 #'
-#' \dontrun{
 #' x <- rope(model)
 #' plot(x)
-#' }
 #'
-#' data <- rnorm(1000, 1)
-#' x <- hdi(data, c(0.8, 0.9))
+#' x <- hdi(model)
 #' plot(x) + theme_modern()
 #'
 #' \dontrun{
-#' x <- hdi(model)
-#' plot(x) + theme_modern()
-#' }
-#'
 #' data <- rnorm(1000, 1)
 #' x <- p_direction(data)
 #' plot(x)
 #'
-#' \dontrun{
 #' x <- p_direction(model)
 #' plot(x)
-#' }
 #'
-#' \dontrun{
-#' model <- stan_glm(mpg ~ wt + gear + cyl + disp, data = mtcars)
+#' model <- stan_glm(
+#'   mpg ~ wt + gear + cyl + disp,
+#'   chains = 2,
+#'   iter = 200,
+#'   data = mtcars
+#' )
 #' x <- equivalence_test(model)
-#' plot(x)
-#' }
+#' plot(x)}
 #'
 #' @export
 data_plot <- function(x, data = NULL, ...){
@@ -107,6 +105,7 @@ print.data_plot <- function(x, ...){
 #'
 #' @inheritParams data_plot
 #' @examples
+#' \dontrun{
 #' library(rstanarm)
 #' library(bayestestR)
 #' library(see)
@@ -126,7 +125,7 @@ print.data_plot <- function(x, ...){
 #'   ggridges::geom_ridgeline_gradient()
 #'
 #' p
-#' p + add_plot_attributes(data)
+#' p + add_plot_attributes(data)}
 #'
 #'
 #' @export
@@ -151,21 +150,38 @@ add_plot_attributes <- function(x){
 
 
 #' @keywords internal
-.retrieve_data <- function(x){
+.retrieve_data <- function(x) {
   # retrieve model
-  data <- tryCatch(
-    {
-      if (!is.null(attr(x, "object_name", exact = TRUE)))
-        get(attributes(x)$object_name, envir = parent.frame())
-      else
-        attr(x, "data", exact = TRUE)
+  obj_name <- attr(x, "object_name", exact = TRUE)
+  dat <- NULL
+
+  if (!is.null(obj_name)) {
+    # first try, parent frame
+    dat <- tryCatch({
+      get(obj_name, envir = parent.frame())
     },
     error = function(e) { NULL }
-  )
+    )
 
-  if (is.null(data)) {
+    if (is.null(dat)) {
+      # second try, global env
+      dat <- tryCatch({
+        get(obj_name, envir = globalenv())
+      },
+      error = function(e) { NULL }
+      )
+
+    }
+  }
+
+  if (is.null(dat)) {
+    dat <- attr(x, "data", exact = TRUE)
+  }
+
+
+  if (is.null(dat)) {
     stop("Failed at retrieving data :( Please provide original model or data through the `data` argument", call. = FALSE)
   }
 
-  data
+  dat
 }
