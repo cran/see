@@ -31,14 +31,19 @@
 #' development and probably not yet available):
 #' \itemize{
 #'   \item \code{bayestestR::bayesfactor_models()}
+#'   \item \code{bayestestR::bayesfactor_parameters()}
 #'   \item \code{bayestestR::bayesfactor_savagedickey()}
 #'   \item \code{bayestestR::ci()}
 #'   \item \code{bayestestR::equivalence_test()}
 #'   \item \code{bayestestR::estimate_density()}
+#'   \item \code{bayestestR::eti()}
 #'   \item \code{bayestestR::hdi()}
+#'   \item \code{bayestestR::map_estimate()}
 #'   \item \code{bayestestR::p_direction()}
+#'   \item \code{bayestestR::point_estimate()}
 #'   \item \code{bayestestR::rope()}
-#'   \item \code{estimate::estimateContrasts()}
+#'   \item \code{estimate::estimate_contrasts()}
+#'   \item \code{parameters::model_parameters()}
 #'   \item \code{performance::binned_residuals()}
 #'   \item \code{performance::check_collinearity()}
 #'   \item \code{performance::check_distribution()}
@@ -50,7 +55,10 @@
 #'   \item \code{performance::performance_roc()}
 #' }
 #'
+#' @seealso \href{https://easystats.github.io/see/articles/}{Package-Vignettes}
+#'
 #' @examples
+#' \dontrun{
 #' library(bayestestR)
 #' library(rstanarm)
 #'
@@ -66,7 +74,6 @@
 #' x <- hdi(model)
 #' plot(x) + theme_modern()
 #'
-#' \dontrun{
 #' data <- rnorm(1000, 1)
 #' x <- p_direction(data)
 #' plot(x)

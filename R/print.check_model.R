@@ -5,16 +5,19 @@ print.see_check_model <- function(x, ...) {
   p <- list()
 
   panel <- attr(x, "panel")
+  check <- attr(x, "check")
   dot_size <- attr(x, "dot_size")
   line_size <- attr(x, "line_size")
   text_size <- attr(x, "text_size")
 
-  if ("VIF" %in% names(x)) p$VIF <- .plot_diag_vif(x$VIF)
-  if ("QQ" %in% names(x)) p$QQ <- .plot_diag_qq(x$QQ, dot_size, line_size)
-  if ("NORM" %in% names(x)) p$NORM <- .plot_diag_norm(x$NORM, line_size)
-  if ("NCV" %in% names(x)) p$NCV <- .plot_diag_ncv(x$NCV, dot_size, line_size)
-  if ("HOMOGENEITY" %in% names(x)) p$HOMOGENEITY <- .plot_diag_homogeneity(x$HOMOGENEITY, dot_size, line_size)
-  if ("OUTLIERS" %in% names(x)) {
+  if (is.null(check)) check <- all
+
+  if ("VIF" %in% names(x) && any(c("vif", "all") %in% check)) p$VIF <- .plot_diag_vif(x$VIF)
+  if ("QQ" %in% names(x) && any(c("qq", "all") %in% check)) p$QQ <- .plot_diag_qq(x$QQ, dot_size, line_size)
+  if ("NORM" %in% names(x) && any(c("normality", "all") %in% check)) p$NORM <- .plot_diag_norm(x$NORM, line_size)
+  if ("NCV" %in% names(x) && any(c("ncv", "all") %in% check)) p$NCV <- .plot_diag_ncv(x$NCV, dot_size, line_size)
+  if ("HOMOGENEITY" %in% names(x) && any(c("homogeneity", "all") %in% check)) p$HOMOGENEITY <- .plot_diag_homogeneity(x$HOMOGENEITY, dot_size, line_size)
+  if ("OUTLIERS" %in% names(x) && any(c("outliers", "all") %in% check)) {
     p$OUTLIERS <- .plot_diag_outliers(x$OUTLIERS, text_size)
     p$OUTLIERS <- p$OUTLIERS +
       theme_lucid(
@@ -24,7 +27,7 @@ print.see_check_model <- function(x, ...) {
       )
   }
 
-  if ("REQQ" %in% names(x)) {
+  if ("REQQ" %in% names(x) && any(c("reqq", "all") %in% check)) {
     ps <- .plot_diag_reqq(x$REQQ, dot_size, line_size)
     for (i in 1:length(ps)) {
       p[[length(p) + 1]] <- ps[[i]]
@@ -46,13 +49,21 @@ print.see_check_model <- function(x, ...) {
 
   # make sure legend is properly sorted
   x$group <- factor(x$group, levels = c("low", "moderate", "high"))
+  colors <- unname(flat_colors("green", "orange", "red"))
+  names(colors) <- c("low", "moderate", "high")
 
-  ggplot(x, aes(x = .data$x, y = .data$y, fill = .data$group)) +
+  p <- ggplot(x, aes(x = .data$x, y = .data$y, fill = .data$group)) +
     geom_col(width = 0.7) +
     labs(title = "Check for Multicollinearity", x = NULL, y = NULL, fill = "Correlation") +
-    scale_fill_manual(values = unname(flat_colors("green", "orange", "red"))) +
+    scale_fill_manual(values = colors) +
     theme_lucid(base_size = 10, plot.title.space = 3, axis.title.space = 5) +
     ylim(c(0, ylim))
+
+  if ("facet" %in% colnames(x)) {
+    p <- p + facet_wrap(~facet, nrow = 1, scales = "free")
+  }
+
+  p
 }
 
 

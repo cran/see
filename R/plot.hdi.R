@@ -1,16 +1,8 @@
 #' @importFrom dplyr group_by mutate ungroup select one_of n
 #' @export
-data_plot.bayestestR_hdi <- function(x, data = NULL, ...){
+data_plot.hdi <- function(x, data = NULL, ...){
   .data_plot_hdi(x, data)
 }
-
-
-
-## TODO remove after bayestestR update 0.3.0
-
-#' @export
-data_plot.hdi <- data_plot.bayestestR_hdi
-
 
 
 #' @keywords internal
@@ -124,6 +116,7 @@ plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, ...) {
       fill = .data$fill
     )) +
     ggridges::geom_ridgeline_gradient() +
+    geom_vline(xintercept = 0, linetype = "dotted") +
     add_plot_attributes(x)
 
   p

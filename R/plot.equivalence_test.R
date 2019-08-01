@@ -79,12 +79,15 @@ plot.see_equivalence_test <- function(x, rope_color = "#0171D3", rope_alpha = .2
   # check for user defined arguments
 
   fill.color <- c("#CD423F", "#018F77", "#FCDA3B")
-  x.title <- sprintf("%i%% Highest Density Region of Posterior Samples", x$CI[1])
+  if (length(unique(tmp$HDI)) > 1)
+    x.title <- "Highest Density Region of Posterior Samples"
+  else
+    x.title <- sprintf("%i%% Highest Density Region of Posterior Samples", x$CI[1])
   legend.title <- "Decision on H0"
   labels <- levels(tmp$predictor)
   names(labels) <- labels
 
-  fill.color <- fill.color[sort(unique(match(x$ROPE_Equivalence, c("accepted", "rejected", "undecided"))))]
+  fill.color <- fill.color[sort(unique(match(x$ROPE_Equivalence, c("Accepted", "Rejected", "Undecided"))))]
 
   add.args <- lapply(match.call(expand.dots = F)$`...`, function(x) x)
   if ("colors" %in% names(add.args)) fill.color <- eval(add.args[["colors"]])

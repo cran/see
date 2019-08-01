@@ -1,13 +1,13 @@
 #' @importFrom dplyr group_by mutate ungroup select one_of n
 #' @export
-data_plot.bayestestR_ci <- function(x, data = NULL, ...){
-  .data_plot_ci(x, data)
+data_plot.eti <- function(x, data = NULL, ...){
+  .data_plot_eti(x, data)
 }
 
 
 
 #' @keywords internal
-.data_plot_ci <- function(x, data=NULL, ...){
+.data_plot_eti <- function(x, data=NULL, ...){
   if (is.null(data)) {
     data <- .retrieve_data(x)
   }
@@ -48,15 +48,9 @@ data_plot.bayestestR_ci <- function(x, data = NULL, ...){
                                  "legend_fill" = "CI",
                                  "title" = "Credible Interval (CI)")
 
-  class(dataplot) <- c("data_plot", "see_ci", class(dataplot))
+  class(dataplot) <- c("data_plot", "see_eti", class(dataplot))
   dataplot
 }
-
-
-## TODO remove after bayestestR update 0.3.0
-
-#' @export
-data_plot.ci <- data_plot.bayestestR_ci
 
 
 #' @importFrom rlang .data
@@ -105,7 +99,7 @@ data_plot.ci <- data_plot.bayestestR_ci
 #' @importFrom ggridges geom_ridgeline_gradient
 #' @importFrom rlang .data
 #' @export
-plot.see_ci <- function(x, data = NULL, show_intercept = FALSE, ...) {
+plot.see_eti <- function(x, data = NULL, show_intercept = FALSE, ...) {
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x, data = data)
   }
@@ -126,4 +120,3 @@ plot.see_ci <- function(x, data = NULL, show_intercept = FALSE, ...) {
 
   p
 }
-
