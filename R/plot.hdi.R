@@ -1,21 +1,44 @@
 #' @importFrom dplyr group_by mutate ungroup select one_of n
 #' @export
-data_plot.hdi <- function(x, data = NULL, ...){
-  .data_plot_hdi(x, data)
+data_plot.hdi <- function(x, data = NULL, show_intercept = FALSE, ...) {
+  .data_plot_hdi(x = x, data = data, show_intercept = show_intercept)
 }
+
+#' @export
+data_plot.bayestestR_hdi <- data_plot.hdi
+
+#' @export
+data_plot.bayestestR_eti <- data_plot.hdi
+
 
 
 #' @keywords internal
-.data_plot_hdi <- function(x, data=NULL, ...){
+.data_plot_hdi <- function(x, data = NULL, parms = NULL, show_intercept = FALSE, ...) {
   if (is.null(data)) {
     data <- .retrieve_data(x)
   }
+
+  if (inherits(x, "bayestestR_hdi")) {
+    legend_title <- "HDI"
+    plot_title <- "Highest Density Interval (HDI)"
+  } else {
+    legend_title <- "CI"
+    plot_title <- "Credible Interval (CI)"
+  }
+
+  if (!is.null(parms))
+    params <- parms
+  else
+    params <- NULL
 
   if (inherits(data, "emmGrid")) {
     if (!requireNamespace("emmeans", quietly = TRUE)) {
       stop("Package 'emmeans' required for this function to work. Please install it.", call. = FALSE)
     }
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
+  } else if (inherits(data, c("stanreg", "brmsfit"))) {
+    params <- insight::clean_parameters(data)
+    data <- as.data.frame(data)
   } else {
     data <- as.data.frame(data)
   }
@@ -25,31 +48,69 @@ data_plot.hdi <- function(x, data = NULL, ...){
     data <- data[, levels_order]
     dataplot <- data.frame()
     for (i in names(data)) {
-      dataplot <- rbind(
-        dataplot,
-        .compute_densities_hdi(data[[i]], hdi = as.data.frame(x[x$Parameter == i, ]), name = i)
-      )
+      if (!is.null(params)) {
+        dataplot <- rbind(
+          dataplot,
+          cbind(
+            .compute_densities_hdi(data[[i]], hdi = as.data.frame(x[x$Parameter == i, ]), name = i),
+            "Effects" = params$Effects[params$Parameter == i],
+            "Component" = params$Component[params$Parameter == i]
+          )
+        )
+      } else {
+        dataplot <- rbind(
+          dataplot,
+          .compute_densities_hdi(data[[i]], hdi = as.data.frame(x[x$Parameter == i, ]), name = i)
+        )
+      }
     }
+
+    if ("Effects" %in% names(dataplot) && "Component" %in% names(dataplot)) {
+      if (length(unique(dataplot$Effects)) == 1 && length(unique(dataplot$Component)) == 1) {
+        dataplot$Effects <- NULL
+        dataplot$Component <- NULL
+      } else {
+        dataplot$Effects <- factor(dataplot$Effects, levels = sort(levels(dataplot$Effects)))
+        dataplot$Component <- factor(dataplot$Component, levels = sort(levels(dataplot$Component)))
+      }
+    }
+
   } else {
     levels_order <- NULL
     dataplot <- .compute_densities_hdi(x = data[, 1], hdi = x, name = "Posterior")
   }
 
-  dataplot <- dataplot %>%
-    dplyr::select(dplyr::one_of("x", "y", "height", "fill"))
+  cn <- intersect(c("x", "y", "height", "fill", "Effects", "Component"), colnames(dataplot))
+  dataplot <- dataplot[, cn, drop = FALSE]
 
   if (!is.null(levels_order)) {
     dataplot$y <- factor(dataplot$y, levels = levels_order)
   }
 
+  groups <- unique(dataplot$y)
+  if (!show_intercept) {
+    dataplot <- .remove_intercept(dataplot, column = "y", show_intercept)
+    groups <- unique(setdiff(groups, .intercepts()))
+  }
+
+  if (length(groups) == 1) {
+    ylab <- groups
+    dataplot$y <- 0
+  } else {
+    ylab <- "Parameters"
+  }
+
+  dataplot <- .fix_facet_names(dataplot)
+
   attr(dataplot, "info") <- list("xlab" = "Possible parameter values",
-                                 "ylab" = "Parameters",
-                                 "legend_fill" = "HDI",
-                                 "title" = "Highest Density Interval (HDI)")
+                                 "ylab" = ylab,
+                                 "legend_fill" = legend_title,
+                                 "title" = plot_title)
 
   class(dataplot) <- c("data_plot", "see_hdi", class(dataplot))
   dataplot
 }
+
 
 
 
@@ -98,13 +159,19 @@ data_plot.hdi <- function(x, data = NULL, ...){
 # Plot --------------------------------------------------------------------
 #' @importFrom ggridges geom_ridgeline_gradient
 #' @importFrom rlang .data
+#' @rdname data_plot
 #' @export
-plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, ...) {
+plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, n_columns = 1, ...) {
   if (!"data_plot" %in% class(x)) {
-    x <- data_plot(x, data = data)
+    x <- data_plot(x, data = data, show_intercept = show_intercept)
   }
 
-  x <- .remove_intercept(x, column = "y", show_intercept)
+  # check if we have multiple panels
+  if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
+      (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) n_columns <- NULL
+
+  # get labels
+  labels <- .clean_parameter_names(x$y, grid = !is.null(n_columns))
 
   p <- x %>%
     as.data.frame() %>%
@@ -119,6 +186,26 @@ plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, ...) {
     geom_vline(xintercept = 0, linetype = "dotted") +
     add_plot_attributes(x)
 
+  if (length(unique(x$y)) == 1  && is.numeric(x$y)) {
+    p <- p + scale_y_continuous(breaks = NULL, labels = NULL)
+  } else {
+    p <- p + scale_y_discrete(labels = labels)
+  }
+
+
+  if (!is.null(n_columns)) {
+    if ("Component" %in% names(x) && "Effects" %in% names(x)) {
+      p <- p + facet_wrap(~ Effects + Component, scales = "free", ncol = n_columns)
+    } else if ("Effects" %in% names(x)) {
+      p <- p + facet_wrap(~ Effects, scales = "free", ncol = n_columns)
+    } else if ("Component" %in% names(x)) {
+      p <- p + facet_wrap(~ Component, scales = "free", ncol = n_columns)
+    }
+  }
+
   p
 }
 
+
+#' @export
+plot.see_eti <- plot.see_hdi

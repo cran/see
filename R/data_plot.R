@@ -6,11 +6,44 @@
 #' functions from different packages of the \href{https://github.com/easystats}{easystats-project}.
 #'
 #' @param x An object.
-#' @param data The original data used to create this object. Can be a statistical model or such.
+#' @param data The original data used to create this object. Can be a
+#'   statistical model or such.
 #' @param show_intercept Logical, if \code{TRUE}, the intercept-parameter is included
 #'   in the plot. By default, it is hidden because in many cases the intercept-parameter
 #'   has a posterior distribution on a very different location, so density curves of
 #'   posterior distributions for other parameters are hardly visible.
+#' @param show_labels Logical, if \code{TRUE}, the text labels for the point
+#'   estimates (i.e. \emph{"Mean"}, \emph{"Median"} and/or \emph{"MAP"}) are shown.
+#'   You may set \code{show_labels = FALSE} in case of overlapping labels, and
+#'   add your own legend or footnote to the plot.
+#' @param priors Logical, if \code{TRUE}, prior distributions are simulated
+#'   (using \code{\link[bayestestR]{simulate_prior}}) and added to the plot.
+#' @param priors_alpha Alpha value of the prior distributions.
+#' @param point_size Size of point-geoms.
+#' @param rope_alpha Transparency level of ROPE ribbon.
+#' @param rope_color Color of ROPE ribbon.
+#' @param n_columns For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.
+#' @param stack Logical, if \code{TRUE}, densities are plotted as stacked lines.
+#'   Else, densities are plotted for each parameter among each other.
+#' @param n_pies Number of pies.
+#' @param value What value to display.
+#' @param log Show log-transformed Bayes factors.
+#' @param text_size Size of text labels.
+#' @param text_color Color of text labels.
+#' @param threshold_coefficient Numeric, threshold at which value coefficients will be displayed.
+#' @param threshold_p Numeric, threshold at which value p-values will be displayed.
+#' @param ci Logical, whether confidence intervals should be added to the plot.
+#' @param size Size of geoms. Ddepends on the context of the \code{plot()} function,
+#'   so this argument may change size of points, lines or bars.
+#' @param panel Logical, if \code{TRUE}, plots are arranged as panels; else,
+#'   single plots are returned.
+#' @param type Character vector, indicating the type of plot (for
+#'   \code{\link[performance]{check_normality}}, \code{parameters::model_parameters.lavaan}
+#'   or \code{\link[parameters]{n_factors}}).
+#' @param prior_odds optional vector of prior odds for the models. See
+#'   \code{BayesFactor::priorOdds}. As the size of the pizza slices corresponds
+#'   to posterior probability (which is a function of prior probability and the BF),
+#'   custom \code{prior_odds} will change the slices' size.
 #' @param ... Arguments passed to or from other methods.
 #'
 #' @details \code{data_plot()} is in most situation not needed when the purpose
@@ -40,10 +73,15 @@
 #'   \item \code{bayestestR::hdi()}
 #'   \item \code{bayestestR::map_estimate()}
 #'   \item \code{bayestestR::p_direction()}
+#'   \item \code{bayestestR::p_significance()}
 #'   \item \code{bayestestR::point_estimate()}
 #'   \item \code{bayestestR::rope()}
 #'   \item \code{estimate::estimate_contrasts()}
+#'   \item \code{parameters::cluster_analysis()}
 #'   \item \code{parameters::model_parameters()}
+#'   \item \code{parameters::n_factors()}
+#'   \item \code{parameters::parameters_simulate()}
+#'   \item \code{parameters::principal_components()}
 #'   \item \code{performance::binned_residuals()}
 #'   \item \code{performance::check_collinearity()}
 #'   \item \code{performance::check_distribution()}

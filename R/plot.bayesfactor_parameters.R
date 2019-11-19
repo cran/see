@@ -1,5 +1,4 @@
 #' @rdname data_plot
-#' @param point_size Size of point-geoms.
 #' @importFrom rlang .data
 #' @export
 plot.see_bayesfactor_parameters <- function(x, point_size = 2, rope_color = "#0171D3", rope_alpha = .2, show_intercept = FALSE, ...) {
@@ -8,21 +7,21 @@ plot.see_bayesfactor_parameters <- function(x, point_size = 2, rope_color = "#01
   hypothesis <- attr(x, "hypothesis")
 
   # if we have intercept-only models, keep at least the intercept
-  intercepts_points <- which(d_points$ind %in% c("Intercept", "(Intercept)", "b_Intercept"))
+  intercepts_points <- which(.in_intercepts(d_points$ind))
   if (length(intercepts_points) &&
       nrow(d_points) > length(intercepts_points) &&
       !show_intercept) {
-    intercepts_data <- which(plot_data$ind %in% c("Intercept", "(Intercept)", "b_Intercept"))
+    intercepts_data <- which(.in_intercepts(plot_data$ind))
     plot_data <- plot_data[-intercepts_data, ]
     d_points <- d_points[-intercepts_points, ]
   }
 
   # make sure point outline matches theme
-  t <- theme_get()
-  if (is.null(t$panel.grid.major$colour))
+  .theme <- theme_get()
+  if (is.null(.theme$panel.grid.major$colour))
     null_point_outline <- "white"
   else
-    null_point_outline <- t$panel.grid.major$colour
+    null_point_outline <- .theme$panel.grid.major$colour
 
   p <- plot_data %>%
     ggplot(aes(
@@ -32,14 +31,17 @@ plot.see_bayesfactor_parameters <- function(x, point_size = 2, rope_color = "#01
       fill = .data$Distribution
     )) +
     geom_line(size = 1) +
-    geom_area(alpha = 0.15) +
+    geom_area(alpha = 0.15, position = "identity") +
     geom_vline(xintercept = hypothesis, linetype = "dashed", colour = "grey50") +
-    facet_wrap(~ind, scales = "free") +
     labs(y = "Density",
          color = "Distribution",
          fill = "Distribution",
          x = "") +
     theme(legend.position = "bottom")
+
+  if (length(unique(plot_data$ind)) > 1) {
+    p <- p + facet_wrap(~ind, scales = "free")
+  }
 
   if (length(hypothesis) > 1) {
     rope <- range(hypothesis)

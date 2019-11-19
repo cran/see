@@ -9,16 +9,6 @@ magrittr::`%>%`
 
 
 
-.remove_intercept <- function(x, column = "Parameter", show_intercept) {
-  if (!show_intercept) {
-    remove <- which(x[[column]] %in% c("Intercept", "(Intercept)", "b_Intercept"))
-    if (length(remove)) x <- x[-remove, ]
-  }
-  x
-}
-
-
-
 .normalize <- function(x) {
   as.vector((x - min(x, na.rm = TRUE)) / diff(range(x, na.rm = TRUE), na.rm = TRUE))
 }
@@ -69,95 +59,83 @@ magrittr::`%>%`
 }
 
 
-## TODO remove once bayestestR >= 0.2.5 is on CRAN
 
-#' @importFrom stats reshape
-.reshape_ci <- function(x) {
+#' @importFrom stats setNames
+.clean_parameter_names <- function(params, grid = FALSE) {
 
+  params <- unique(params)
+  labels <- params
 
-  # Long to wide ----------------
-  if ("CI_low" %in% names(x) & "CI_high" %in% names(x) & "CI" %in% names(x)) {
+  # clean parameters names
+  params <- gsub("(b_|bs_|bsp_|bcs_)(.*)", "\\2", params, perl = TRUE)
+  params <- gsub("^zi_(.*)", "\\1 (Zero-Inflated)", params, perl = TRUE)
+  params <- gsub("(.*)_zi$", "\\1 (Zero-Inflated)", params, perl = TRUE)
+  # clean random effect parameters names
+  params <- gsub("r_(.*)\\.(.*)\\.", "(re) \\1", params)
+  params <- gsub("b\\[\\(Intercept\\) (.*)\\]", "(re) \\1", params)
+  params <- gsub("b\\[(.*) (.*)\\]", "(re) \\2", params)
+  # clean smooth terms
+  params <- gsub("^smooth_sd\\[(.*)\\]", "\\1 (smooth)", params)
+  params <- gsub("^sds_", "\\1 (Smooth)", params)
+  # remove ".1" etc. suffix
+  params <- gsub("(.*)(\\.)(\\d)$", "\\1 \\3", params)
+  # fix zero-inflation part in random effects
+  params <- gsub("(.*)__zi\\s(.*)", "\\1 \\2 (Zero-Inflated)", params, perl = TRUE)
+  # fix temporary random effects token
+  params <- gsub("\\(re\\)\\s(.*)", "\\1 (Random)", params, perl = TRUE)
 
-    ci_position <- which(names(x) == "CI")
+  if (grid) {
+    params <- trimws(gsub("(Zero-Inflated)", "", params, fixed = TRUE))
+    params <- trimws(gsub("(Random)", "", params, fixed = TRUE))
+  } else {
+    params <- gsub("(Zero-Inflated) (Random)", "(Random, Zero-Inflated)", params, fixed = TRUE)
+  }
 
-    # Reshape
-    if (length(unique(x$CI)) > 1) {
-
-      if (!"Parameter" %in% names(x)) {
-        x$Parameter <- x$CI
-        remove_parameter <- TRUE
-      } else {
-        remove_parameter <- FALSE
-      }
-
-      x <- stats::reshape(
-        x,
-        idvar = "Parameter",
-        timevar = "CI",
-        direction = "wide",
-        v.names = c("CI_low", "CI_high"),
-        sep = "_"
-      )
-      row.names(x) <- NULL
-      if (remove_parameter) x$Parameter <- NULL
-    }
-
-    # Replace at the right place
-    ci_colname <- names(x)[c(grepl("CI_low_*", names(x)) | grepl("CI_high_*", names(x)))]
-    colnames_1 <- names(x)[0:(ci_position - 1)][!names(x)[0:(ci_position - 1)] %in% ci_colname]
-    colnames_2 <- names(x)[!names(x) %in% c(ci_colname, colnames_1)]
-    x <- x[c(colnames_1, ci_colname, colnames_2)]
+  stats::setNames(params, labels)
+}
 
 
-    # Wide to long --------------
-  } else{
 
-    if (!"Parameter" %in% names(x)) {
-      x$Parameter <- 1:nrow(x)
-      remove_parameter <- TRUE
+.fix_facet_names <- function(x) {
+  if ("Component" %in% names(x)) {
+    x$Component <- as.character(x$Component)
+    if (!"Effects" %in% names(x)) {
+      x$Component[x$Component == "conditional"] <- "Conditional"
+      x$Component[x$Component == "zero_inflated"] <- "Zero-Inflated"
     } else {
-      remove_parameter <- FALSE
+      x$Component[x$Component == "conditional"] <- "(Conditional)"
+      x$Component[x$Component == "zero_inflated"] <- "(Zero-Inflated)"
     }
+  }
+  if ("Effects" %in% names(x)) {
+    x$Effects <- as.character(x$Effects)
+    x$Effects[x$Effects == "fixed"] <- "Fixed Effects"
+    x$Effects[x$Effects == "random"] <- "Random Effects"
+  }
+  x
+}
 
-    lows <- grepl("CI_low_*", names(x))
-    highs <- grepl("CI_high_*", names(x))
-    ci <- as.numeric(gsub("CI_low_", "", names(x)[lows]))
-    if (paste0(ci, collapse = "-") != paste0(gsub("CI_high_", "", names(x)[highs]), collapse = "-")) {
-      stop("Something went wrong in the CIs reshaping.")
-      return(x)
-    }
-    if (sum(lows) > 1 & sum(highs) > 1) {
-      low <- stats::reshape(
-        x[!highs],
-        direction = "long",
-        varying = list(names(x)[lows]),
-        sep = "_",
-        timevar = "CI",
-        v.names = "CI_low",
-        times = ci
-      )
-      high <- stats::reshape(
-        x[!lows],
-        direction = "long",
-        varying = list(names(x)[highs]),
-        sep = "_",
-        timevar = "CI",
-        v.names = "CI_high",
-        times = ci
-      )
-      x <- merge(low, high)
-      x$id <- NULL
-      x <- x[order(x$Parameter), ]
-      row.names(x) <- NULL
-      if (remove_parameter) x$Parameter <- NULL
-    }
 
-    # Replace at the right place
-    ci_position <- which(lows)[1]
-    ci_colname <- c("CI", "CI_low", "CI_high")
-    colnames_1 <- names(x)[0:(ci_position - 1)][!names(x)[0:(ci_position - 1)] %in% ci_colname]
-    colnames_2 <- names(x)[!names(x) %in% c(ci_colname, colnames_1)]
-    x <- x[c(colnames_1, ci_colname, colnames_2)]
+
+.intercepts <- function() {
+  c("(intercept)_zi", "intercept (zero-inflated)", "intercept", "zi_intercept", "(intercept)", "b_intercept", "b_zi_intercept")
+}
+
+
+.has_intercept <- function(x) {
+  tolower(x) %in% .intercepts() | grepl("^intercept", tolower(x))
+}
+
+
+.in_intercepts <- function(x) {
+  tolower(x) %in% .intercepts() | grepl("^intercept", tolower(x))
+}
+
+
+.remove_intercept <- function(x, column = "Parameter", show_intercept) {
+  if (!show_intercept) {
+    remove <- which(.in_intercepts(x[[column]]))
+    if (length(remove)) x <- x[-remove, ]
   }
   x
 }

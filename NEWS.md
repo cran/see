@@ -1,3 +1,33 @@
+# see 0.3.0
+
+## Breaking changes
+
+* `how_to_plot()` was removed for the time being, due to its inadequate maintainace effort. It might be re-implemented sometime in the future...
+
+## General
+
+* Improved layout (vertical alignment) for some plotting-functions for the **bayestestR**-package, when there was only one parameter. Plots now are closer to the x-axis, removing unnecessary empty space.
+* Labels and plot annotations are now more "human readable", and labelling is more context sensitive.
+
+## New plot-functions
+
+* Added `coord_radar` for radar charts.
+* Added plot-function for `parameters::cluster_analysis()`.
+* Added plot-function for `parameters::principal_components()`.
+* Added plot-function for `parameters::parameters_simulate()`.
+* Added plot-function for `parameters::n_factors()`.
+* Added plot-function for `bayestestR::p_significance()`.
+
+## Changes to functions
+
+* `plot()` for `parameters::model_parameters()` gets a `sort`-argument to sort coefficients.
+* `plot()` for `parameters::model_parameters()` now also create forest plots for meta-analysis.
+* `plot()` for `bayestestR::bayesfactor_parameters()` only plots facets when necessary.
+* `plot()` for `performance::check_outliers()` now also plot multiple methods in one plot.
+* Following `plot()` methods get a `n_columns`-argument, so model components like random effects or a zero-inflation component can be plotted in a multi-column layout: `bayestestR::p_direction()`, `bayestestR::hdi()`, `bayestestR::rope()`, `bayestestR::equivalence_test()`, `parameters::model_parameter()`, `parameters::parameters_simulate()`
+* Following `plot()` methods get `priors` and `priors_alpha` arguments, to add a layer with prior samples to the plot: `bayestestR::p_direction()`, `bayestestR::estimate_density()`, `bayestestR::point_estimate()`
+
+
 # see 0.2.1
 
 ## General

@@ -35,7 +35,7 @@ data_plot.parameters_sem <- function(x, data = NULL, type = c("regression", "cor
         "% CI [",
         sprintf("%.2f, %.2f]", .data$CI_low, .data$CI_high)))
   } else {
-    edges <- dplyr::mutate(edges, Label = sprintf("%.2f, ", .data$Coefficient))
+    edges <- dplyr::mutate(edges, Label = sprintf("%.2f", .data$Coefficient))
   }
 
 
@@ -72,13 +72,10 @@ data_plot.parameters_sem <- function(x, data = NULL, type = c("regression", "cor
 
 
 # Plot --------------------------------------------------------------------
-#' @param threshold_coefficient Numeric, threshold at which value coefficients will be displayed.
-#' @param threshold_p Numeric, threshold at which value p-values will be displayed.
-#' @param ci Logical, whether confidence intervals should be added to the plot.
 #' @importFrom rlang .data
 #' @rdname data_plot
 #' @export
-plot.see_parameters_sem <- function(x, data = NULL, type = c("regression", "correlation", "loading"), threshold_coefficient = NULL, threshold_p = NULL, ci = TRUE, ...){
+plot.see_parameters_sem <- function(x, data = NULL, type = c("regression", "correlation", "loading"), threshold_coefficient = NULL, threshold_p = NULL, ci = TRUE, size = 22, ...) {
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x, type = type, threshold_coefficient = threshold_coefficient, threshold_p = threshold_p, ci = ci, ...)
   }
@@ -96,7 +93,7 @@ plot.see_parameters_sem <- function(x, data = NULL, type = c("regression", "corr
     ggraph::geom_edge_arc(aes(alpha = as.numeric(.data$Type == "Correlation"),
                       label = .data$Label_Correlation,
                       color = .data$Coefficient),
-                      curvature = 0.1,
+                      strength = 0.1,
                       label_dodge = unit(2, "mm"),
                       linetype = 2, angle_calc = "along",
                       label_size = 3,
@@ -110,7 +107,7 @@ plot.see_parameters_sem <- function(x, data = NULL, type = c("regression", "corr
                        check_overlap = TRUE,
                        arrow = arrow(type = "closed", length = unit(3, "mm")),
                        start_cap = ggraph::circle(12, 'mm'), end_cap = ggraph::circle(12, 'mm')) +
-    ggraph::geom_node_point(aes(colour = .data$Latent), size = 30) +
+    ggraph::geom_node_point(aes(colour = .data$Latent), size = size) +
     ggraph::geom_node_text(aes(label = .data$Name))  +
     ggraph::scale_edge_colour_gradient2(
       guide = FALSE,
