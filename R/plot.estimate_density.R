@@ -15,6 +15,10 @@ data_plot.estimate_density <- function(x, data = NULL, ...) {
 
   dataplot <- .fix_facet_names(dataplot)
 
+  dataplot$Parameter <- factor(dataplot$Parameter)
+  dataplot$Parameter <- factor(dataplot$Parameter, levels = rev(levels(dataplot$Parameter)))
+
+
   attr(dataplot, "info") <- list("xlab" = "Values",
                                  "ylab" = "Density",
                                  "legend_fill" = "Parameter",
@@ -99,6 +103,11 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
     p <- p + scale_y_continuous(breaks = NULL, labels = NULL)
   } else {
     p <- p + scale_y_discrete(labels = labels)
+  }
+
+
+  if (length(unique(x$Parameter)) == 1) {
+    p <- p + guides(color = FALSE)
   }
 
 

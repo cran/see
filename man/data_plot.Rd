@@ -2,11 +2,12 @@
 % Please edit documentation in R/data_plot.R, R/plot.bayesfactor_models.R,
 %   R/plot.bayesfactor_parameters.R, R/plot.check_distribution.R,
 %   R/plot.check_normality.R, R/plot.check_outliers.R,
-%   R/plot.cluster_analysis.R, R/plot.equivalence_test.R,
-%   R/plot.estimate_density.R, R/plot.hdi.R, R/plot.n_factors.R,
-%   R/plot.p_direction.R, R/plot.p_significance.R, R/plot.parameters_model.R,
-%   R/plot.parameters_pca.R, R/plot.parameters_sem.R,
-%   R/plot.parameters_simulate.R, R/plot.point_estimates.R, R/plot.rope.R
+%   R/plot.cluster_analysis.R, R/plot.compare_performance.R,
+%   R/plot.equivalence_test.R, R/plot.estimate_density.R, R/plot.hdi.R,
+%   R/plot.n_factors.R, R/plot.p_direction.R, R/plot.p_significance.R,
+%   R/plot.parameters_model.R, R/plot.parameters_pca.R, R/plot.parameters_sem.R,
+%   R/plot.parameters_simulate.R, R/plot.point_estimates.R, R/plot.rope.R,
+%   R/plot.si.R
 \name{data_plot}
 \alias{data_plot}
 \alias{plot.see_bayesfactor_models}
@@ -15,6 +16,7 @@
 \alias{plot.see_check_normality}
 \alias{plot.see_check_outliers}
 \alias{plot.see_cluster_analysis}
+\alias{plot.see_compare_performance}
 \alias{plot.see_equivalence_test}
 \alias{plot.see_estimate_density}
 \alias{plot.see_hdi}
@@ -27,70 +29,154 @@
 \alias{plot.see_parameters_simulate}
 \alias{plot.see_point_estimate}
 \alias{plot.see_rope}
+\alias{plot.see_si}
 \title{Prepare objects for plotting or plot objects}
 \usage{
 data_plot(x, data = NULL, ...)
 
-\method{plot}{see_bayesfactor_models}(x, n_pies = c("one", "many"),
-  value = c("none", "BF", "probability"), log = FALSE,
-  prior_odds = NULL, ...)
+\method{plot}{see_bayesfactor_models}(
+  x,
+  n_pies = c("one", "many"),
+  value = c("none", "BF", "probability"),
+  sort = FALSE,
+  log = FALSE,
+  prior_odds = NULL,
+  ...
+)
 
-\method{plot}{see_bayesfactor_parameters}(x, point_size = 2,
-  rope_color = "#0171D3", rope_alpha = 0.2, show_intercept = FALSE,
-  ...)
+\method{plot}{see_bayesfactor_parameters}(
+  x,
+  point_size = 2,
+  rope_color = "#0171D3",
+  rope_alpha = 0.2,
+  show_intercept = FALSE,
+  ...
+)
 
-\method{plot}{see_check_distribution}(x, point_size = 2, panel = TRUE,
-  ...)
+\method{plot}{see_check_distribution}(x, point_size = 2, panel = TRUE, ...)
 
-\method{plot}{see_check_normality}(x, type = c("density", "qq", "pp"),
-  data = NULL, ...)
+\method{plot}{see_check_normality}(x, type = c("density", "qq", "pp"), data = NULL, ...)
 
 \method{plot}{see_check_outliers}(x, text_size = 3.5, ...)
 
-\method{plot}{see_cluster_analysis}(x, data = NULL, n_columns = NULL,
-  size = 0.6, ...)
+\method{plot}{see_cluster_analysis}(x, data = NULL, n_columns = NULL, size = 0.6, ...)
 
-\method{plot}{see_equivalence_test}(x, rope_color = "#0171D3",
-  rope_alpha = 0.2, show_intercept = FALSE, n_columns = 1, ...)
+\method{plot}{see_compare_performance}(x, size = 1, ...)
 
-\method{plot}{see_estimate_density}(x, stack = TRUE,
-  show_intercept = FALSE, n_columns = 1, priors = FALSE,
-  priors_alpha = 0.4, size = 0.9, ...)
+\method{plot}{see_equivalence_test}(
+  x,
+  rope_color = "#0171D3",
+  rope_alpha = 0.2,
+  show_intercept = FALSE,
+  n_columns = 1,
+  ...
+)
 
-\method{plot}{see_hdi}(x, data = NULL, show_intercept = FALSE,
-  n_columns = 1, ...)
+\method{plot}{see_estimate_density}(
+  x,
+  stack = TRUE,
+  show_intercept = FALSE,
+  n_columns = 1,
+  priors = FALSE,
+  priors_alpha = 0.4,
+  size = 0.9,
+  ...
+)
 
-\method{plot}{see_n_factors}(x, data = NULL, type = c("bar", "line",
-  "area"), size = 1, ...)
+\method{plot}{see_hdi}(
+  x,
+  data = NULL,
+  show_intercept = FALSE,
+  show_zero = TRUE,
+  show_title = TRUE,
+  n_columns = 1,
+  ...
+)
 
-\method{plot}{see_p_direction}(x, data = NULL, show_intercept = FALSE,
-  priors = FALSE, priors_alpha = 0.4, n_columns = 1, ...)
+\method{plot}{see_n_factors}(x, data = NULL, type = c("bar", "line", "area"), size = 1, ...)
 
-\method{plot}{see_p_significance}(x, data = NULL,
-  show_intercept = FALSE, priors = FALSE, priors_alpha = 0.4,
-  n_columns = 1, ...)
+\method{plot}{see_p_direction}(
+  x,
+  data = NULL,
+  show_intercept = FALSE,
+  priors = FALSE,
+  priors_alpha = 0.4,
+  n_columns = 1,
+  ...
+)
 
-\method{plot}{see_parameters_model}(x, show_intercept = FALSE,
-  point_size = 0.8, sort = NULL, n_columns = NULL, ...)
+\method{plot}{see_p_significance}(
+  x,
+  data = NULL,
+  show_intercept = FALSE,
+  priors = FALSE,
+  priors_alpha = 0.4,
+  n_columns = 1,
+  ...
+)
 
-\method{plot}{see_parameters_pca}(x, type = c("bar", "line"),
-  text_size = 3.5, text_color = "black", size = 1, ...)
+\method{plot}{see_parameters_model}(
+  x,
+  show_intercept = FALSE,
+  point_size = 0.8,
+  sort = NULL,
+  n_columns = NULL,
+  ...
+)
 
-\method{plot}{see_parameters_sem}(x, data = NULL,
+\method{plot}{see_parameters_pca}(
+  x,
+  type = c("bar", "line"),
+  text_size = 3.5,
+  text_color = "black",
+  size = 1,
+  ...
+)
+
+\method{plot}{see_parameters_sem}(
+  x,
+  data = NULL,
   type = c("regression", "correlation", "loading"),
-  threshold_coefficient = NULL, threshold_p = NULL, ci = TRUE,
-  size = 22, ...)
+  threshold_coefficient = NULL,
+  threshold_p = NULL,
+  ci = TRUE,
+  size = 22,
+  ...
+)
 
-\method{plot}{see_parameters_simulate}(x, data = NULL, stack = TRUE,
-  show_intercept = FALSE, n_columns = NULL, ...)
+\method{plot}{see_parameters_simulate}(
+  x,
+  data = NULL,
+  stack = TRUE,
+  show_intercept = FALSE,
+  n_columns = NULL,
+  ...
+)
 
-\method{plot}{see_point_estimate}(x, data = NULL, point_size = 2,
-  text_size = 3.5, panel = TRUE, show_labels = TRUE,
-  show_intercept = FALSE, priors = FALSE, priors_alpha = 0.4, ...)
+\method{plot}{see_point_estimate}(
+  x,
+  data = NULL,
+  point_size = 2,
+  text_size = 3.5,
+  panel = TRUE,
+  show_labels = TRUE,
+  show_intercept = FALSE,
+  priors = FALSE,
+  priors_alpha = 0.4,
+  ...
+)
 
-\method{plot}{see_rope}(x, data = NULL, rope_alpha = 0.5,
-  rope_color = "cadetblue", show_intercept = FALSE, n_columns = 1,
-  ...)
+\method{plot}{see_rope}(
+  x,
+  data = NULL,
+  rope_alpha = 0.5,
+  rope_color = "cadetblue",
+  show_intercept = FALSE,
+  n_columns = 1,
+  ...
+)
+
+\method{plot}{see_si}(x, si_color = "#0171D3", si_alpha = 0.2, show_intercept = FALSE, ...)
 }
 \arguments{
 \item{x}{An object.}
@@ -104,6 +190,15 @@ statistical model or such.}
 
 \item{value}{What value to display.}
 
+\item{sort}{\describe{
+  \item{Plotting model parameters}{
+  If \code{NULL}, coefficients are plotted in the order as they appear in the summary. Use \code{sort = "ascending"} (or \code{sort = TRUE})) resp. \code{sort = "descending"} to sort coefficients in ascending or descending order.
+  }
+  \item{Plotting Bayes factors}{
+  Sort pie-slices by posterior probability (descending)?
+  }
+}}
+
 \item{log}{Show log-transformed Bayes factors.}
 
 \item{prior_odds}{optional vector of prior odds for the models. See
@@ -113,9 +208,9 @@ custom \code{prior_odds} will change the slices' size.}
 
 \item{point_size}{Size of point-geoms.}
 
-\item{rope_color}{Color of ROPE ribbon.}
+\item{rope_color, si_color}{Color of ROPE/SI ribbon.}
 
-\item{rope_alpha}{Transparency level of ROPE ribbon.}
+\item{rope_alpha, si_alpha}{Transparency level of ROPE/SI ribbon.}
 
 \item{show_intercept}{Logical, if \code{TRUE}, the intercept-parameter is included
 in the plot. By default, it is hidden because in many cases the intercept-parameter
@@ -144,7 +239,9 @@ Else, densities are plotted for each parameter among each other.}
 
 \item{priors_alpha}{Alpha value of the prior distributions.}
 
-\item{sort}{If \code{NULL}, coefficients are plotted in the order as they appear in the summary. Use \code{sort = "ascending"} (or \code{sort = TRUE})) resp. \code{sort = "descending"} to sort coefficients in ascending or descending order.}
+\item{show_zero}{Logical, if \code{TRUE}, will add a vertical (dotted) line at 0.}
+
+\item{show_title}{Logical, if \code{TRUE}, will show the title of the plot.}
 
 \item{text_color}{Color of text labels.}
 
@@ -195,7 +292,8 @@ development and probably not yet available):
   \item \code{bayestestR::p_significance()}
   \item \code{bayestestR::point_estimate()}
   \item \code{bayestestR::rope()}
-  \item \code{estimate::estimate_contrasts()}
+  \item \code{bayestestR::si()}
+  \item \code{modelbased::estimate_contrasts()}
   \item \code{parameters::cluster_analysis()}
   \item \code{parameters::model_parameters()}
   \item \code{parameters::n_factors()}
@@ -209,6 +307,7 @@ development and probably not yet available):
   \item \code{performance::check_model()}
   \item \code{performance::check_normality()}
   \item \code{performance::check_outliers()}
+  \item \code{performance::compare_performance()}
   \item \code{performance::performance_roc()}
 }
 }

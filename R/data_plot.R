@@ -16,17 +16,27 @@
 #'   estimates (i.e. \emph{"Mean"}, \emph{"Median"} and/or \emph{"MAP"}) are shown.
 #'   You may set \code{show_labels = FALSE} in case of overlapping labels, and
 #'   add your own legend or footnote to the plot.
+#' @param show_zero Logical, if \code{TRUE}, will add a vertical (dotted) line at 0.
+#' @param show_title Logical, if \code{TRUE}, will show the title of the plot.
 #' @param priors Logical, if \code{TRUE}, prior distributions are simulated
 #'   (using \code{\link[bayestestR]{simulate_prior}}) and added to the plot.
 #' @param priors_alpha Alpha value of the prior distributions.
 #' @param point_size Size of point-geoms.
-#' @param rope_alpha Transparency level of ROPE ribbon.
-#' @param rope_color Color of ROPE ribbon.
+#' @param rope_alpha,si_alpha Transparency level of ROPE/SI ribbon.
+#' @param rope_color,si_color Color of ROPE/SI ribbon.
 #' @param n_columns For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.
 #' @param stack Logical, if \code{TRUE}, densities are plotted as stacked lines.
 #'   Else, densities are plotted for each parameter among each other.
 #' @param n_pies Number of pies.
 #' @param value What value to display.
+#' @param sort \describe{
+#'   \item{Plotting model parameters}{
+#'   If \code{NULL}, coefficients are plotted in the order as they appear in the summary. Use \code{sort = "ascending"} (or \code{sort = TRUE})) resp. \code{sort = "descending"} to sort coefficients in ascending or descending order.
+#'   }
+#'   \item{Plotting Bayes factors}{
+#'   Sort pie-slices by posterior probability (descending)?
+#'   }
+#' }
 #' @param log Show log-transformed Bayes factors.
 #' @param text_size Size of text labels.
 #' @param text_color Color of text labels.
@@ -76,7 +86,8 @@
 #'   \item \code{bayestestR::p_significance()}
 #'   \item \code{bayestestR::point_estimate()}
 #'   \item \code{bayestestR::rope()}
-#'   \item \code{estimate::estimate_contrasts()}
+#'   \item \code{bayestestR::si()}
+#'   \item \code{modelbased::estimate_contrasts()}
 #'   \item \code{parameters::cluster_analysis()}
 #'   \item \code{parameters::model_parameters()}
 #'   \item \code{parameters::n_factors()}
@@ -90,6 +101,7 @@
 #'   \item \code{performance::check_model()}
 #'   \item \code{performance::check_normality()}
 #'   \item \code{performance::check_outliers()}
+#'   \item \code{performance::compare_performance()}
 #'   \item \code{performance::performance_roc()}
 #' }
 #'

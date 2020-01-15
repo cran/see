@@ -1,3 +1,24 @@
+# see 0.4.0
+
+## Breaking changes
+
+* Arguments `ncol` and `nrow` in `plots()` were renamed into `n_columns` and `n_rows` to be consistent with arguments from other functions in the **see**-package.
+
+## New plot-functions
+
+* Added plot-function for `performance::compare_performance()`.
+* Added plot-function for `bayestestR::si()`.
+
+## Changes to functions
+
+* `plot()`-functions for the [**bayestestR**-package](https://easystats.github.io/see/articles/bayestestR.html) now also support `BFBayesFactor` and `MCMCglmm` objects.
+* `plot()` for `parameters::model_parameters()` now uses fixed axis for facets when model is an ordinal or cumulative link model (because all facets are on the same scale, and thus parameters are easier to compare).
+
+## Bug fixes
+
+* Fixed issue with group coloring for `parameters::model_parameters()` when `exponentiate = TRUE`.
+* Fixes issue with `plot.point_estimate()` for vectors.
+
 # see 0.3.0
 
 ## Breaking changes

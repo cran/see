@@ -11,14 +11,24 @@ data_plot.point_estimate <- function(x, data = NULL, ...) {
     }
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
   } else if (inherits(data, c("stanreg", "brmsfit"))) {
-    params <- insight::clean_parameters(data)
     data <- insight::get_parameters(data, effects = "all", component = "all")
+  } else if (inherits(data, "BFBayesFactor")) {
+    data <- insight::get_parameters(data)
+  } else if (inherits(data, "MCMCglmm")) {
+    nF <- data$Fixed$nfl
+    data <- as.data.frame(data$Sol[, 1:nF, drop = FALSE])
   } else {
     data <- as.data.frame(data)
   }
 
   data <- tryCatch(
-    {data[, x$Parameter]},
+    {
+      if (!is.null(x$Parameter)) {
+        data[, x$Parameter, drop = FALSE]
+      } else {
+        data
+      }
+    },
     error = function(e) {data}
   )
 

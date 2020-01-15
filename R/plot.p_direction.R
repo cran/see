@@ -15,14 +15,20 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...){
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
   } else if (inherits(data, c("stanreg", "brmsfit"))) {
     params <- insight::clean_parameters(data)
-    data <- as.data.frame(data)
+    data <- as.data.frame(data, optional = FALSE)
+  } else if (inherits(data, "BFBayesFactor")) {
+    data <- insight::get_parameters(data)
+  } else if (inherits(data, "MCMCglmm")) {
+    params <- insight::clean_parameters(data)
+    nF <- data$Fixed$nfl
+    data <- as.data.frame(data$Sol[, 1:nF, drop = FALSE])
   } else {
     data <- as.data.frame(data)
   }
 
   if (ncol(data) > 1) {
     levels_order <- rev(x$Parameter)
-    data <- data[, x$Parameter]
+    data <- data[, x$Parameter, drop = FALSE]
     dataplot <- data.frame()
     for (i in names(data)) {
       if (!is.null(params)) {
