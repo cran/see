@@ -3,9 +3,10 @@
 %   R/plot.bayesfactor_parameters.R, R/plot.check_distribution.R,
 %   R/plot.check_normality.R, R/plot.check_outliers.R,
 %   R/plot.cluster_analysis.R, R/plot.compare_performance.R,
-%   R/plot.equivalence_test.R, R/plot.estimate_density.R, R/plot.hdi.R,
-%   R/plot.n_factors.R, R/plot.p_direction.R, R/plot.p_significance.R,
-%   R/plot.parameters_model.R, R/plot.parameters_pca.R, R/plot.parameters_sem.R,
+%   R/plot.easycorrelation.R, R/plot.equivalence_test.R,
+%   R/plot.estimate_density.R, R/plot.hdi.R, R/plot.n_factors.R,
+%   R/plot.p_direction.R, R/plot.p_significance.R, R/plot.parameters_model.R,
+%   R/plot.parameters_pca.R, R/plot.parameters_sem.R,
 %   R/plot.parameters_simulate.R, R/plot.point_estimates.R, R/plot.rope.R,
 %   R/plot.si.R
 \name{data_plot}
@@ -17,6 +18,7 @@
 \alias{plot.see_check_outliers}
 \alias{plot.see_cluster_analysis}
 \alias{plot.see_compare_performance}
+\alias{plot.see_easycorrelation}
 \alias{plot.see_equivalence_test}
 \alias{plot.see_estimate_density}
 \alias{plot.see_hdi}
@@ -62,6 +64,8 @@ data_plot(x, data = NULL, ...)
 \method{plot}{see_cluster_analysis}(x, data = NULL, n_columns = NULL, size = 0.6, ...)
 
 \method{plot}{see_compare_performance}(x, size = 1, ...)
+
+\method{plot}{see_easycorrelation}(x, size = 22, text_color = "white", node_color = "#647687", ...)
 
 \method{plot}{see_equivalence_test}(
   x,
@@ -176,7 +180,14 @@ data_plot(x, data = NULL, ...)
   ...
 )
 
-\method{plot}{see_si}(x, si_color = "#0171D3", si_alpha = 0.2, show_intercept = FALSE, ...)
+\method{plot}{see_si}(
+  x,
+  si_color = "#0171D3",
+  si_alpha = 0.2,
+  show_intercept = FALSE,
+  support_only = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{An object.}
@@ -228,8 +239,12 @@ or \code{\link[parameters]{n_factors}}).}
 
 \item{n_columns}{For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.}
 
-\item{size}{Size of geoms. Ddepends on the context of the \code{plot()} function,
+\item{size}{Size of geoms. Depends on the context of the \code{plot()} function,
 so this argument may change size of points, lines or bars.}
+
+\item{text_color}{Color of text labels.}
+
+\item{node_color}{Color of node- or circle-geoms.}
 
 \item{stack}{Logical, if \code{TRUE}, densities are plotted as stacked lines.
 Else, densities are plotted for each parameter among each other.}
@@ -243,8 +258,6 @@ Else, densities are plotted for each parameter among each other.}
 
 \item{show_title}{Logical, if \code{TRUE}, will show the title of the plot.}
 
-\item{text_color}{Color of text labels.}
-
 \item{threshold_coefficient}{Numeric, threshold at which value coefficients will be displayed.}
 
 \item{threshold_p}{Numeric, threshold at which value p-values will be displayed.}
@@ -255,6 +268,8 @@ Else, densities are plotted for each parameter among each other.}
 estimates (i.e. \emph{"Mean"}, \emph{"Median"} and/or \emph{"MAP"}) are shown.
 You may set \code{show_labels = FALSE} in case of overlapping labels, and
 add your own legend or footnote to the plot.}
+
+\item{support_only}{Plot only the support data, or show the "raw" prior and posterior distributions? Only applies when plotting \code{\link[bayestestR]{si}}.}
 }
 \description{
 \code{data_plot()} attempts to extract and tranform an object
@@ -281,7 +296,6 @@ development and probably not yet available):
 \itemize{
   \item \code{bayestestR::bayesfactor_models()}
   \item \code{bayestestR::bayesfactor_parameters()}
-  \item \code{bayestestR::bayesfactor_savagedickey()}
   \item \code{bayestestR::ci()}
   \item \code{bayestestR::equivalence_test()}
   \item \code{bayestestR::estimate_density()}
@@ -293,11 +307,12 @@ development and probably not yet available):
   \item \code{bayestestR::point_estimate()}
   \item \code{bayestestR::rope()}
   \item \code{bayestestR::si()}
+  \item \code{correlation::correlation()}
   \item \code{modelbased::estimate_contrasts()}
   \item \code{parameters::cluster_analysis()}
   \item \code{parameters::model_parameters()}
   \item \code{parameters::n_factors()}
-  \item \code{parameters::parameters_simulate()}
+  \item \code{parameters::simulate_parameters()}
   \item \code{parameters::principal_components()}
   \item \code{performance::binned_residuals()}
   \item \code{performance::check_collinearity()}
@@ -314,35 +329,36 @@ development and probably not yet available):
 \examples{
 \dontrun{
 library(bayestestR)
-library(rstanarm)
+if (require("rstanarm")) {
+  model <- stan_glm(
+    Sepal.Length ~ Petal.Width * Species,
+    data = iris,
+    chains = 2, iter = 200
+  )
 
-model <- stan_glm(
-  Sepal.Length ~ Petal.Width * Species,
-  data = iris,
-  chains = 2, iter = 200
-)
+  x <- rope(model)
+  plot(x)
 
-x <- rope(model)
-plot(x)
+  x <- hdi(model)
+  plot(x) + theme_modern()
 
-x <- hdi(model)
-plot(x) + theme_modern()
+  data <- rnorm(1000, 1)
+  x <- p_direction(data)
+  plot(x)
 
-data <- rnorm(1000, 1)
-x <- p_direction(data)
-plot(x)
+  x <- p_direction(model)
+  plot(x)
 
-x <- p_direction(model)
-plot(x)
-
-model <- stan_glm(
-  mpg ~ wt + gear + cyl + disp,
-  chains = 2,
-  iter = 200,
-  data = mtcars
-)
-x <- equivalence_test(model)
-plot(x)}
+  model <- stan_glm(
+    mpg ~ wt + gear + cyl + disp,
+    chains = 2,
+    iter = 200,
+    data = mtcars
+  )
+  x <- equivalence_test(model)
+  plot(x)
+}
+}
 
 library(bayestestR)
 library(see)
@@ -356,7 +372,6 @@ result <- bayesfactor_models(lm1, lm2, lm3, denominator = lm0)
 
 plot(result, n_pies = "one", value = "probability") + theme_modern() +
   scale_fill_pizza(reverse = TRUE)
-
 }
 \seealso{
 \href{https://easystats.github.io/see/articles/}{Package-Vignettes}

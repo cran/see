@@ -24,6 +24,7 @@
 #' @param point_size Size of point-geoms.
 #' @param rope_alpha,si_alpha Transparency level of ROPE/SI ribbon.
 #' @param rope_color,si_color Color of ROPE/SI ribbon.
+#' @param support_only Plot only the support data, or show the "raw" prior and posterior distributions? Only applies when plotting \code{\link[bayestestR]{si}}.
 #' @param n_columns For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.
 #' @param stack Logical, if \code{TRUE}, densities are plotted as stacked lines.
 #'   Else, densities are plotted for each parameter among each other.
@@ -37,13 +38,14 @@
 #'   Sort pie-slices by posterior probability (descending)?
 #'   }
 #' }
+#' @param node_color Color of node- or circle-geoms.
 #' @param log Show log-transformed Bayes factors.
 #' @param text_size Size of text labels.
 #' @param text_color Color of text labels.
 #' @param threshold_coefficient Numeric, threshold at which value coefficients will be displayed.
 #' @param threshold_p Numeric, threshold at which value p-values will be displayed.
 #' @param ci Logical, whether confidence intervals should be added to the plot.
-#' @param size Size of geoms. Ddepends on the context of the \code{plot()} function,
+#' @param size Size of geoms. Depends on the context of the \code{plot()} function,
 #'   so this argument may change size of points, lines or bars.
 #' @param panel Logical, if \code{TRUE}, plots are arranged as panels; else,
 #'   single plots are returned.
@@ -75,7 +77,6 @@
 #' \itemize{
 #'   \item \code{bayestestR::bayesfactor_models()}
 #'   \item \code{bayestestR::bayesfactor_parameters()}
-#'   \item \code{bayestestR::bayesfactor_savagedickey()}
 #'   \item \code{bayestestR::ci()}
 #'   \item \code{bayestestR::equivalence_test()}
 #'   \item \code{bayestestR::estimate_density()}
@@ -87,11 +88,12 @@
 #'   \item \code{bayestestR::point_estimate()}
 #'   \item \code{bayestestR::rope()}
 #'   \item \code{bayestestR::si()}
+#'   \item \code{correlation::correlation()}
 #'   \item \code{modelbased::estimate_contrasts()}
 #'   \item \code{parameters::cluster_analysis()}
 #'   \item \code{parameters::model_parameters()}
 #'   \item \code{parameters::n_factors()}
-#'   \item \code{parameters::parameters_simulate()}
+#'   \item \code{parameters::simulate_parameters()}
 #'   \item \code{parameters::principal_components()}
 #'   \item \code{performance::binned_residuals()}
 #'   \item \code{performance::check_collinearity()}
@@ -110,35 +112,36 @@
 #' @examples
 #' \dontrun{
 #' library(bayestestR)
-#' library(rstanarm)
+#' if (require("rstanarm")) {
+#'   model <- stan_glm(
+#'     Sepal.Length ~ Petal.Width * Species,
+#'     data = iris,
+#'     chains = 2, iter = 200
+#'   )
 #'
-#' model <- stan_glm(
-#'   Sepal.Length ~ Petal.Width * Species,
-#'   data = iris,
-#'   chains = 2, iter = 200
-#' )
+#'   x <- rope(model)
+#'   plot(x)
 #'
-#' x <- rope(model)
-#' plot(x)
+#'   x <- hdi(model)
+#'   plot(x) + theme_modern()
 #'
-#' x <- hdi(model)
-#' plot(x) + theme_modern()
+#'   data <- rnorm(1000, 1)
+#'   x <- p_direction(data)
+#'   plot(x)
 #'
-#' data <- rnorm(1000, 1)
-#' x <- p_direction(data)
-#' plot(x)
+#'   x <- p_direction(model)
+#'   plot(x)
 #'
-#' x <- p_direction(model)
-#' plot(x)
-#'
-#' model <- stan_glm(
-#'   mpg ~ wt + gear + cyl + disp,
-#'   chains = 2,
-#'   iter = 200,
-#'   data = mtcars
-#' )
-#' x <- equivalence_test(model)
-#' plot(x)}
+#'   model <- stan_glm(
+#'     mpg ~ wt + gear + cyl + disp,
+#'     chains = 2,
+#'     iter = 200,
+#'     data = mtcars
+#'   )
+#'   x <- equivalence_test(model)
+#'   plot(x)
+#' }
+#' }
 #'
 #' @export
 data_plot <- function(x, data = NULL, ...){
@@ -183,8 +186,6 @@ print.data_plot <- function(x, ...){
 #'
 #' p
 #' p + add_plot_attributes(data)}
-#'
-#'
 #' @export
 add_plot_attributes <- function(x){
   info <- attributes(x)$info

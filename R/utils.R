@@ -102,9 +102,11 @@ magrittr::`%>%`
     if (!"Effects" %in% names(x)) {
       x$Component[x$Component == "conditional"] <- "Conditional"
       x$Component[x$Component == "zero_inflated"] <- "Zero-Inflated"
+      x$Component[x$Component == "simplex"] <- "Monotonic Effects"
     } else {
       x$Component[x$Component == "conditional"] <- "(Conditional)"
       x$Component[x$Component == "zero_inflated"] <- "(Zero-Inflated)"
+      x$Component[x$Component == "simplex"] <- "(Monotonic Effects)"
     }
   }
   if ("Effects" %in% names(x)) {
@@ -138,4 +140,12 @@ magrittr::`%>%`
     if (length(remove)) x <- x[-remove, ]
   }
   x
+}
+
+
+
+
+#' @importFrom insight format_value
+.percents <- function(x) {
+  insight::format_value(x = x, as_percent = TRUE, digits = 0)
 }

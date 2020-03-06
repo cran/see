@@ -1,5 +1,4 @@
 #' @importFrom insight clean_parameters
-#' @importFrom dplyr group_by mutate ungroup select one_of n
 #' @export
 data_plot.estimate_density <- function(x, data = NULL, ...) {
   dataplot <- x
@@ -65,8 +64,9 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
   x <- .remove_intercept(x, show_intercept = show_intercept)
 
   if (stack == TRUE) {
-    p <- x %>%
-      ggplot(aes(
+    p <- ggplot(
+      x,
+      aes(
         x = .data$x,
         y = .data$y,
         color = .data$Parameter
@@ -75,8 +75,9 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
       add_plot_attributes(x) +
       scale_color_flat(labels = labels)
   } else {
-    p <- x %>%
-      ggplot(aes(
+    p <- ggplot(
+      x,
+      aes(
         x = .data$x,
         y = .data$Parameter,
         height = .data$y

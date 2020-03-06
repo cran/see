@@ -1,7 +1,6 @@
 #' @importFrom graphics plot
 #' @importFrom insight get_response
 #' @importFrom stats residuals density
-#' @importFrom gridExtra grid.arrange
 #' @rdname data_plot
 #' @export
 plot.see_check_distribution <- function(x, point_size = 2, panel = TRUE, ...) {
@@ -29,7 +28,7 @@ plot.see_check_distribution <- function(x, point_size = 2, panel = TRUE, ...) {
     geom_point(size = point_size, position = position_dodge(.4)) +
     coord_flip() +
     labs(x = NULL, y = NULL, fill = NULL, colour = NULL, title = "Predicted Distribution of Residuals and Response") +
-    scale_y_continuous(labels = scales::percent, expand = c(0, 0), limits = c(0, max_y)) +
+    scale_y_continuous(labels = .percents, expand = c(0, 0), limits = c(0, max_y)) +
     scale_color_material_d() +
     theme_lucid(legend.position = lp)
 
@@ -53,6 +52,9 @@ plot.see_check_distribution <- function(x, point_size = 2, panel = TRUE, ...) {
   p <- list(p1, p2, p3)
 
   if (panel) {
+    if (!requireNamespace("gridExtra", quietly = TRUE)) {
+      stop("Package 'gridExtra' required for this function to work. Please install it.", call. = FALSE)
+    }
     gridExtra::grid.arrange(p1, p2, p3, layout_matrix = rbind(c(1, 1), c(2, 3)))
   } else {
     lapply(p, graphics::plot)
@@ -85,7 +87,7 @@ plot.see_check_distribution_numeric <- function(x, point_size = 2, panel = TRUE,
     geom_point(size = point_size, position = position_dodge(.4)) +
     coord_flip() +
     labs(x = NULL, y = NULL, fill = NULL, colour = NULL, title = "Predicted Distribution of Vector") +
-    scale_y_continuous(labels = scales::percent, expand = c(0, 0), limits = c(0, max_y)) +
+    scale_y_continuous(labels = .percents, expand = c(0, 0), limits = c(0, max_y)) +
     theme_lucid(legend.position = lp)
 
   dat1 <- as.data.frame(stats::density(vec))
@@ -104,6 +106,9 @@ plot.see_check_distribution_numeric <- function(x, point_size = 2, panel = TRUE,
   p <- list(p1, p2, p3)
 
   if (panel) {
+    if (!requireNamespace("gridExtra", quietly = TRUE)) {
+      stop("Package 'gridExtra' required for this function to work. Please install it.", call. = FALSE)
+    }
     gridExtra::grid.arrange(p1, p2, p3, layout_matrix = rbind(c(1, 1), c(2, 3)))
   } else {
     lapply(p, graphics::plot)

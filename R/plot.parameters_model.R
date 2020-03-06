@@ -13,15 +13,43 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
   # ordinal model? needed for free facet scales later...
   ordinal_model <- isTRUE(attributes(x)$ordinal_model)
 
-  # remember components
-  has_effects <- "Effects" %in% colnames(x) && length(unique(x$Effects)) > 1
-  has_component <- "Component" %in% colnames(x) && length(unique(x$Component)) > 1
-  has_response <- "Response" %in% colnames(x) && length(unique(x$Response)) > 1
+  # brms has some special handling...
+  is_brms <- inherits(x, "parameters_brms")
+
+  # do we have a measure for meta analysis (to label axis)
+  meta_measure <- attributes(x)$measure
+
+  if (is_brms) {
+    cleaned_parameters <- attributes(x)$parameter_info
+    if (!is.null(cleaned_parameters)) {
+      x <- merge(x, cleaned_parameters, sort = FALSE)
+      x$Parameter <- x$Cleaned_Parameter
+      if (all(x$Group == "")) {
+        x$Group <- NULL
+      } else {
+        x <- x[x$Group != "SD/Cor", , drop = FALSE]
+      }
+    }
+  }
+
+  if ("Subgroup" %in% colnames(x)) {
+    x$Subgroup <- factor(x$Subgroup, levels = unique(x$Subgroup))
+  }
 
   # do we have prettified names?
   pretty_names <- attributes(x)$pretty_names
 
   x <- .fix_facet_names(x)
+
+  if (is_brms && "Group" %in% colnames(x)) {
+    x$Effects[x$Group != ""] <- paste0(x$Effects[x$Group != ""], " (", x$Group[x$Group != ""], ")")
+  }
+
+  # remember components
+  has_effects <- "Effects" %in% colnames(x) && length(unique(x$Effects)) > 1
+  has_component <- "Component" %in% colnames(x) && length(unique(x$Component)) > 1
+  has_response <- "Response" %in% colnames(x) && length(unique(x$Response)) > 1
+  has_subgroups <- "Subgroup" %in% colnames(x) && length(unique(x$Subgroup)) > 1
 
   mc <- attributes(x)$model_class
   cp <- attributes(x)$cleaned_parameters
@@ -29,12 +57,15 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
 
   # minor fixes for Bayesian models
   if (!is.null(mc) && !is.null(cp) && mc %in% c("stanreg", "stanmvreg", "brmsfit")) {
-    x$Parameter <- cp
+    if (length(cp) == length(x$Parameter)) {
+      x$Parameter <- cp
+    }
   }
 
   # data preparation for metafor-objects
   if (is_meta) {
     overall <- which(x$Parameter == "(Intercept)")
+    if (length(overall) == 0) overall <- which(x$Parameter == "Overall")
     x$Parameter[overall] <- "Overall"
     x$group <- "study"
     x$group[overall] <- "Overall"
@@ -155,11 +186,47 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
     p <- p + facet_wrap(~Effects, ncol = n_columns, scales = facet_scales)
   } else if (has_response) {
     p <- p + facet_wrap(~Response, ncol = n_columns, scales = facet_scales)
+  } else if (has_subgroups) {
+    suppressWarnings(p <- p + facet_grid(Subgroup~., scales = "free", space = "free"))
   }
 
-  p + labs(
-    x = "Parameter",
-    y = ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"),
-    colour = "CI"
-  )
+  if (isTRUE(is_meta)) {
+    measure <- switch(
+      meta_measure,
+      "MD" = "Raw Mean Difference",
+      "SMDH" = ,
+      "SMD" = "Standardized Mean Difference",
+      "ROM" = "Log transformed Ratio of Means",
+      "D2ORL" = ,
+      "D2ORN" = "Transformed Standardized Mean Difference",
+      "UCOR" = ,
+      "COR" = "Raw Correlation Coefficient",
+      "ZCOR" = "Z transformed Correlation Coefficient",
+      "PHI" = "Phi Coefficient",
+      "RR" = "Log Risk Ratio",
+      "OR" = "Log Odds Ratio",
+      "RD" = "Risk Difference",
+      "AS" = "Root transformed Risk Difference",
+      "PETO" = "Peto's Log Odds Ratio",
+      "PBIT" = "Standardized Mean Difference (Probit-transformed)",
+      "OR2DL" = ,
+      "OR2DN" = "Standardized Mean Difference (Odds Ratio-transformed)",
+      "IRR" = "Log Incidence Rate Ratio",
+      "IRD" = "Incidence Rate Difference",
+      "IRSD" = "Square Root transformed Incidence Rate Difference",
+      "GEN" = "Generic Estimate",
+      "Estimate"
+    )
+    p + labs(
+      x = "",
+      y = measure,
+      colour = "CI"
+    )
+  } else {
+    p + labs(
+      x = "Parameter",
+      y = ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"),
+      colour = "CI"
+    )
+  }
 }

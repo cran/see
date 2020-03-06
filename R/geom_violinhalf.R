@@ -53,15 +53,14 @@ GeomViolinHalf <-
               params$width %||% (resolution(data$x, FALSE) * 0.9)
 
             # ymin, ymax, xmin, and xmax define the bounding rectangle for each group
-            data %>%
-              dplyr::group_by(.data$group) %>%
-              dplyr::mutate(
-                ymin = min(.data$y),
-                ymax = max(.data$y),
-                xmin = .data$x,
-                xmax = .data$x + .data$width / 2
-              )
-
+            data <- dplyr::group_by(data, .data$group)
+            data <- dplyr::mutate(
+              data,
+              ymin = min(.data$y),
+              ymax = max(.data$y),
+              xmin = .data$x,
+              xmax = .data$x + .data$width / 2
+            )
           },
 
           draw_group = function(data, panel_scales, coord) {
@@ -98,9 +97,11 @@ GeomViolinHalf <-
 "%||%" <- function(a, b) if (!is.null(a)) a else b
 
 
-#' @importFrom grid grobName
 #' @keywords internal
 .grobName <- function(prefix, grob) {
+  if (!requireNamespace("grid", quietly = TRUE)) {
+    stop("Package 'grid' required for this function to work. Please install it.", call. = FALSE)
+  }
   grob$name <- grid::grobName(grob, prefix)
   grob
 }
