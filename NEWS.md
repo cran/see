@@ -1,3 +1,23 @@
+# see 0.5.0
+
+## New functions
+
+- `golden_ratio()` was added as a helper to get nice proportions.
+- New plotting functions for the `effectsize` package.
+ 
+## New plot functions
+
+* Added plot-function for `correlation::summary()`.
+* Added plot-function for `parameters::describe_distribution()`.
+* Added plot-function for `effectsize::equivalence_test()`.
+* Added plot-function for various effectsize-functions, like `effectsize::eta_squared()`.
+
+## Changes to functions
+
+* `plot.estimate_density()` now also works for density estimation of data frames.
+* `plot.equivalence_test()` now also works for frequentist models and data frames (see `parameters::equivalence_test()`).
+* Slightly changed plotting-style for `plot.equivalence_test()`.
+
 # see 0.4.1
 
 ## General
@@ -13,7 +33,7 @@
 * `plot()` for `model_parameters.rma()` now arranges facets by subgroups (see vignettes).
 * minor improvements to `plot()` for `parameters::cluster_analysis()`.
 * minor improvements to `plot()` for `parameters::model_parameters.brmsfit()`.
-* Plot-function for `bayestestR::si()` gets a `support_only` argument, to lot only the support data or the "raw" prior and posterior distributions.
+* Plot-function for `bayestestR::si()` gets a `support_only` argument, to plot only the support data or the "raw" prior and posterior distributions.
 
 # see 0.4.0
 

@@ -10,43 +10,55 @@ data_plot.parameters_sem <- function(x, data = NULL, type = c("regression", "cor
   }
 
   # Edge properties
-  edges <- x %>%
-    dplyr::mutate(Coefficient_abs = abs(.data$Coefficient),
-                  From = as.character(.data$From),
-                  To = as.character(.data$To)) %>%
-    dplyr::filter(
-      tolower(.data$Type) %in% c(type),
-      .data$From != .data$To,
-      .data$Coefficient_abs >= threshold_coefficient,
-      .data$p < threshold_p
-    ) %>%
-    dplyr::select(-dplyr::one_of("Coefficient_abs")) %>%
-    dplyr::rename(
-      "to" = "To",
-      "from" = "From"
-    )
+  edges <- x
+  edges$Coefficient_abs <- abs(x$Coefficient)
+  edges$from <- as.character(x$From)
+  edges$to <- as.character(x$To)
+
+  edges <- edges[tolower(edges$Type) %in% type &
+                   edges$from != edges$to &
+                   edges$Coefficient_abs >= threshold_coefficient &
+                   edges$p < threshold_p, ]
+
+  edges$Coefficient_abs <- NULL
+  edges$From <- NULL
+  edges$To <- NULL
+
+  rownames(edges) <- NULL
+
+  # edges <- x %>%
+  #   dplyr::mutate(Coefficient_abs = abs(.data$Coefficient),
+  #                 From = as.character(.data$From),
+  #                 To = as.character(.data$To)) %>%
+  #   dplyr::filter(
+  #     tolower(.data$Type) %in% c(type),
+  #     .data$From != .data$To,
+  #     .data$Coefficient_abs >= threshold_coefficient,
+  #     .data$p < threshold_p
+  #   ) %>%
+  #   dplyr::select(-dplyr::one_of("Coefficient_abs")) %>%
+  #   dplyr::rename(
+  #     "to" = "To",
+  #     "from" = "From"
+  #   )
 
   # Labels
   if (ci == TRUE) {
-    edges <- edges %>%
-      dplyr::mutate(Label = paste0(
-        sprintf("%.2f, ", .data$Coefficient),
-        attributes(x)$ci * 100,
-        "% CI [",
-        sprintf("%.2f, %.2f]", .data$CI_low, .data$CI_high)))
+    edges$Label <- paste0(
+      sprintf("%.2f, ", edges$Coefficient),
+      attributes(x)$ci * 100,
+      "% CI [",
+      sprintf("%.2f, %.2f]", edges$CI_low, edges$CI_high))
   } else {
-    edges <- dplyr::mutate(edges, Label = sprintf("%.2f", .data$Coefficient))
+    edges$Label <- sprintf("%.2f", edges$Coefficient)
   }
 
 
 
   # Separate labels
-  edges <- edges %>%
-    dplyr::mutate(
-      Label_Regression = ifelse(.data$Type == 'Regression', .data$Label, ''),
-      Label_Correlation = ifelse(.data$Type == 'Correlation', .data$Label, ''),
-      Label_Loading = ifelse(.data$Type == 'Loading', .data$Label, '')
-    )
+  edges$Label_Regression <- ifelse(edges$Type == 'Regression', edges$Label, '')
+  edges$Label_Correlation <- ifelse(edges$Type == 'Correlation', edges$Label, '')
+  edges$Label_Loading <- ifelse(edges$Type == 'Loading', edges$Label, '')
   edges <- edges[colSums(!is.na(edges)) > 0]
 
   # Identify latent variables for nodes
@@ -117,8 +129,8 @@ plot.see_parameters_sem <- function(x, data = NULL, type = c("regression", "corr
     ) +
     scale_alpha(guide = FALSE, range = c(0, 1)) +
     ggraph::scale_edge_alpha(guide = FALSE, range = c(0, 1)) +
-    scale_x_continuous(expand = expand_scale(c(.10, .10))) +
-    scale_y_continuous(expand = expand_scale(c(.10, .10))) +
+    scale_x_continuous(expand = expansion(c(.10, .10))) +
+    scale_y_continuous(expand = expansion(c(.10, .10))) +
     ggraph::theme_graph() +
     theme(legend.position = "none")
 

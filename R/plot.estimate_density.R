@@ -31,7 +31,6 @@ data_plot.estimate_density <- function(x, data = NULL, ...) {
 
 
 
-
 # Plot --------------------------------------------------------------------
 #' @rdname data_plot
 #' @importFrom rlang .data
@@ -120,6 +119,63 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
     } else if ("Component" %in% names(x)) {
       p <- p + facet_wrap(~ Component, scales = "free", ncol = n_columns)
     }
+  }
+
+  p
+}
+
+
+
+
+# Density df --------------------------------------------------------------------
+
+#' @export
+data_plot.estimate_density_df <- data_plot.estimate_density
+
+
+#' @importFrom rlang .data
+#' @importFrom ggridges geom_ridgeline
+#' @importFrom stats setNames
+#' @export
+plot.see_estimate_density_df <- function(x, stack = TRUE, n_columns = 1, size = .9, ...) {
+  x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
+  labels <- stats::setNames(levels(x$Parameter), levels(x$Parameter))
+
+  if (stack == TRUE) {
+    p <- ggplot(
+      x,
+      aes(
+        x = .data$x,
+        y = .data$y,
+        color = .data$Parameter
+      )) +
+      geom_line(size = size)
+  } else {
+    p <- ggplot(
+      x,
+      aes(
+        x = .data$x,
+        y = .data$Parameter,
+        height = .data$y
+      )) +
+      ggridges::geom_ridgeline()
+  }
+
+
+  if (length(unique(x$Parameter)) == 1 || isTRUE(stack)) {
+    p <- p + scale_y_continuous(breaks = NULL, labels = NULL)
+  } else {
+    p <- p + scale_y_discrete(labels = labels)
+  }
+
+
+  if (length(unique(x$Parameter)) == 1) {
+    p <- p + guides(color = FALSE)
+  }
+
+
+  if ("Group" %in% names(x)) {
+    p <- p + facet_wrap(~ Group, scales = "free", ncol = n_columns)
   }
 
   p
