@@ -1,8 +1,3 @@
-#' @importFrom magrittr %>%
-#' @export
-magrittr::`%>%`
-
-
 .as.data.frame_density <- function(x, ...) {
   data.frame(x = x$x, y = x$y)
 }
@@ -70,6 +65,7 @@ magrittr::`%>%`
   params <- gsub("(b_|bs_|bsp_|bcs_)(.*)", "\\2", params, perl = TRUE)
   params <- gsub("^zi_(.*)", "\\1 (Zero-Inflated)", params, perl = TRUE)
   params <- gsub("(.*)_zi$", "\\1 (Zero-Inflated)", params, perl = TRUE)
+  params <- gsub("(.*)_disp$", "\\1 (Dispersion)", params, perl = TRUE)
   # clean random effect parameters names
   params <- gsub("r_(.*)\\.(.*)\\.", "(re) \\1", params)
   params <- gsub("b\\[\\(Intercept\\) (.*)\\]", "(re) \\1", params)
@@ -110,6 +106,7 @@ magrittr::`%>%`
   if (grid) {
     params <- trimws(gsub("(Zero-Inflated)", "", params, fixed = TRUE))
     params <- trimws(gsub("(Random)", "", params, fixed = TRUE))
+    params <- trimws(gsub("(Dispersion)", "", params, fixed = TRUE))
   } else {
     params <- gsub("(Zero-Inflated) (Random)", "(Random, Zero-Inflated)", params, fixed = TRUE)
   }
@@ -125,10 +122,11 @@ magrittr::`%>%`
     if (!"Effects" %in% names(x)) {
       x$Component[x$Component == "conditional"] <- "Conditional"
       x$Component[x$Component == "zero_inflated"] <- "Zero-Inflated"
+      x$Component[x$Component == "dispersion"] <- "Dispersion"
       x$Component[x$Component == "simplex"] <- "Monotonic Effects"
     } else {
       x$Component[x$Component == "conditional"] <- "(Conditional)"
-      x$Component[x$Component == "zero_inflated"] <- "(Zero-Inflated)"
+      x$Component[x$Component == "dispersion"] <- "(Dispersion)"
       x$Component[x$Component == "simplex"] <- "(Monotonic Effects)"
     }
   }
@@ -179,4 +177,10 @@ magrittr::`%>%`
 .n_unique <- function(x, na.rm = TRUE) {
   if (isTRUE(na.rm)) x <- stats::na.omit(x)
   length(unique(x))
+}
+
+
+
+.is_integer <- function(x) {
+  is.numeric(x) && all(floor(x) == x, na.rm = T)
 }

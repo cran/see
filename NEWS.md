@@ -1,10 +1,24 @@
+# see 0.5.1
+
+## Changes to functions
+
+* Plot-function for `parameters::describe_distribution()` gains `highlight`, `highlight_color` and `size` arguments.
+* Plot-function for `parameters::describe_distribution()` now uses thin bars for variables with integer values (instead of less precise histogram).
+* Plot-function for `performance::check_normality()` gains `size` and `point_size` arguments.
+* Plot-function for `performance::check_normality()` now also plots normality of random effects, when `check_normality(effects = "random")` was called.
+* Legend labels nopw show a percentage-sign where applicable (for instance, for `plot.hdi()`).
+
+## Bug fixes
+
+* Fixed issue with argument `n_column` in `plot.p_significant()`, `plot.hdi()`, and  `plot.p_direction()`, which stopped working since R 4.0.0.
+* Fixed issue in `plot.performance_roc()` with swapped x/y axes.
+
 # see 0.5.0
 
 ## New functions
 
-- `golden_ratio()` was added as a helper to get nice proportions.
-- New plotting functions for the `effectsize` package.
- 
+* `golden_ratio()` was added as a helper to get nice proportions.
+
 ## New plot functions
 
 * Added plot-function for `correlation::summary()`.
