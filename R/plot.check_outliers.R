@@ -1,4 +1,22 @@
-#' @rdname data_plot
+#' Plot method for checking outliers
+#'
+#' The \code{plot()} method for the \code{performance::check_outliers()} function.
+#'
+#' @param text_size Size of text labels.
+#' @inheritParams data_plot
+#'
+#' @return A ggplot2-object.
+#'
+#' @examples
+#' library(performance)
+#' data(mtcars)
+#' mt1 <- mtcars[, c(1, 3, 4)]
+#' mt2 <- rbind(
+#'   mt1,
+#'   data.frame(mpg = c(37, 40), disp = c(300, 400), hp = c(110, 120))
+#' )
+#' model <- lm(disp ~ mpg + hp, data = mt2)
+#' plot(check_outliers(model))
 #' @export
 plot.see_check_outliers <- function(x, text_size = 3.5, ...) {
   methods <- attr(x, "methods", exact = TRUE)

@@ -40,7 +40,24 @@ data_plot.compare_performance <- function(x, data = NULL, ...){
 
 
 # Plot --------------------------------------------------------------------
-#' @rdname data_plot
+#' Plot method for comparing model performances
+#'
+#' The \code{plot()} method for the \code{performance::compare_performance()} function.
+#'
+#' @inheritParams data_plot
+#' @inheritParams plot.see_check_normality
+#'
+#' @return A ggplot2-object.
+#'
+#' @examples
+#' library(performance)
+#' data(iris)
+#' lm1 <- lm(Sepal.Length ~ Species, data = iris)
+#' lm2 <- lm(Sepal.Length ~ Species + Petal.Length, data = iris)
+#' lm3 <- lm(Sepal.Length ~ Species * Petal.Length, data = iris)
+#' result <- compare_performance(lm1, lm2, lm3)
+#' result
+#' plot(result)
 #' @importFrom rlang .data
 #' @export
 plot.see_compare_performance <- function(x, size = 1, ...) {
@@ -79,7 +96,8 @@ plot.see_compare_performance <- function(x, size = 1, ...) {
     scale_y_continuous(limits = c(0, 1), labels = NULL) +
     add_plot_attributes(x) +
     guides(fill = "none") +
-    theme_radar()
+    theme_radar() +
+    scale_color_see()
 
   p
 }

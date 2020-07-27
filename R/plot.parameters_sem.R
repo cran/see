@@ -26,22 +26,6 @@ data_plot.parameters_sem <- function(x, data = NULL, type = c("regression", "cor
 
   rownames(edges) <- NULL
 
-  # edges <- x %>%
-  #   dplyr::mutate(Coefficient_abs = abs(.data$Coefficient),
-  #                 From = as.character(.data$From),
-  #                 To = as.character(.data$To)) %>%
-  #   dplyr::filter(
-  #     tolower(.data$Type) %in% c(type),
-  #     .data$From != .data$To,
-  #     .data$Coefficient_abs >= threshold_coefficient,
-  #     .data$p < threshold_p
-  #   ) %>%
-  #   dplyr::select(-dplyr::one_of("Coefficient_abs")) %>%
-  #   dplyr::rename(
-  #     "to" = "To",
-  #     "from" = "From"
-  #   )
-
   # Labels
   if (ci == TRUE) {
     edges$Label <- paste0(
@@ -84,8 +68,11 @@ data_plot.parameters_sem <- function(x, data = NULL, type = c("regression", "cor
 
 
 # Plot --------------------------------------------------------------------
+#' @param threshold_coefficient Numeric, threshold at which value coefficients will be displayed.
+#' @param threshold_p Numeric, threshold at which value p-values will be displayed.
+#' @param ci Logical, whether confidence intervals should be added to the plot.#'
 #' @importFrom rlang .data
-#' @rdname data_plot
+#' @rdname plot.see_parameters_model
 #' @export
 plot.see_parameters_sem <- function(x, data = NULL, type = c("regression", "correlation", "loading"), threshold_coefficient = NULL, threshold_p = NULL, ci = TRUE, size = 22, ...) {
   if (!"data_plot" %in% class(x)) {

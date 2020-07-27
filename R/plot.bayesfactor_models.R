@@ -1,4 +1,27 @@
-#' @rdname data_plot
+#' Plot method for Bayes Factors for model comparison
+#'
+#' The \code{plot()} method for the \code{bayestestR::bayesfactor_models()} function.
+#' These plots visualize the \strong{posterior probabilities} of the compared models.
+#'
+#' @param n_pies Number of pies.
+#' @param value What value to display.
+#' @param sort \describe{
+#'   \item{Plotting model parameters}{
+#'   If \code{NULL}, coefficients are plotted in the order as they appear in the summary. Use \code{sort = "ascending"} (or \code{sort = TRUE})) resp. \code{sort = "descending"} to sort coefficients in ascending or descending order.
+#'   }
+#'   \item{Plotting Bayes factors}{
+#'   Sort pie-slices by posterior probability (descending)?
+#'   }
+#' }
+#' @param log Show log-transformed Bayes factors.
+#' @param prior_odds optional vector of prior odds for the models. See
+#'   \code{BayesFactor::priorOdds}. As the size of the pizza slices corresponds
+#'   to posterior probability (which is a function of prior probability and the BF),
+#'   custom \code{prior_odds} will change the slices' size.
+#' @inheritParams data_plot
+#'
+#' @return A ggplot2-object.
+#'
 #' @examples
 #' library(bayestestR)
 #' library(see)
@@ -10,8 +33,11 @@
 #'
 #' result <- bayesfactor_models(lm1, lm2, lm3, denominator = lm0)
 #'
-#' plot(result, n_pies = "one", value = "probability") + theme_modern() +
+#' plot(result, n_pies = "one", value = "probability", sort = TRUE) +
 #'   scale_fill_pizza(reverse = TRUE)
+#'
+#' plot(result, n_pies = "many", value = "BF", log = TRUE) +
+#'   scale_fill_pizza(reverse = FALSE)
 #' @export
 plot.see_bayesfactor_models <-
   function(x,
@@ -35,89 +61,63 @@ plot.see_bayesfactor_models <-
     po_txt <- "NOTE: Slice sizes based on custom prior odds"
   }
 
-  if (isTRUE(sort)) {
-    one_pie_sort <- "PostProb"
-  } else {
-    one_pie_sort <- NULL
-  }
-
-  # Prep data and bar position:
+  ## Prep data
+  # One pie data
   one_pie_data <- as.data.frame(x)
-  one_pie_data$PostProb = (one_pie_data$BF / sum(one_pie_data$BF)) * priorOdds
+  one_pie_data$postOdds <- priorOdds * one_pie_data$BF
+  one_pie_data$PostProb <- (one_pie_data$postOdds / sum(one_pie_data$postOdds))
   if (isTRUE(sort)) one_pie_data <- one_pie_data[order(one_pie_data$PostProb, decreasing = TRUE), ]
-  one_pie_data$pos_txt <- sum(one_pie_data$PostProb) + one_pie_data$PostProb / 2 - cumsum(one_pie_data$PostProb)
-  one_pie_data$Model <- factor(one_pie_data$Model, levels = unique(one_pie_data$Model))
+  one_pie_data$Model <- factor(one_pie_data$Model, levels = one_pie_data$Model)
+
+  # Two pie data
+  many_pies_data <- one_pie_data[one_pie_data$Model != denominator_name, ]
+  many_pies_data <- split(many_pies_data, many_pies_data$Model)
+  many_pies_data <- lapply(many_pies_data, function(m) {
+    m <- rbind(one_pie_data[one_pie_data$Model == denominator_name, ], m)
+    m$panel <- m$Model[2]
+    m$bar_pos <- m$PostProb / sum(m$PostProb)
+    m
+  })
+  many_pies_data <- many_pies_data[names(many_pies_data) != denominator_name]
+  many_pies_data <- do.call(rbind,many_pies_data)
+  many_pies_data$Model <- factor(many_pies_data$Model, levels = levels(one_pie_data$Model))
+  many_pies_data$panel <- factor(many_pies_data$panel, levels = levels(one_pie_data$Model))
+  many_pies_data$panel <- droplevels(many_pies_data$panel)
 
 
-
-  opd1 <- opd2 <- one_pie_data
-
-  opd1$Type <- denominator_name
-  opd1$BF <- one_pie_data$BF[denominator]
-  opd1$PostProb <- one_pie_data$PostProb[denominator]
-
-  opd2$Type <- one_pie_data$Model
-
-  many_pies_data <- rbind(opd1, opd2)
-  many_pies_data <- do.call(rbind, lapply(split(many_pies_data, many_pies_data$Model), function(.i) {
-    .i$pos_bar <- .i$PostProb / sum(.i$PostProb)
-    .i$pos_txt <- sum(.i$pos_bar) + .i$pos_bar / 2 - cumsum(.i$pos_bar)
-    .i[.i$Model != denominator_name, ]
-  }))
-  many_pies_data$Type <- factor(many_pies_data$Type, levels = unique(many_pies_data$Type))
-
-
-
-  # many_pies_data <- suppressWarnings(
-  #   rbind(one_pie_data %>%
-  #           dplyr::mutate(Type     = denominator_name,
-  #                         BF       = .data$BF[denominator],
-  #                         PostProb = .data$PostProb[denominator]),
-  #         one_pie_data %>%
-  #           dplyr::mutate(Type = .data$Model)) %>%
-  #     dplyr::group_by(.data$Model) %>%
-  #     dplyr::mutate(pos_bar = .data$PostProb / sum(.data$PostProb),
-  #                   pos_txt = sum(.data$pos_bar) + .data$pos_bar / 2 - cumsum(.data$pos_bar)) %>%
-  #     dplyr::filter(.data$Model != denominator_name) %>%
-  #     dplyr::ungroup() %>%
-  #     dplyr::mutate(Type = factor(.data$Type, levels = unique(.data$Type)))
-  # )
-
-
+  ## Labels
   if (value == "BF") {
     if (log) {
-      one_pie_data$label <- round(log(one_pie_data$BF), 2)
-      many_pies_data$label <- round(log(many_pies_data$BF), 2)
+      one_pie_data$label <- insight::format_value(log(one_pie_data$BF), 2)
+      many_pies_data$label <- insight::format_value(log(many_pies_data$BF), 2)
+      po_txt <- paste0(po_txt, "\nLabels are log(BF).")
     } else {
-      one_pie_data$label <- round(one_pie_data$BF, 2)
-      many_pies_data$label <- round(many_pies_data$BF, 2)
+      one_pie_data$label <- insight::format_value(one_pie_data$BF, 2)
+      many_pies_data$label <- insight::format_value(many_pies_data$BF, 2)
     }
   } else if (value == "probability") {
-    one_pie_data$label <- paste0(round(one_pie_data$PostProb * 100, 1),"%")
-    many_pies_data$label <- paste0(round(many_pies_data$PostProb * 100, 1),"%")
+    one_pie_data$label <- insight::format_value(one_pie_data$PostProb, 1, as_percent = TRUE)
+    many_pies_data$label <- insight::format_value(many_pies_data$PostProb, 1, as_percent = TRUE)
   } else {
     one_pie_data$label <- ""
     many_pies_data$label <- ""
   }
 
 
+  ## Plot
   if (n_pies == "one") {
-    ggplot(one_pie_data, aes(x = "", y = .data$PostProb, fill = .data$Model)) +
-      geom_bar(width = 1, stat = "identity", color = "white", size = .5) +
-      geom_text(aes(y = .data$pos_txt, label = .data$label), position = position_nudge(.1)) +
-      coord_polar("y", start = 0) +
-      scale_y_continuous(expand = c(0, 0)) +
-      labs(x = "", y = "", fill = "Model") +
-      theme_void() +
-      labs(caption = po_txt)
+    p <- ggplot(one_pie_data, aes(x = "", y = .data$PostProb, fill = .data$Model))
   } else {
-    ggplot(many_pies_data, aes(x = "", y = .data$pos_bar, fill = .data$Type)) +
-      geom_bar(width = 1, stat = "identity", color = "white", size = .5) +
-      geom_text(aes(y = .data$pos_txt, label = .data$label), position = position_nudge(.1)) +
-      coord_polar("y", start = 0) +
-      facet_wrap( ~ .data$Model) +
-      labs(x = "", y = "", fill = "Model") +
-      theme_void() +
-      labs(caption = po_txt)
+    p <- ggplot(many_pies_data, aes(x = "", y = .data$bar_pos, fill = .data$Model)) +
+      facet_wrap( ~ .data$panel)
   }
+
+  p +
+    geom_bar(width = 1, stat = "identity", color = "white", size = .5) +
+    geom_text(aes(label = .data$label), position = position_stack(vjust = 0.5)) +
+    coord_polar("y", start = 0) +
+    scale_y_continuous(expand = c(0, 0)) +
+    labs(x = "", y = "", fill = "Model") +
+    theme_void() +
+    labs(caption = po_txt)
 }

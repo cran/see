@@ -2,7 +2,7 @@ Package: see
 Type: Package
 Title: Visualisation Toolbox for 'easystats' and Extra Geoms, Themes
         and Color Palettes for 'ggplot2'
-Version: 0.5.1
+Version: 0.5.2
 Authors@R: c(
 	person("Daniel", 
 		"Lüdecke", 
@@ -41,13 +41,13 @@ Suggests: brms, coda, correlation, emmeans, ggraph, ggrepel, glmmTMB,
         grid, gridExtra, lavaan, logspline, lme4, MASS, mclust,
         metafor, modelbased, NbClust, nFactors, performance, psych,
         randomForest, rmarkdown, rstanarm, splines, tidygraph, tidyr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Language: en-GB
 NeedsCompilation: no
-Packaged: 2020-06-12 20:50:47 UTC; Daniel
+Packaged: 2020-07-27 06:31:15 UTC; Daniel
 Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>),
   Dominique Makowski [aut, inv] (<https://orcid.org/0000-0001-5375-9967>),
   Philip Waggoner [aut, ctb] (<https://orcid.org/0000-0002-7825-7573>),
   Mattan S. Ben-Shachar [aut] (<https://orcid.org/0000-0002-4287-4801>)
 Repository: CRAN
-Date/Publication: 2020-06-13 07:10:02 UTC
+Date/Publication: 2020-07-27 07:40:02 UTC

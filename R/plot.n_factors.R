@@ -52,8 +52,24 @@ data_plot.n_clusters <- data_plot.n_factors
 
 
 # Plot --------------------------------------------------------------------
+
+#' Plot method for numbers of clusters to extract or factors to retain
+#'
+#' The \code{plot()} method for the \code{parameters::n_factors()} and \code{parameters::n_clusters()}
+#'
+#' @inheritParams data_plot
+#' @inheritParams plot.see_check_normality
+#'
+#' @return A ggplot2-object.
+#'
+#' @examples
+#' if (require("parameters") && require("nFactors")) {
+#'   data(mtcars)
+#'   result <- n_factors(mtcars, type = "PCA")
+#'   result
+#'   plot(result, type = "line")
+#' }
 #' @importFrom rlang .data
-#' @rdname data_plot
 #' @export
 plot.see_n_factors <- function(x, data = NULL, type = c("bar", "line", "area"), size = 1, ...) {
   type <- match.arg(type)
@@ -72,10 +88,9 @@ plot.see_n_factors <- function(x, data = NULL, type = c("bar", "line", "area"), 
 
   if (type == "area") {
     ggplot(x, aes(x = .data$x, y = .data$y)) +
-      geom_area(fill = "#2196F3") +
-      geom_segment(aes(x = .data$x[which.max(.data$y)], xend = .data$x[which.max(.data$y)], y = 0, yend = max(.data$y)), color = "#E91E63", linetype = "dashed") +
-      geom_point(aes(x = .data$x[which.max(.data$y)], y = max(.data$y)), color = "#E91E63") +
-      scale_color_manual(values = c("black", "#E91E63")) +
+      geom_area(fill = flat_colors("grey")) +
+      geom_segment(aes(x = .data$x[which.max(.data$y)], xend = .data$x[which.max(.data$y)], y = 0, yend = max(.data$y)), color = flat_colors("red"), linetype = "dashed") +
+      geom_point(aes(x = .data$x[which.max(.data$y)], y = max(.data$y)), color = flat_colors("red")) +
       scale_y_continuous(labels = .percents) +
       scale_x_continuous(breaks = 1:max(x$x)) +
       add_plot_attributes(x)
@@ -86,6 +101,7 @@ plot.see_n_factors <- function(x, data = NULL, type = c("bar", "line", "area"), 
       coord_flip() +
       guides(colour = FALSE) +
       scale_y_continuous(labels = .percents) +
+      scale_color_manual(values = unname(flat_colors(c("grey", "red")))) +
       add_plot_attributes(x)
   } else {
     ggplot(x, aes(x = .data$x, y = .data$y, fill = .data$fill)) +
@@ -94,7 +110,7 @@ plot.see_n_factors <- function(x, data = NULL, type = c("bar", "line", "area"), 
       scale_y_continuous(labels = .percents) +
       add_plot_attributes(x) +
       scale_x_continuous(breaks = 1:max(x$x)) +
-      scale_fill_manual(values = c("black", "red"))
+      scale_fill_manual(values = unname(flat_colors(c("grey", "red"))))
   }
 }
 
