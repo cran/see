@@ -9,9 +9,11 @@
 \method{plot}{see_parameters_model}(
   x,
   show_intercept = FALSE,
-  point_size = 0.8,
+  size_point = 0.8,
+  size_text = NULL,
   sort = NULL,
   n_columns = NULL,
+  type = c("forest", "funnel"),
   ...
 )
 
@@ -22,7 +24,7 @@
   threshold_coefficient = NULL,
   threshold_p = NULL,
   ci = TRUE,
-  size = 22,
+  size_point = 22,
   ...
 )
 }
@@ -34,34 +36,33 @@ in the plot. By default, it is hidden because in many cases the intercept-parame
 has a posterior distribution on a very different location, so density curves of
 posterior distributions for other parameters are hardly visible.}
 
-\item{point_size}{Size of point-geoms.}
+\item{size_point}{Size of point-geoms.}
+
+\item{size_text}{Size of text labels.}
 
 \item{sort}{\describe{
-  \item{Plotting model parameters}{
+  \item{\emph{Plotting model parameters}}{
   If \code{NULL}, coefficients are plotted in the order as they appear in the summary. Use \code{sort = "ascending"} (or \code{sort = TRUE})) resp. \code{sort = "descending"} to sort coefficients in ascending or descending order.
   }
-  \item{Plotting Bayes factors}{
+  \item{\emph{Plotting Bayes factors}}{
   Sort pie-slices by posterior probability (descending)?
   }
 }}
 
 \item{n_columns}{For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.}
 
+\item{type}{Indicating the type of plot. Only applies for model parameters from meta-analysis objects (e.g. \pkg{metafor}).}
+
 \item{...}{Arguments passed to or from other methods.}
 
 \item{data}{The original data used to create this object. Can be a
 statistical model or such.}
-
-\item{type}{Character vector, indicating the type of plot.}
 
 \item{threshold_coefficient}{Numeric, threshold at which value coefficients will be displayed.}
 
 \item{threshold_p}{Numeric, threshold at which value p-values will be displayed.}
 
 \item{ci}{Logical, whether confidence intervals should be added to the plot.#'}
-
-\item{size}{Size of geoms. Depends on the context of the \code{plot()} function,
-so this argument may change size of points, lines or bars.}
 }
 \value{
 A ggplot2-object.

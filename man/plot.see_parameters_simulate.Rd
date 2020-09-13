@@ -10,6 +10,11 @@
   stack = TRUE,
   show_intercept = FALSE,
   n_columns = NULL,
+  normalize_height = FALSE,
+  size_line = 0.9,
+  posteriors_alpha = 0.7,
+  centrality = "median",
+  ci = 0.95,
   ...
 )
 }
@@ -19,8 +24,7 @@
 \item{data}{The original data used to create this object. Can be a
 statistical model or such.}
 
-\item{stack}{Logical, if \code{TRUE}, densities are plotted as stacked lines.
-Else, densities are plotted for each parameter among each other.}
+\item{stack}{Logical, if \code{TRUE}, densities are plotted as stacked lines. Else, densities are plotted for each parameter among each other.}
 
 \item{show_intercept}{Logical, if \code{TRUE}, the intercept-parameter is included
 in the plot. By default, it is hidden because in many cases the intercept-parameter
@@ -28,6 +32,19 @@ has a posterior distribution on a very different location, so density curves of
 posterior distributions for other parameters are hardly visible.}
 
 \item{n_columns}{For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.}
+
+\item{normalize_height}{Logical, if \code{TRUE}, height of density-areas is
+"normalized", to avoid overlap. In certain cases when the range of a
+distribution of simulated draws is narrow for some parameters, this may result in
+very flat density-areas. In such cases, set \code{normalize_height = FALSE}.}
+
+\item{size_line}{Size of line geoms.}
+
+\item{posteriors_alpha}{Alpha value of the posterior distributions.}
+
+\item{centrality}{The point-estimate (centrality index) to compute. May be \code{"median"}, \code{"mean"} or \code{"MAP"}.}
+
+\item{ci}{Value of probability of the CI (between 0 and 1) to be estimated. Default to .95.}
 
 \item{...}{Arguments passed to or from other methods.}
 }

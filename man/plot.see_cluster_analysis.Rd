@@ -4,7 +4,7 @@
 \alias{plot.see_cluster_analysis}
 \title{Plot method for computing cluster analysis}
 \usage{
-\method{plot}{see_cluster_analysis}(x, data = NULL, n_columns = NULL, size = 0.6, ...)
+\method{plot}{see_cluster_analysis}(x, data = NULL, n_columns = NULL, size_bar = 0.6, ...)
 }
 \arguments{
 \item{x}{An object.}
@@ -14,8 +14,7 @@ statistical model or such.}
 
 \item{n_columns}{For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.}
 
-\item{size}{Size of geoms. Depends on the context of the \code{plot()} function,
-so this argument may change size of points, lines or bars.}
+\item{size_bar}{Size of bar geoms.}
 
 \item{...}{Arguments passed to or from other methods.}
 }

@@ -2,7 +2,7 @@
 #'
 #' The \code{plot()} method for the \code{performance::check_outliers()} function.
 #'
-#' @param text_size Size of text labels.
+#' @param size_text Size of text labels.
 #' @inheritParams data_plot
 #'
 #' @return A ggplot2-object.
@@ -18,11 +18,11 @@
 #' model <- lm(disp ~ mpg + hp, data = mt2)
 #' plot(check_outliers(model))
 #' @export
-plot.see_check_outliers <- function(x, text_size = 3.5, ...) {
+plot.see_check_outliers <- function(x, size_text = 3.5, ...) {
   methods <- attr(x, "methods", exact = TRUE)
 
   if (length(methods == 1)) {
-    .plot_diag_outliers(x, text_size)
+    .plot_diag_outliers(x, size_text)
   } else {
     .plot_outliers_multimethod(x)
   }
@@ -38,7 +38,7 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
 
   # Extract distances
   d <- data[grepl("Distance_", names(data))]
-  d <- effectsize::normalize(d)
+  d <- effectsize::normalize(d, verbose = FALSE)
 
   d_long <- stats::reshape(
     d,
@@ -56,12 +56,12 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
 }
 
 
-.plot_diag_outliers <- function(x, text_size = 3.5) {
+.plot_diag_outliers <- function(x, size_text = 3.5) {
   d <- data_plot(x)
   d$Id <- 1:nrow(d)
   d$Outliers <- as.factor(attr(x, "data", exact = TRUE)[["Outlier"]])
   d$Id[d$Outliers == "0"] <- NA
-  d$Distance <- effectsize::normalize(d$Distance)
+  d$Distance <- effectsize::normalize(d$Distance, verbose = FALSE)
 
   method <- switch(
     attr(x, "method", exact = TRUE),
@@ -77,7 +77,7 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
 
   threshold <- attr(x, "threshold", exact = TRUE)[[method]]
 
-  if (is.null(text_size)) text_size <- 3.5
+  if (is.null(size_text)) size_text <- 3.5
 
   p <- ggplot(d, aes(x = .data$Distance, fill = .data$Outliers, label = .data$Id)) +
     geom_histogram() +
@@ -101,9 +101,9 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
 
 
   if (requireNamespace("ggrepel", quietly = TRUE))
-    p <- p + ggrepel::geom_text_repel(y = 2.5, size = text_size)
+    p <- p + ggrepel::geom_text_repel(y = 2.5, size = size_text)
   else
-    p <- p + geom_text(y = 2.5, size = text_size)
+    p <- p + geom_text(y = 2.5, size = size_text)
 
   p
 }
@@ -111,14 +111,18 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
 
 .plot_outliers_multimethod <- function(x) {
   d <- data_plot(x)
-  ggplot(data = d, aes(x = .data$Obs, y = .data$Distance, fill = .data$Method, group = .data$Method)) +
-    # geom_vline(xintercept = as.character(c(1, 2))) +
-    geom_bar(position = "dodge", stat = "identity") +
-    scale_fill_viridis_d() +
-    theme_modern() +
-    labs(x = "Observation", y = "Distance", fill = "Method") +
-    theme(
-      axis.text.x = element_text(colour = ifelse(as.numeric(x) >= 0.5, "red", "darkgrey")),
-      panel.grid.major.x = element_line(linetype = "dashed", colour = ifelse(as.numeric(x) >= 0.5, "red", "lightgrey"))
-    )
+  suppressWarnings(
+    ggplot(data = d, aes(x = .data$Obs, y = .data$Distance, fill = .data$Method, group = .data$Method)) +
+      # geom_vline(xintercept = as.character(c(1, 2))) +
+      geom_bar(position = "dodge", stat = "identity") +
+      scale_fill_viridis_d() +
+      theme_modern() +
+      labs(x = "Observation", y = "Distance", fill = "Method") +
+      # Warning: Vectorized input to `element_text()` is not officially supported.
+      # Results may be unexpected or may change in future versions of ggplot2.
+      theme(
+        axis.text.x = element_text(colour = ifelse(as.numeric(x) >= 0.5, "red", "darkgrey")),
+        panel.grid.major.x = element_line(linetype = "dashed", colour = ifelse(as.numeric(x) >= 0.5, "red", "lightgrey"))
+      )
+  )
 }

@@ -7,8 +7,8 @@
 \method{plot}{see_point_estimate}(
   x,
   data = NULL,
-  point_size = 2,
-  text_size = 3.5,
+  size_point = 2,
+  size_text = 3.5,
   panel = TRUE,
   show_labels = TRUE,
   show_intercept = FALSE,
@@ -23,9 +23,9 @@
 \item{data}{The original data used to create this object. Can be a
 statistical model or such.}
 
-\item{point_size}{Size of point-geoms.}
+\item{size_point}{Size of point-geoms.}
 
-\item{text_size}{Size of text labels.}
+\item{size_text}{Size of text labels.}
 
 \item{panel}{Logical, if \code{TRUE}, plots are arranged as panels; else,
 single plots are returned.}
@@ -40,8 +40,7 @@ in the plot. By default, it is hidden because in many cases the intercept-parame
 has a posterior distribution on a very different location, so density curves of
 posterior distributions for other parameters are hardly visible.}
 
-\item{priors}{Logical, if \code{TRUE}, prior distributions are simulated
-(using \code{\link[bayestestR]{simulate_prior}}) and added to the plot.}
+\item{priors}{Logical, if \code{TRUE}, prior distributions are simulated (using \code{\link[bayestestR:simulate_prior]{simulate_prior()}}) and added to the plot.}
 
 \item{priors_alpha}{Alpha value of the prior distributions.}
 

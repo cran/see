@@ -2,11 +2,13 @@
 #'
 #' The \code{plot()} method for the \code{parameters::model_parameters()} function.
 #'
+#' @param type Indicating the type of plot. Only applies for model parameters from meta-analysis objects (e.g. \pkg{metafor}).
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_bayesfactor_models
 #' @inheritParams plot.see_cluster_analysis
 #' @inheritParams plot.see_check_normality
+#' @inheritParams plot.see_parameters_brms_meta
 #'
 #' @return A ggplot2-object.
 #'
@@ -18,20 +20,35 @@
 #' plot(result)
 #' @importFrom bayestestR reshape_ci
 #' @export
-plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8, sort = NULL, n_columns = NULL, ...) {
+plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8, size_text = NULL, sort = NULL, n_columns = NULL, type = c("forest", "funnel"), ...) {
   if (!any(grepl("Coefficient", colnames(x), fixed = TRUE))) {
     colnames(x)[which.min(match(colnames(x), c("Median", "Mean", "Map")))] <- "Coefficient"
   }
 
+  # retrieve settings ----------------
+
   # is exp?
   exponentiated_coefs <- isTRUE(attributes(x)$exponentiate)
   y_intercept <- ifelse(exponentiated_coefs, 1, 0)
+
+  # add coefficients and CIs?
+  add_values <- !is.null(size_text) && !is.na(size_text)
 
   # ordinal model? needed for free facet scales later...
   ordinal_model <- isTRUE(attributes(x)$ordinal_model)
 
   # brms has some special handling...
   is_brms <- inherits(x, c("parameters_stan", "parameters_brms"))
+
+  # check column names, differs for standardized models
+  if ("Std_Coefficient" %in% colnames(x)) {
+    colnames(x)[which(colnames(x) == "Std_Coefficient")] <- "Coefficient"
+  }
+
+  # create text string for estimate and CI
+  x$Estimate_CI <- sprintf("%.2f %s",
+                           x$Coefficient,
+                           insight::format_ci(x$CI_low, x$CI_high, ci = NULL, digits = 2))
 
   # do we have a measure for meta analysis (to label axis)
   meta_measure <- attributes(x)$measure
@@ -86,10 +103,17 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
     x$Parameter[overall] <- "Overall"
     x$group <- "study"
     x$group[overall] <- "Overall"
-    x$point_size <- sqrt(x$Weight)
-    x$point_size[overall] <- 8
+    x$size_point <- sqrt(x$Weight)
+    x$size_point[overall] <- 8
     x$shape <- 19
     x$shape[overall] <- 18
+
+    type <- match.arg(type)
+
+    if (type == "funnel") {
+      if (missing(size_point)) size_point <- 2.5
+      return(.funnel_plot(x, size_point, meta_measure))
+    }
   }
 
   # if we have a model with multiple responses or response levels
@@ -98,10 +122,14 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
   if (has_response) {
     for (i in rev(sort(unique(x$Response)))) {
       x$Parameter <- gsub(i, "", x$Parameter)
-      names(pretty_names) <- gsub(i, "", names(pretty_names))
+      if (!is.null(pretty_names)) {
+        names(pretty_names) <- gsub(i, "", names(pretty_names))
+      }
     }
     x$Parameter <- gsub("^\\:(.*)", "\\1", x$Parameter)
-    names(pretty_names) <- gsub("^\\:(.*)", "\\1", names(pretty_names))
+    if (!is.null(pretty_names)) {
+      names(pretty_names) <- gsub("^\\:(.*)", "\\1", names(pretty_names))
+    }
   }
 
   # make sure components are sorted in original order, not alphabetically
@@ -130,7 +158,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
     # plot setup for metafor-objects
     p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$group)) +
       geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
-      geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = point_size, fatten = x$point_size, shape = x$shape) +
+      geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = size_point, fatten = x$size_point, shape = x$shape) +
       coord_flip() +
       theme_modern(legend.position = "none") +
       scale_color_material() +
@@ -143,7 +171,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
       geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
       geom_pointrange(
         aes(ymin = .data$CI_low, ymax = .data$CI_high),
-        size = point_size,
+        size = size_point,
         position = position_dodge(1 / length(unique(x$CI)))
       ) +
       coord_flip() +
@@ -154,7 +182,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
     x$group <- as.factor(x$Coefficient < y_intercept)
     p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$group)) +
       geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
-      geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = point_size) +
+      geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = size_point) +
       coord_flip() +
       theme_modern(legend.position = "none") +
       scale_color_material()
@@ -163,6 +191,18 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
 
   if (!is.null(pretty_names)) {
     p <- p + scale_x_discrete(labels = pretty_names)
+  }
+
+  # add coefficients and CIs?
+  if (add_values) {
+    # add some space to the right panel for text
+    space_factor <- sqrt(ceiling(diff(c(min(x$CI_low), max(x$CI_high)))) / 5)
+    new_range <- pretty(c(min(x$CI_low), max(x$CI_high) + space_factor))
+
+    p <- p +
+      geom_text(mapping = aes(label = .data$Estimate_CI, y = Inf),
+                colour = "black", hjust = "inward", size = size_text) +
+      ylim(c(min(new_range), max(new_range)))
   }
 
   # check for exponentiated estimates. in such cases, we transform the y-axis
@@ -174,6 +214,11 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
     range <- 2^c(-24:16)
     x_low <- which.min(min(x$CI_low) > range) - 1
     x_high <- which.max(max(x$CI_high) < range)
+    if (add_values) {
+      # add some space to the right panel for text
+      new_range <- pretty(2 * max(x$CI_high))
+      x_high <- which.max(max(new_range) < range)
+    }
     p <- p + scale_y_log10(
       breaks = range[x_low:x_high],
       limits = c(range[x_low], range[x_high]),
@@ -208,32 +253,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
   }
 
   if (isTRUE(is_meta)) {
-    measure <- switch(
-      meta_measure,
-      "MD" = "Raw Mean Difference",
-      "SMDH" = ,
-      "SMD" = "Standardized Mean Difference",
-      "ROM" = "Log transformed Ratio of Means",
-      "D2ORL" = ,
-      "D2ORN" = "Transformed Standardized Mean Difference",
-      "UCOR" = ,
-      "COR" = "Raw Correlation Coefficient",
-      "ZCOR" = "Z transformed Correlation Coefficient",
-      "PHI" = "Phi Coefficient",
-      "RR" = "Log Risk Ratio",
-      "OR" = "Log Odds Ratio",
-      "RD" = "Risk Difference",
-      "AS" = "Root transformed Risk Difference",
-      "PETO" = "Peto's Log Odds Ratio",
-      "PBIT" = "Standardized Mean Difference (Probit-transformed)",
-      "OR2DL" = ,
-      "OR2DN" = "Standardized Mean Difference (Odds Ratio-transformed)",
-      "IRR" = "Log Incidence Rate Ratio",
-      "IRD" = "Incidence Rate Difference",
-      "IRSD" = "Square Root transformed Incidence Rate Difference",
-      "GEN" = "Generic Estimate",
-      "Estimate"
-    )
+    measure <- .meta_measure(meta_measure)
     p + labs(
       x = "",
       y = measure,
@@ -246,4 +266,67 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, point_size = .8
       colour = "CI"
     )
   }
+}
+
+
+
+#' @importFrom effectsize change_scale
+#' @importFrom stats qnorm
+.funnel_plot <- function(x, size_point = 3, meta_measure = NULL) {
+  max_y <- max(pretty(max(x$SE) * 105)) / 100
+  measure <- .meta_measure(meta_measure)
+
+  dat_funnel <- data.frame(
+    se_range = effectsize::change_scale(1:(nrow(x) * 10), to = c(0, max_y))
+  )
+  estimate <- x$Coefficient[x$Parameter == "Overall"]
+
+  dat_funnel$ci_low <- estimate - stats::qnorm(.975) * dat_funnel$se_range
+  dat_funnel$ci_high <- estimate + stats::qnorm(.975) * dat_funnel$se_range
+
+  d_polygon <- data.frame(
+    x = c(min(dat_funnel$ci_low), estimate, max(dat_funnel$ci_high)),
+    y = c(max(dat_funnel$se_range), 0, max(dat_funnel$se_range))
+  )
+
+  ggplot(x, aes(x = .data$Coefficient, y = .data$SE)) +
+    scale_y_reverse(expand = c(0, 0), limits = c(max_y, 0)) +
+    geom_polygon(data = d_polygon, aes(.data$x, .data$y), fill = "grey80", alpha = .3) +
+    geom_line(data = dat_funnel, mapping = aes(x = .data$ci_low, y = .data$se_range), linetype = "dashed", color = "grey70") +
+    geom_line(data = dat_funnel, mapping = aes(x = .data$ci_high, y = .data$se_range), linetype = "dashed", color = "grey70") +
+    theme_modern() +
+    geom_vline(xintercept = estimate, colour = "grey70") +
+    geom_point(size = size_point, colour = "#34465d") +
+    labs(y = "Standard Error", x = measure)
+}
+
+
+
+.meta_measure <- function(meta_measure) {
+  switch(
+    meta_measure,
+    "MD" = "Raw Mean Difference",
+    "SMDH" = ,
+    "SMD" = "Standardized Mean Difference",
+    "ROM" = "Log transformed Ratio of Means",
+    "D2ORL" = ,
+    "D2ORN" = "Transformed Standardized Mean Difference",
+    "UCOR" = ,
+    "COR" = "Raw Correlation Coefficient",
+    "ZCOR" = "Z transformed Correlation Coefficient",
+    "PHI" = "Phi Coefficient",
+    "RR" = "Log Risk Ratio",
+    "OR" = "Log Odds Ratio",
+    "RD" = "Risk Difference",
+    "AS" = "Root transformed Risk Difference",
+    "PETO" = "Peto's Log Odds Ratio",
+    "PBIT" = "Standardized Mean Difference (Probit-transformed)",
+    "OR2DL" = ,
+    "OR2DN" = "Standardized Mean Difference (Odds Ratio-transformed)",
+    "IRR" = "Log Incidence Rate Ratio",
+    "IRD" = "Incidence Rate Difference",
+    "IRSD" = "Square Root transformed Incidence Rate Difference",
+    "GEN" = "Generic Estimate",
+    "Estimate"
+  )
 }

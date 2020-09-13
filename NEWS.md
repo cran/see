@@ -1,3 +1,25 @@
+# see 0.6.0
+
+## Breaking changes
+
+* Harmonized spelling of arguments. Formerly, we had `text_size` and `size_text`, or just `size` even if only in the context of text labels. We now tried to harmonize these kind of arguments to gain more consistency throughout the different `plot()` methods.
+
+## New plot functions
+
+* Added plot-function for `parameters::model_parameters()` for brms-meta-analysis models.
+* Added plot-function for `performance::pp_check()`.
+
+## Changes to functions
+
+* `plot()` for `parameters::model_parameters()` gains a `size_text`-argument, to add text values for estimates and confidence intervals to the plot (see also vignette). 
+* `plot()` for `parameters::model_parameters()` from meta-analysis models (e.g. from *metafor*) gains a `type` argument, to create funnel plots with `type = "funnel"`.
+* `plot()` for `bayestestR::estimate_density()` and `parameters::simulate_parameters()` were revised, and now also include the point-estimate and error bar. Therefore, arguments `centrality` and `ci` were added.
+
+## Bug fixes
+
+* Fixed bug in `plot.model_parameters()` when `standardize` was `"basic"`, `"smart"` or `"posthoc"`.
+* Fixed wrong axis labelling for ROC-curves (from `performance::performance_roc()`).
+
 # see 0.5.2
 
 ## Changes to functions
