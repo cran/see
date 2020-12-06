@@ -31,6 +31,10 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   exponentiated_coefs <- isTRUE(attributes(x)$exponentiate)
   y_intercept <- ifelse(exponentiated_coefs, 1, 0)
 
+  # label for coefficient scale
+  coefficient_name <- attributes(x)$coefficient_name
+  zi_coefficient_name <- attributes(x)$zi_coefficient_name
+
   # add coefficients and CIs?
   add_values <- !is.null(size_text) && !is.na(size_text)
 
@@ -61,7 +65,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
       if (all(x$Group == "")) {
         x$Group <- NULL
       } else {
-        x <- x[x$Group != "SD/Cor", , drop = FALSE]
+        x <- x[!grepl("^SD/Cor", x$Group), , drop = FALSE]
       }
     }
   }
@@ -88,6 +92,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   mc <- attributes(x)$model_class
   cp <- attributes(x)$cleaned_parameters
   is_meta <- !is.null(mc) && mc %in% c("rma", "rma.mv", "rma.uni", "metaplus")
+  is_meta_bma <- !is.null(mc) && mc %in% c("meta_random", "meta_fixed", "meta_bma")
 
   # minor fixes for Bayesian models
   if (!is.null(mc) && !is.null(cp) && mc %in% c("stanreg", "stanmvreg", "brmsfit")) {
@@ -114,6 +119,19 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
       if (missing(size_point)) size_point <- 2.5
       return(.funnel_plot(x, size_point, meta_measure))
     }
+  }
+
+  # data preparation for metaBMA-objects
+  if (is_meta_bma) {
+    overall <- which(x$Component == "meta")
+    x$group <- "study"
+    x$group[overall] <- "Overall"
+    x$size_point <- sqrt(x$Weight)
+    x$size_point[overall] <- 8
+    x$shape <- 19
+    x$shape[overall] <- 18
+    x$Component <- NULL
+    has_component <- FALSE
   }
 
   # if we have a model with multiple responses or response levels
@@ -154,7 +172,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
     x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
   }
 
-  if (is_meta) {
+  if (is_meta || is_meta_bma) {
     # plot setup for metafor-objects
     p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$group)) +
       geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
@@ -234,6 +252,8 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   else
     facet_scales <- "free"
 
+  axis_title_in_facet <- FALSE
+
   if (has_component && has_response && has_effects) {
     p <- p + facet_wrap(~Response + Effects + Component, ncol = n_columns, scales = facet_scales)
   } else if (has_component && has_effects) {
@@ -243,7 +263,15 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   } else if (has_effects && has_response) {
     p <- p + facet_wrap(~Response + Effects , ncol = n_columns, scales = facet_scales)
   } else if (has_component) {
-    p <- p + facet_wrap(~Component, ncol = n_columns, scales = facet_scales)
+    if (!is.null(zi_coefficient_name) && !is.null(coefficient_name) && zi_coefficient_name != coefficient_name) {
+      coef_labeller <- function(string) {
+        paste0(gsub("(\\(|\\))", "", string), " (", c(coefficient_name, zi_coefficient_name), ")")
+      }
+      p <- p + facet_wrap(~Component, ncol = n_columns, scales = facet_scales, labeller = as_labeller(coef_labeller))
+      axis_title_in_facet <- TRUE
+    } else {
+      p <- p + facet_wrap(~Component, ncol = n_columns, scales = facet_scales)
+    }
   } else if (has_effects) {
     p <- p + facet_wrap(~Effects, ncol = n_columns, scales = facet_scales)
   } else if (has_response) {
@@ -260,11 +288,19 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
       colour = "CI"
     )
   } else {
-    p + labs(
-      x = "Parameter",
-      y = ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"),
-      colour = "CI"
-    )
+    if (isTRUE(axis_title_in_facet)) {
+      p + labs(
+        x = "Parameter",
+        y = NULL,
+        colour = "CI"
+      )
+    } else {
+      p + labs(
+        x = "Parameter",
+        y = ifelse(is.null(coefficient_name), ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"), coefficient_name),
+        colour = "CI"
+      )
+    }
   }
 }
 

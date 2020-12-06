@@ -12,7 +12,7 @@
 
 .compact_list <- function(x) {
   if (!is.null(x) && length(x) > 0 && is.list(x)) {
-    x[!sapply(x, function(i) length(i) == 0 || is.null(i) || any(i == "NULL"))]
+    x[!sapply(x, function(i) length(i) == 0 || is.null(i) || any(i == "NULL", na.rm = TRUE))]
   } else {
     x
   }
@@ -126,6 +126,7 @@
       x$Component[x$Component == "simplex"] <- "Monotonic Effects"
     } else {
       x$Component[x$Component == "conditional"] <- "(Conditional)"
+      x$Component[x$Component == "zero_inflated"] <- "(Zero-Inflated)"
       x$Component[x$Component == "dispersion"] <- "(Dispersion)"
       x$Component[x$Component == "simplex"] <- "(Monotonic Effects)"
     }

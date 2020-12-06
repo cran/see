@@ -1,6 +1,6 @@
-0f1419410cd96ece5f53970242b0a2c8 *DESCRIPTION
-a0d68c97595c48ac0b33982dc51086a8 *NAMESPACE
-f807fd25063b3c82d8a252a0b8fdc000 *NEWS.md
+3d97558ce8d6a92bd9bc9fc002cc461d *DESCRIPTION
+287ba05d1191bbe0ad37ec3646950bbc *NAMESPACE
+1b288f4f5fb429faf9bcb5257e8940b4 *NEWS.md
 31fad6221d881924055f4e42432958d2 *R/coord_radar.R
 e93c4f4f6866c0dcfc2e8f218df2b39a *R/data_plot.R
 a45301304b0aa070bfe889a53039dc85 *R/geom_point2.R
@@ -17,9 +17,9 @@ fd234cf23089a087b3856ed9208a0328 *R/plot.check_collinearity.R
 1c6ea9b67276c4ed74ba22fb28881fcb *R/plot.check_normality.R
 ec887f9625ce0ffedbb2d4a4a0d1b761 *R/plot.check_outliers.R
 76c83f4e0ec71ade502403d21e6ed45d *R/plot.cluster_analysis.R
-93e85d1fde1bfc3c6b7d6cf6201b79db *R/plot.compare_performance.R
+e2dbacc8f42910c8a51706047e753a84 *R/plot.compare_performance.R
 da00dc8b22872f6115448e5dfdcce34d *R/plot.describe_distribution.R
-f54284927c016a79b6fffd82d4a5c739 *R/plot.easycormatrix.R
+31f33c4f386e453a3f66e0b73014a62f *R/plot.easycormatrix.R
 e3a989617bdd246e4f33ce5eecf205f5 *R/plot.easycorrelation.R
 136c49dedcb8a5441cb2999c6df00112 *R/plot.effectsize_table.R
 aa16528a36dbfc85058dfbd302bd0b37 *R/plot.equivalence_test.R
@@ -30,10 +30,10 @@ f9309a2006aaed40fafcf80fd8035984 *R/plot.hdi.R
 ca60d50d0e9386dbb3df9462a15d2837 *R/plot.p_direction.R
 e019255626fe93c79ad968cc28c24cb8 *R/plot.p_significance.R
 2c75b8f8720adea76d2e169ff107e46d *R/plot.parameters_brms_meta.R
-a1aa1582c439bfffb099127b37613f88 *R/plot.parameters_model.R
+72a82e1b71689f4a3d6360e527cd3ecd *R/plot.parameters_model.R
 1a8254fef586cf90c5cfa057c799428d *R/plot.parameters_pca.R
 6e135ed6a242ee739a771ab33afac32d *R/plot.parameters_sem.R
-67929c4821eb67366a545d429fb5377c *R/plot.parameters_simulate.R
+778de6019902ff0e324da727559e6b51 *R/plot.parameters_simulate.R
 5b059b1561d488508171a7fb59f05f5d *R/plot.performance_pp_check.R
 1d6ffd75ab50812749c8a2df9e5e4a10 *R/plot.performance_roc.R
 930e5d1c5c3dd9a9dd8c1fa6ac3c5a6d *R/plot.point_estimates.R
@@ -56,7 +56,7 @@ a35a5fd3740df965b17b8b50c0e3215b *R/theme_abyss.R
 abfe73779194eb9ddbf5c53f8da70c8c *R/theme_lucid.R
 4ae6ea992eb2108018f854421df85865 *R/theme_modern.R
 9af07ecc9bad064b2b1e5e9e4831e74e *R/theme_radar.R
-d2e7319cb71b1bd72582aba41ba5a97c *R/utils.R
+69835023aadaa609de22b51411b995e0 *R/utils.R
 822a6b45b6bd5fe62f9dfdc6a9decb07 *R/utils_add_prior_layer.R
 9ec07132c0fd6dde4110955b82a7be81 *inst/CITATION
 6b5c3cd409f4a7ffc57287266e9d4e06 *man/add_plot_attributes.Rd
