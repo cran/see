@@ -1,8 +1,22 @@
+# see 0.6.2
+
+## Changes to functions
+
+* `plot()` for `performance::check_normality()` gains a `alpha`-argument, to change the alpha-level of confidence bands.
+* The `...` argument for `geom_violindot()` is now also passed to to `geom_violinhalf()`, allowing, e.g., to change the alpha value of the violin-geoms as well.
+* Reorganized order of arguments in `geom_violindot()`, so aesthetics arguments like `fill` are not absorbed by partial matching for arguments like `fill_dots`.
+
+## Bug fixes
+
+* `plot()` for `performance::check_normality()` shows more accurate QQ-plots.
+* `plot()` for `performance::check_normality()` show correct confidence bands for QQ- and PP-plots (with `qqplotr`). Previous bands were extremely narrow!
+
 # see 0.6.1
 
 ## Changes to functions
 
 * `plot()` for `parameters::model_parameters()` now supports models from package *metaBMA*
+* `plot()` for `parameters::model_parameters()` gains a `weight_points` argument, to adjust the point-size depending on study-weights for meta-analysis models.
 * `plot()` for `parameters::model_parameters()` now labels the x-axis depending on model-type (i.e. "Odds Ratio" instead of "Exp(Estimate)") when this information is available.
 
 ## Bug fixes

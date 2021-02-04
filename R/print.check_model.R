@@ -10,12 +10,17 @@ print.see_check_model <- function(x, ...) {
   size_point <- attr(x, "dot_size")
   size_line <- attr(x, "line_size")
   size_text <- attr(x, "text_size")
+  alpha_level <- attr(x, "alpha")
 
-  if (is.null(check)) check <- all
+  if (is.null(alpha_level)) {
+    alpha_level <- .2
+  }
+
+  if (is.null(check)) check <- "all"
 
   if ("VIF" %in% names(x) && any(c("vif", "all") %in% check)) p$VIF <- .plot_diag_vif(x$VIF)
-  if ("QQ" %in% names(x) && any(c("qq", "all") %in% check)) p$QQ <- .plot_diag_qq(x$QQ, size_point, size_line)
-  if ("NORM" %in% names(x) && any(c("normality", "all") %in% check)) p$NORM <- .plot_diag_norm(x$NORM, size_line)
+  if ("QQ" %in% names(x) && any(c("qq", "all") %in% check)) p$QQ <- .plot_diag_qq(x$QQ, size_point, size_line, alpha_level = alpha_level)
+  if ("NORM" %in% names(x) && any(c("normality", "all") %in% check)) p$NORM <- .plot_diag_norm(x$NORM, size_line, alpha_level = alpha_level)
   if ("NCV" %in% names(x) && any(c("ncv", "all") %in% check)) p$NCV <- .plot_diag_ncv(x$NCV, size_point, size_line)
   if ("HOMOGENEITY" %in% names(x) && any(c("homogeneity", "all") %in% check)) p$HOMOGENEITY <- .plot_diag_homogeneity(x$HOMOGENEITY, size_point, size_line)
   if ("OUTLIERS" %in% names(x) && any(c("outliers", "all") %in% check)) {
@@ -29,7 +34,7 @@ print.see_check_model <- function(x, ...) {
   }
 
   if ("REQQ" %in% names(x) && any(c("reqq", "all") %in% check)) {
-    ps <- .plot_diag_reqq(x$REQQ, size_point, size_line)
+    ps <- .plot_diag_reqq(x$REQQ, size_point, size_line, alpha_level = alpha_level)
     for (i in 1:length(ps)) {
       p[[length(p) + 1]] <- ps[[i]]
     }
@@ -70,13 +75,13 @@ print.see_check_model <- function(x, ...) {
 
 
 
-.plot_diag_norm <- function(x, size_line) {
+.plot_diag_norm <- function(x, size_line, alpha_level = .2) {
   ggplot(x, aes(x = .data$x)) +
     geom_ribbon(
       mapping = aes(ymin = 0, ymax = .data$y),
       colour = unname(flat_colors("blue grey")),
       fill = unname(flat_colors("light blue")),
-      alpha = 0.2
+      alpha = alpha_level
     ) +
     geom_line(
       mapping = aes(y = .data$curve),
@@ -94,14 +99,32 @@ print.see_check_model <- function(x, ...) {
 
 
 
-.plot_diag_qq <- function(x, size_point, size_line) {
-  ggplot(x, aes(x = .data$x, y = .data$y)) +
-    stat_smooth(method = "lm", size = size_line, colour = unname(flat_colors("teal"))) +
-    geom_point2(colour = "#2c3e50", size = size_point) +
+.plot_diag_qq <- function(x, size_point, size_line, alpha_level = .2) {
+  if (requireNamespace("qqplotr")) {
+    qq_stuff <- list(
+      qqplotr::stat_qq_band(alpha = alpha_level),
+      qqplotr::stat_qq_line(size = size_line,
+                            colour = unname(flat_colors("teal"))),
+      qqplotr::stat_qq_point(shape = 16, stroke = 0,
+                             size = size_point,
+                             colour = "#2c3e50")
+    )
+  } else {
+    message("For confidence bands, please install `qqplotr`.")
+    qq_stuff <- list(
+      geom_qq(shape = 16, stroke = 0,
+              size = size_point,
+              colour = "#2c3e50"),
+      geom_qq_line(size = size_line,
+                   colour = unname(flat_colors("teal")))
+    )
+  }
+  ggplot(x, aes(sample = .data$y)) +
+    qq_stuff +
     labs(
-      title = "Non-normality of Residuals and Outliers",
+      title = "Non-normality of Residuals",
       subtitle = "Dots should be plotted along the line",
-      y = "(Studentized) Residuals",
+      y = "Sample Quantiles",
       x = "Theoretical Quantiles"
     ) +
     theme_lucid(base_size = 10, plot.title.space = 3, axis.title.space = 5)
@@ -110,15 +133,37 @@ print.see_check_model <- function(x, ...) {
 
 
 
-.plot_diag_pp <- function(x, size_point, size_line) {
-  ggplot(x, aes(x = .data$x, y = .data$y)) +
-    stat_smooth(method = "lm", size = size_line, colour = unname(flat_colors("teal"))) +
-    geom_point2(colour = "#2c3e50", size = size_point) +
+.plot_diag_pp <- function(x, size_point, size_line, alpha_level = .2) {
+  if (requireNamespace("qqplotr", quietly = TRUE)) {
+    p_plot <- ggplot(x, aes(sample = .data$res)) +
+      qqplotr::stat_pp_band(alpha = alpha_level) +
+      qqplotr::stat_pp_line(size = size_line,
+                            colour = unname(flat_colors("teal"))) +
+      qqplotr::stat_pp_point(shape = 16, stroke = 0,
+                             size = size_point,
+                             colour = "#2c3e50")
+  } else if (requireNamespace("MASS", quietly = TRUE)) {
+    message("For confidence bands, please install `qqplotr`.")
+
+    x$probs <- stats::ppoints(x$res)
+    dparms <- MASS::fitdistr(x$res, densfun = "normal")
+    x$y <- do.call(stats::pnorm, c(list(q = x$res), dparms$estimate))
+
+    p_plot <- ggplot(x, aes(x = .data$probs, y = .data$y)) +
+      geom_abline(slope = 1,
+                  size = size_line,
+                  colour = unname(flat_colors("teal"))) +
+      geom_point2(colour = "#2c3e50", size = size_point)
+  } else {
+    stop("Package 'qqplotr' OR 'MASS' required for PP-plots. Please install one of them.", call. = FALSE)
+  }
+
+  p_plot +
     labs(
-      title = "Non-normality of Residuals and Outliers (PP plot)",
+      title = "Non-normality of Residuals (PP plot)",
       subtitle = "Dots should be plotted along the line",
-      y = "Residuals",
-      x = "Theoretical Quantiles"
+      y = "Cummulative Probability",
+      x = "Probability Points"
     ) +
     theme_lucid(base_size = 10, plot.title.space = 3, axis.title.space = 5)
 }
@@ -156,7 +201,7 @@ print.see_check_model <- function(x, ...) {
 
 
 
-.plot_diag_reqq <- function(x, size_point, size_line, panel = TRUE) {
+.plot_diag_reqq <- function(x, size_point, size_line, panel = TRUE, alpha_level = .2) {
   lapply(names(x), function(i) {
     dat <- x[[i]]
     p <- ggplot(dat, aes(x = .data$x, y = .data$y)) +
@@ -168,7 +213,7 @@ print.see_check_model <- function(x, ...) {
       ) +
       stat_smooth(
         method = "lm",
-        alpha = .2,
+        alpha = alpha_level,
         size = size_line,
         colour = unname(flat_colors("teal"))
       ) +
