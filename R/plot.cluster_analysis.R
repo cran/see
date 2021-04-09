@@ -1,15 +1,22 @@
 #' @export
 data_plot.cluster_analysis <- function(x, data = NULL, ...) {
   dat <- .retrieve_data(x)
-  dataplot <- .reshape_to_long(dat, names_to = "Group", values_to = "Z_Score", columns = 2:ncol(dat))
+  dataplot <- .reshape_to_long(
+    dat,
+    names_to = "Group",
+    values_to = "Z_Score",
+    columns = 2:ncol(dat)
+  )
 
   dataplot$Group <- as.factor(dataplot$Group)
   dataplot$Term <- factor(dataplot$Term, levels = unique(dat$Term))
 
-  attr(dataplot, "info") <- list("xlab" = "Cluster Group",
-                                 "ylab" = "Mean Z-Score",
-                                 "legend_fill" = "Variable",
-                                 "title" = "Cluster Analysis")
+  attr(dataplot, "info") <- list(
+    "xlab" = "Cluster Group",
+    "ylab" = "Mean Z-Score",
+    "legend_fill" = "Variable",
+    "title" = "Cluster Analysis"
+  )
 
   class(dataplot) <- c("data_plot", "see_cluster_analysis", class(dataplot))
   dataplot
@@ -23,7 +30,9 @@ data_plot.cluster_analysis <- function(x, data = NULL, ...) {
 #'
 #' The \code{plot()} method for the \code{parameters::cluster_analysis()} function.
 #'
-#' @param n_columns For models with multiple components (like fixed and random, count and zero-inflated), defines the number of columns for the panel-layout. If \code{NULL}, a single, integrated plot is shown.
+#' @param n_columns For models with multiple components (like fixed and random,
+#'   count and zero-inflated), defines the number of columns for the
+#'   panel-layout. If \code{NULL}, a single, integrated plot is shown.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_check_normality
 #' @inheritParams plot.see_parameters_distribution
@@ -47,7 +56,7 @@ plot.see_cluster_analysis <- function(x, data = NULL, n_columns = NULL, size_bar
 
   if (!is.null(n_columns)) {
     p <- p +
-      facet_wrap(~ Group, ncol = n_columns, scales = "free_x") +
+      facet_wrap(~Group, ncol = n_columns, scales = "free_x") +
       scale_x_discrete(labels = NULL, breaks = NULL)
   }
 

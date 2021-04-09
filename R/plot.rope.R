@@ -1,5 +1,5 @@
 #' @export
-data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...){
+data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...) {
   if (is.null(data)) {
     data <- .retrieve_data(x)
   }
@@ -93,14 +93,22 @@ data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...){
 #' }
 #' @importFrom rlang .data
 #' @export
-plot.see_rope <- function(x, data = NULL, rope_alpha = 0.5, rope_color = "cadetblue", show_intercept = FALSE, n_columns = 1, ...) {
+plot.see_rope <- function(x,
+                          data = NULL,
+                          rope_alpha = 0.5,
+                          rope_color = "cadetblue",
+                          show_intercept = FALSE,
+                          n_columns = 1,
+                          ...) {
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x, data = data, show_intercept = show_intercept)
   }
 
   # check if we have multiple panels
   if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-      (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) n_columns <- NULL
+    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+    n_columns <- NULL
+  }
 
   # get labels
   labels <- .clean_parameter_names(x$y, grid = !is.null(n_columns))
@@ -113,7 +121,8 @@ plot.see_rope <- function(x, data = NULL, rope_alpha = 0.5, rope_color = "cadetb
       height = .data$height,
       group = .data$y,
       fill = .data$fill
-    )) +
+    )
+  ) +
     ggridges::geom_ridgeline_gradient() +
     annotate(
       "rect",
@@ -136,12 +145,11 @@ plot.see_rope <- function(x, data = NULL, rope_alpha = 0.5, rope_color = "cadetb
     if ("Component" %in% names(x) && "Effects" %in% names(x)) {
       p <- p + facet_wrap(~ Effects + Component, scales = "free", ncol = n_columns)
     } else if ("Effects" %in% names(x)) {
-      p <- p + facet_wrap(~ Effects, scales = "free", ncol = n_columns)
+      p <- p + facet_wrap(~Effects, scales = "free", ncol = n_columns)
     } else if ("Component" %in% names(x)) {
-      p <- p + facet_wrap(~ Component, scales = "free", ncol = n_columns)
+      p <- p + facet_wrap(~Component, scales = "free", ncol = n_columns)
     }
   }
 
   p
 }
-

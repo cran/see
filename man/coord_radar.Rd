@@ -9,7 +9,8 @@ coord_radar(theta = "x", start = 0, direction = 1, ...)
 \arguments{
 \item{theta}{Can be 'x' or 'y'.}
 
-\item{start}{Starting position. Best expressed in terms of \code{pi} (e.g., \code{-pi/4}).}
+\item{start}{Starting position. Best expressed in terms of \code{pi} (e.g.,
+\code{-pi/4}).}
 
 \item{direction}{The direction of plotting. Can be 1 or -1.}
 
@@ -29,6 +30,6 @@ if (require("dplyr") && require("tidyr") && require("ggplot2")) {
   data \%>\%
     ggplot(aes(x = name, y = value, color = Species, group = Species)) +
     geom_polygon(fill = NA, size = 2) +
-    coord_radar(start = -pi/4)
+    coord_radar(start = -pi / 4)
 }
 }

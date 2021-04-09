@@ -1,7 +1,11 @@
 #' @importFrom insight clean_parameters
 #' @importFrom dplyr group_by mutate ungroup select one_of n
 #' @export
-data_plot.p_significance <- function(x, data = NULL, grid = TRUE, show_intercept = FALSE, ...){
+data_plot.p_significance <- function(x,
+                                     data = NULL,
+                                     grid = TRUE,
+                                     show_intercept = FALSE,
+                                     ...) {
   if (is.null(data)) {
     data <- .retrieve_data(x)
   }
@@ -62,7 +66,6 @@ data_plot.p_significance <- function(x, data = NULL, grid = TRUE, show_intercept
         }
       }
     }
-
   } else {
     levels_order <- NULL
     dataplot <- .compute_densities_pd(data[, 1], name = "Posterior")
@@ -97,10 +100,12 @@ data_plot.p_significance <- function(x, data = NULL, grid = TRUE, show_intercept
 
   dataplot <- .fix_facet_names(dataplot)
 
-  attr(dataplot, "info") <- list("xlab" = "Possible parameter values",
-                                 "ylab" = ylab,
-                                 "legend_fill" = "Probability",
-                                 "title" = "Practical Significance")
+  attr(dataplot, "info") <- list(
+    "xlab" = "Possible parameter values",
+    "ylab" = ylab,
+    "legend_fill" = "Probability",
+    "title" = "Practical Significance"
+  )
 
   class(dataplot) <- c("data_plot", "see_p_significance", class(dataplot))
   dataplot
@@ -159,7 +164,14 @@ data_plot.p_significance <- function(x, data = NULL, grid = TRUE, show_intercept
 #' @importFrom rlang .data
 #' @importFrom ggridges geom_ridgeline_gradient
 #' @export
-plot.see_p_significance <- function(x, data = NULL, show_intercept = FALSE, priors = FALSE, priors_alpha = .4, n_columns = 1, ...) {
+plot.see_p_significance <- function(x,
+                                    data = NULL,
+                                    show_intercept = FALSE,
+                                    priors = FALSE,
+                                    priors_alpha = .4,
+                                    n_columns = 1,
+                                    ...) {
+
   # save model for later use
   model <- .retrieve_data(x)
 
@@ -170,7 +182,9 @@ plot.see_p_significance <- function(x, data = NULL, show_intercept = FALSE, prio
 
   # check if we have multiple panels
   if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-      (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) n_columns <- NULL
+    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+    n_columns <- NULL
+  }
 
   # get labels
   labels <- .clean_parameter_names(x$y, grid = !is.null(n_columns))
@@ -218,12 +232,11 @@ plot.see_p_significance <- function(x, data = NULL, show_intercept = FALSE, prio
     if ("Component" %in% names(x) && "Effects" %in% names(x)) {
       p <- p + facet_wrap(~ Effects + Component, scales = "free", ncol = n_columns)
     } else if ("Effects" %in% names(x)) {
-      p <- p + facet_wrap(~ Effects, scales = "free", ncol = n_columns)
+      p <- p + facet_wrap(~Effects, scales = "free", ncol = n_columns)
     } else if ("Component" %in% names(x)) {
-      p <- p + facet_wrap(~ Component, scales = "free", ncol = n_columns)
+      p <- p + facet_wrap(~Component, scales = "free", ncol = n_columns)
     }
   }
 
   p
 }
-

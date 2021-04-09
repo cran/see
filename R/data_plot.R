@@ -19,6 +19,7 @@
 #'  \item{\link[=plot.see_effectsize_table]{effectsize::effectsize()}}
 #'  \item{\link[=plot.see_estimate_contrasts]{modelbased::estimate_contrasts()}}
 #'  \item{\link[=plot.see_cluster_analysis]{parameters::cluster_analysis()}}
+#'  \item{\link[=plot.see_compare_parameters]{parameters::compare_parameters()}}
 #'  \item{\link[=plot.see_parameters_distribution]{parameters::describe_distribution()}}
 #'  \item{\link[=plot.see_parameters_model]{parameters::model_parameters()}}
 #'  \item{\link[=plot.see_parameters_pca]{parameters::principal_components()}}
@@ -32,6 +33,7 @@
 #'  \item{\link[=plot.see_check_outliers]{performance::check_outliers()}}
 #'  \item{\link[=plot.see_compare_performance]{performance::compare_performance()}}
 #'  \item{\link[=plot.see_performance_roc]{performance::performance_roc()}}
+#'  \item{\link[=plot.see_performance_pp_check]{performance::pp_check()}}
 #'  }
 #'
 #' @param x An object.
@@ -90,7 +92,7 @@
 #' }
 #'
 #' @export
-data_plot <- function(x, data = NULL, ...){
+data_plot <- function(x, data = NULL, ...) {
   UseMethod("data_plot")
 }
 
@@ -122,7 +124,8 @@ data_plot <- function(x, data = NULL, ...){
 #'   ggridges::geom_ridgeline_gradient()
 #'
 #' p
-#' p + add_plot_attributes(data)}
+#' p + add_plot_attributes(data)
+#' }
 #' @export
 add_plot_attributes <- function(x) {
   info <- attributes(x)$info
@@ -152,20 +155,25 @@ add_plot_attributes <- function(x) {
 
   if (!is.null(obj_name)) {
     # first try, parent frame
-    dat <- tryCatch({
-      get(obj_name, envir = parent.frame())
-    },
-    error = function(e) { NULL }
+    dat <- tryCatch(
+      {
+        get(obj_name, envir = parent.frame())
+      },
+      error = function(e) {
+        NULL
+      }
     )
 
     if (is.null(dat)) {
       # second try, global env
-      dat <- tryCatch({
-        get(obj_name, envir = globalenv())
-      },
-      error = function(e) { NULL }
+      dat <- tryCatch(
+        {
+          get(obj_name, envir = globalenv())
+        },
+        error = function(e) {
+          NULL
+        }
       )
-
     }
   }
 

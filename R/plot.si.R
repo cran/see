@@ -4,7 +4,9 @@
 #'
 #' @param si_alpha Transparency level of SI ribbon.
 #' @param si_color Color of SI ribbon.
-#' @param support_only Plot only the support data, or show the "raw" prior and posterior distributions? Only applies when plotting \code{\link[bayestestR]{si}}.
+#' @param support_only Plot only the support data, or show the "raw" prior and
+#'   posterior distributions? Only applies when plotting
+#'   \code{\link[bayestestR]{si}}.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_cluster_analysis
@@ -23,18 +25,22 @@
 #' }
 #' @importFrom rlang .data
 #' @export
-plot.see_si <- function(x, si_color = "#0171D3", si_alpha = .2, show_intercept = FALSE, support_only = FALSE, ...) {
+plot.see_si <- function(x,
+                        si_color = "#0171D3",
+                        si_alpha = .2,
+                        show_intercept = FALSE,
+                        support_only = FALSE, ...) {
   plot_data <- attr(x, "plot_data")
   x$ind <- x$Parameter
 
   # if we have intercept-only models, keep at least the intercept
   intercepts_data <- which(.in_intercepts(plot_data$ind))
   if (length(intercepts_data) &&
-      nrow(plot_data) > length(intercepts_data) &&
-      !show_intercept) {
+    nrow(plot_data) > length(intercepts_data) &&
+    !show_intercept) {
     intercepts_si <- which(.in_intercepts(x$ind))
     x <- x[-intercepts_si, ]
-    plot_data <- plot_data[-intercepts_data,]
+    plot_data <- plot_data[-intercepts_data, ]
   }
 
 
@@ -71,7 +77,6 @@ plot.see_si <- function(x, si_color = "#0171D3", si_alpha = .2, show_intercept =
         linetype = "dashed", colour = "grey50",
         inherit.aes = FALSE
       ) +
-
       labs(
         x = "",
         title = paste0("Support Interval (BF = ", x$CI[1], " SI)")
@@ -86,19 +91,21 @@ plot.see_si <- function(x, si_color = "#0171D3", si_alpha = .2, show_intercept =
     precision <- 2^8
 
     support_data <- lapply(support_data, function(d) {
-      x_vals <- seq(min(d$x),max(d$x), length.out = precision)
+      x_vals <- seq(min(d$x), max(d$x), length.out = precision)
 
       prior_y <- stats::approx(
         d$x[d$Distribution == "prior"],
         d$y[d$Distribution == "prior"],
-        xout = x_vals)$y
+        xout = x_vals
+      )$y
 
       posterior_y <- stats::approx(
         d$x[d$Distribution == "posterior"],
         d$y[d$Distribution == "posterior"],
-        xout = x_vals)$y
+        xout = x_vals
+      )$y
 
-      updating_factor <- posterior_y/prior_y
+      updating_factor <- posterior_y / prior_y
       # updating_factor[is.na(updating_factor)] <- 0
       x_vals <- x_vals[!is.na(updating_factor)]
       updating_factor <- updating_factor[!is.na(updating_factor)]
@@ -120,9 +127,11 @@ plot.see_si <- function(x, si_color = "#0171D3", si_alpha = .2, show_intercept =
       labs(y = "Updating Factor")
   } else {
     p <- p +
-      aes(y = .data$y,
-          color = .data$Distribution,
-          fill = .data$Distribution) +
+      aes(
+        y = .data$y,
+        color = .data$Distribution,
+        fill = .data$Distribution
+      ) +
       # distributions
       geom_line(size = 1, data = plot_data) +
       geom_area(alpha = 0.15, data = plot_data) +
@@ -130,7 +139,7 @@ plot.see_si <- function(x, si_color = "#0171D3", si_alpha = .2, show_intercept =
   }
 
   if (length(unique(plot_data$ind)) > 1) {
-    p <- p + facet_wrap( ~ ind, scales = "free")
+    p <- p + facet_wrap(~ind, scales = "free")
   }
 
   p

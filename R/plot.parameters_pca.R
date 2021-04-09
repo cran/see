@@ -1,5 +1,5 @@
 #' @export
-data_plot.parameters_pca <- function(x, data = NULL, ...){
+data_plot.parameters_pca <- function(x, data = NULL, ...) {
   dataplot <- as.data.frame(x)
   dataplot$Complexity <- NULL
   dataplot$Uniqueness <- NULL
@@ -10,7 +10,12 @@ data_plot.parameters_pca <- function(x, data = NULL, ...){
     dataplot$Label <- NULL
   }
 
-  dataplot <- .reshape_to_long(dataplot, names_to = "Component", values_to = "y", columns = 2:ncol(dataplot))
+  dataplot <- .reshape_to_long(
+    dataplot,
+    names_to = "Component",
+    values_to = "y",
+    columns = 2:ncol(dataplot)
+  )
   dataplot$Variable <- factor(dataplot$Variable, levels = rev(unique(dataplot$Variable)))
 
   rotation_name <- attr(x, "rotation", exact = TRUE)
@@ -62,15 +67,19 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #' plot(result)
 #' @importFrom rlang .data
 #' @export
-plot.see_parameters_pca <- function(x, type = c("bar", "line"), size_text = 3.5, text_color = "black", size = 1, ...) {
+plot.see_parameters_pca <- function(x,
+                                    type = c("bar", "line"),
+                                    size_text = 3.5,
+                                    text_color = "black",
+                                    size = 1,
+                                    ...) {
   type <- match.arg(type)
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x)
   }
 
   if (missing(size)) {
-    size <- switch(
-      type,
+    size <- switch(type,
       "bar" = .6,
       "line" = 1,
       1
@@ -84,7 +93,8 @@ plot.see_parameters_pca <- function(x, type = c("bar", "line"), size_text = 3.5,
       y = abs(.data$y),
       fill = .data$y,
       color = .data$y
-    ))
+    )
+  )
 
   if (type == "bar") {
     p <- p +
@@ -106,7 +116,7 @@ plot.see_parameters_pca <- function(x, type = c("bar", "line"), size_text = 3.5,
       breaks = c(0, .25, .5, .75, 1, 1.25),
       labels = c("0", "0.25", "0.5", "0.75", "1", "")
     ) +
-    facet_wrap(~ Component) +
+    facet_wrap(~Component) +
     add_plot_attributes(x)
 
   p

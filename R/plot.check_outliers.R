@@ -1,9 +1,14 @@
 #' Plot method for checking outliers
 #'
-#' The \code{plot()} method for the \code{performance::check_outliers()} function.
+#' The \code{plot()} method for the \code{performance::check_outliers()}
+#' function.
 #'
 #' @param size_text Size of text labels.
+#' @param rescale_distance Logical, if \code{TRUE}, distance values are rescaled
+#'   to a range from 0 to 1. This is mainly due to better catch the differences
+#'   between distance values.
 #' @inheritParams data_plot
+#' @inheritParams plot.see_check_normality
 #'
 #' @return A ggplot2-object.
 #'
@@ -18,13 +23,19 @@
 #' model <- lm(disp ~ mpg + hp, data = mt2)
 #' plot(check_outliers(model))
 #' @export
-plot.see_check_outliers <- function(x, size_text = 3.5, ...) {
+plot.see_check_outliers <- function(x, size_text = 3.5, size_line = .8, dot_alpha = .8, colors = c("#3aaf85", "#1b6ca8", "#cd201f"), rescale_distance = TRUE, type = c("dots", "bars"), ...) {
+  type <- match.arg(type)
+  influential_obs <- attributes(x)$influential_obs
   methods <- attr(x, "methods", exact = TRUE)
 
-  if (length(methods == 1)) {
-    .plot_diag_outliers(x, size_text)
+  if (type == "dots" && !is.null(influential_obs) && (is.null(methods) || length(methods) == 1)) {
+    .plot_diag_outliers_new(influential_obs, size_text = size_text, size_line = size_line, dot_alpha_level = dot_alpha, colors = colors)
   } else {
-    .plot_outliers_multimethod(x)
+    if (length(methods == 1)) {
+      .plot_diag_outliers(x, size_text, rescale_distance)
+    } else {
+      .plot_outliers_multimethod(x, rescale_distance)
+    }
   }
 }
 
@@ -32,13 +43,15 @@ plot.see_check_outliers <- function(x, size_text = 3.5, ...) {
 #' @importFrom stats reshape
 #' @importFrom effectsize normalize
 #' @export
-data_plot.check_outliers <- function(x, data = NULL, ...) {
+data_plot.check_outliers <- function(x, data = NULL, rescale_distance = TRUE, ...) {
   data <- attributes(x)$data
   row.names(data) <- data$Obs
 
   # Extract distances
   d <- data[grepl("Distance_", names(data))]
-  d <- effectsize::normalize(d, verbose = FALSE)
+  if (rescale_distance) {
+    d <- effectsize::normalize(d, verbose = FALSE)
+  }
 
   d_long <- stats::reshape(
     d,
@@ -52,19 +65,18 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
   d_long$Obs <- as.factor(d_long$id)
   row.names(d_long) <- d_long$id <- NULL
   d_long$Method <- gsub("Distance_", "", d_long$Method)
+  attr(d_long, "rescale_distance") <- isTRUE(rescale_distance)
   d_long
 }
 
 
-.plot_diag_outliers <- function(x, size_text = 3.5) {
-  d <- data_plot(x)
+.plot_diag_outliers <- function(x, size_text = 3.5, rescale_distance = TRUE) {
+  d <- data_plot(x, rescale_distance = rescale_distance)
   d$Id <- 1:nrow(d)
   d$Outliers <- as.factor(attr(x, "data", exact = TRUE)[["Outlier"]])
   d$Id[d$Outliers == "0"] <- NA
-  d$Distance <- effectsize::normalize(d$Distance, verbose = FALSE)
 
-  method <- switch(
-    attr(x, "method", exact = TRUE),
+  method <- switch(attr(x, "method", exact = TRUE),
     "cook" = "Cook's Distance",
     "pareto" = "Pareto",
     "mahalanobis" = "Mahalanobis Distance",
@@ -76,14 +88,21 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
   )
 
   threshold <- attr(x, "threshold", exact = TRUE)[[method]]
+  rescaled <- attr(d, "rescale_distance")
+  if (isTRUE(rescaled)) {
+    x_lab <- paste0(method, " (rescaled range 0-1)")
+  } else {
+    x_lab <- method
+  }
 
   if (is.null(size_text)) size_text <- 3.5
 
   p <- ggplot(d, aes(x = .data$Distance, fill = .data$Outliers, label = .data$Id)) +
     geom_histogram() +
     labs(
-      title = "Check for Influential Observations",
-      x = method,
+      title = "Influential Observations",
+      subtitle = "High Cook's distance might reflect potential outliers",
+      x = x_lab,
       y = "Count",
       fill = NULL
     ) +
@@ -100,29 +119,49 @@ data_plot.check_outliers <- function(x, data = NULL, ...) {
   }
 
 
-  if (requireNamespace("ggrepel", quietly = TRUE))
-    p <- p + ggrepel::geom_text_repel(y = 2.5, size = size_text)
-  else
-    p <- p + geom_text(y = 2.5, size = size_text)
+  if (requireNamespace("ggrepel", quietly = TRUE)) {
+    p <- p + ggrepel::geom_text_repel(y = 2.5, size = size_text, na.rm = TRUE)
+  } else {
+    p <- p + geom_text(y = 2.5, size = size_text, na.rm = TRUE)
+  }
 
   p
 }
 
 
-.plot_outliers_multimethod <- function(x) {
-  d <- data_plot(x)
+.plot_outliers_multimethod <- function(x, rescale_distance = TRUE) {
+  d <- data_plot(x, rescale_distance = rescale_distance)
+
+  rescaled <- attr(d, "rescale_distance")
+  if (isTRUE(rescaled)) {
+    y_lab <- "Distance (rescaled range 0-1)"
+  } else {
+    y_lab <- "Distance"
+  }
+
   suppressWarnings(
-    ggplot(data = d, aes(x = .data$Obs, y = .data$Distance, fill = .data$Method, group = .data$Method)) +
+    ggplot(
+      data = d,
+      aes(
+        x = .data$Obs,
+        y = .data$Distance,
+        fill = .data$Method,
+        group = .data$Method
+      )
+    ) +
       # geom_vline(xintercept = as.character(c(1, 2))) +
       geom_bar(position = "dodge", stat = "identity") +
       scale_fill_viridis_d() +
       theme_modern() +
-      labs(x = "Observation", y = "Distance", fill = "Method") +
+      labs(x = "Observation", y = y_lab, fill = "Method") +
       # Warning: Vectorized input to `element_text()` is not officially supported.
       # Results may be unexpected or may change in future versions of ggplot2.
       theme(
         axis.text.x = element_text(colour = ifelse(as.numeric(x) >= 0.5, "red", "darkgrey")),
-        panel.grid.major.x = element_line(linetype = "dashed", colour = ifelse(as.numeric(x) >= 0.5, "red", "lightgrey"))
+        panel.grid.major.x = element_line(
+          linetype = "dashed",
+          colour = ifelse(as.numeric(x) >= 0.5, "red", "lightgrey")
+        )
       )
   )
 }

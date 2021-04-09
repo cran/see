@@ -1,6 +1,10 @@
 #' @importFrom insight clean_parameters
 #' @export
-data_plot.estimate_density <- function(x, data = NULL, centrality = "median", ci = 0.95, ...) {
+data_plot.estimate_density <- function(x,
+                                       data = NULL,
+                                       centrality = "median",
+                                       ci = 0.95,
+                                       ...) {
   dataplot <- x
 
   if (!"Parameter" %in% names(dataplot)) {
@@ -47,17 +51,17 @@ data_plot.estimate_density <- function(x, data = NULL, centrality = "median", ci
   summary$Parameter <- factor(summary$Parameter, levels = levels(dataplot$Parameter))
 
   attr(dataplot, "summary") <- summary
-  attr(dataplot, "info") <- list("xlab" = "Values",
-                                 "ylab" = "Density",
-                                 "legend_fill" = "Parameter",
-                                 "legend_color" = "Parameter",
-                                 "title" = "Estimated Density Function")
+  attr(dataplot, "info") <- list(
+    "xlab" = "Values",
+    "ylab" = "Density",
+    "legend_fill" = "Parameter",
+    "legend_color" = "Parameter",
+    "title" = "Estimated Density Function"
+  )
 
   class(dataplot) <- c("data_plot", "see_estimate_density", class(dataplot))
   dataplot
 }
-
-
 
 
 # Plot --------------------------------------------------------------------
@@ -66,12 +70,17 @@ data_plot.estimate_density <- function(x, data = NULL, centrality = "median", ci
 #'
 #' The \code{plot()} method for the \code{bayestestR::estimate_density()} function.
 #'
-#' @param stack Logical, if \code{TRUE}, densities are plotted as stacked lines. Else, densities are plotted for each parameter among each other.
-#' @param priors Logical, if \code{TRUE}, prior distributions are simulated (using \code{\link[bayestestR:simulate_prior]{simulate_prior()}}) and added to the plot.
+#' @param stack Logical, if \code{TRUE}, densities are plotted as stacked lines.
+#'   Else, densities are plotted for each parameter among each other.
+#' @param priors Logical, if \code{TRUE}, prior distributions are simulated
+#'   (using \code{\link[bayestestR:simulate_prior]{simulate_prior()}}) and added
+#'   to the plot.
 #' @param priors_alpha Alpha value of the prior distributions.
 #' @param posteriors_alpha Alpha value of the posterior distributions.
-#' @param centrality The point-estimate (centrality index) to compute. May be \code{"median"}, \code{"mean"} or \code{"MAP"}.
-#' @param ci Value of probability of the CI (between 0 and 1) to be estimated. Default to .95.
+#' @param centrality The point-estimate (centrality index) to compute. May be
+#'   \code{"median"}, \code{"mean"} or \code{"MAP"}.
+#' @param ci Value of probability of the CI (between 0 and 1) to be estimated.
+#'   Default to .95.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_cluster_analysis
@@ -91,7 +100,19 @@ data_plot.estimate_density <- function(x, data = NULL, centrality = "median", ci
 #' @importFrom rlang .data
 #' @importFrom ggridges geom_ridgeline
 #' @export
-plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n_columns = 1, priors = FALSE, priors_alpha = .4, posteriors_alpha = 0.7, size_line = .9, size_point = 2, centrality = "median", ci = 0.95, ...) {
+plot.see_estimate_density <- function(x,
+                                      stack = TRUE,
+                                      show_intercept = FALSE,
+                                      n_columns = 1,
+                                      priors = FALSE,
+                                      priors_alpha = .4,
+                                      posteriors_alpha = 0.7,
+                                      size_line = .9,
+                                      size_point = 2,
+                                      centrality = "median",
+                                      ci = 0.95,
+                                      ...) {
+
   # save model for later use
   model <- tryCatch(
     {
@@ -109,7 +130,9 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
   }
 
   if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-      (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) n_columns <- NULL
+    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+    n_columns <- NULL
+  }
 
   # get labels
   labels <- .clean_parameter_names(x$Parameter, grid = !is.null(n_columns))
@@ -134,13 +157,19 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
           priors_alpha = priors_alpha,
           show_ridge_line = FALSE
         ) +
-        ggridges::geom_ridgeline(aes(fill = "Posterior"), alpha = posteriors_alpha, color = NA) +
+        ggridges::geom_ridgeline(aes(fill = "Posterior"),
+          alpha = posteriors_alpha,
+          color = NA
+        ) +
         guides(color = "none") +
         scale_fill_flat(reverse = TRUE) +
         scale_colour_flat(reverse = TRUE)
     } else {
       p <- p +
-        ggridges::geom_ridgeline(aes(fill = "Posterior"), alpha = posteriors_alpha, color = NA) +
+        ggridges::geom_ridgeline(aes(fill = "Posterior"),
+          alpha = posteriors_alpha,
+          color = NA
+        ) +
         guides(fill = "none", color = "none") +
         scale_fill_manual(values = unname(social_colors("grey"))) +
         scale_color_manual(values = unname(social_colors("grey")))
@@ -151,8 +180,22 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
     summary$y <- NA
 
     p <- p +
-      geom_errorbarh(data = summary, mapping = aes(xmin = .data$CI_low, xmax = .data$CI_high, color = "Posterior"), size = size_line) +
-      geom_point(data = summary, mapping = aes(x = .data$x, color = "Posterior"), size = size_point, fill = "white", shape = 21)
+      geom_errorbarh(
+        data = summary,
+        mapping = aes(
+          xmin = .data$CI_low,
+          xmax = .data$CI_high,
+          color = "Posterior"
+        ),
+        size = size_line
+      ) +
+      geom_point(
+        data = summary,
+        mapping = aes(x = .data$x, color = "Posterior"),
+        size = size_point,
+        fill = "white",
+        shape = 21
+      )
 
     p <- p + add_plot_attributes(x)
   }
@@ -174,9 +217,9 @@ plot.see_estimate_density <- function(x, stack = TRUE, show_intercept = FALSE, n
     if ("Component" %in% names(x) && "Effects" %in% names(x)) {
       p <- p + facet_wrap(~ Effects + Component, scales = "free", ncol = n_columns)
     } else if ("Effects" %in% names(x)) {
-      p <- p + facet_wrap(~ Effects, scales = "free", ncol = n_columns)
+      p <- p + facet_wrap(~Effects, scales = "free", ncol = n_columns)
     } else if ("Component" %in% names(x)) {
-      p <- p + facet_wrap(~ Component, scales = "free", ncol = n_columns)
+      p <- p + facet_wrap(~Component, scales = "free", ncol = n_columns)
     }
   }
 
@@ -196,7 +239,11 @@ data_plot.estimate_density_df <- data_plot.estimate_density
 #' @importFrom ggridges geom_ridgeline
 #' @importFrom stats setNames
 #' @export
-plot.see_estimate_density_df <- function(x, stack = TRUE, n_columns = 1, size_line = .9, ...) {
+plot.see_estimate_density_df <- function(x,
+                                         stack = TRUE,
+                                         n_columns = 1,
+                                         size_line = .9,
+                                         ...) {
   x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
   labels <- stats::setNames(levels(x$Parameter), levels(x$Parameter))
 
@@ -222,9 +269,8 @@ plot.see_estimate_density_df <- function(x, stack = TRUE, n_columns = 1, size_li
 
 
   if ("Group" %in% names(x)) {
-    p <- p + facet_wrap(~ Group, scales = "free", ncol = n_columns)
+    p <- p + facet_wrap(~Group, scales = "free", ncol = n_columns)
   }
 
   p
 }
-
