@@ -1,3 +1,18 @@
+# see 0.6.4
+
+## General
+
+* Reduced/removed some package dependencies.
+
+## New features
+
+* Plotting for normality check is now supported for `afex_aov` models.
+
+## Bug fixes
+
+* Fixed issue that argument `show_intercept` is no longer ignored in `plot()` 
+  for `rope()`.
+
 # see 0.6.3
 
 ## New plot functions
@@ -7,6 +22,9 @@
 * Added option to `detrend` QQ/PP plots.
 
 ## changes
+
+* Plot for SEM models now has arrows pointing from the latent variables towards 
+  the manifest variables.
 
 * The `plot()` method for `check_model()` was revised and should now be more
   consistent regarding titles and subtitles, as well as color schemes and plot

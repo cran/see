@@ -1,5 +1,8 @@
 #' @export
-data_plot.hdi <- function(x, data = NULL, show_intercept = FALSE, ...) {
+data_plot.hdi <- function(x,
+                          data = NULL,
+                          show_intercept = FALSE,
+                          ...) {
   .data_plot_hdi(x = x, data = data, show_intercept = show_intercept)
 }
 
@@ -12,7 +15,11 @@ data_plot.bayestestR_eti <- data_plot.hdi
 
 
 #' @keywords internal
-.data_plot_hdi <- function(x, data = NULL, parms = NULL, show_intercept = FALSE, ...) {
+.data_plot_hdi <- function(x,
+                           data = NULL,
+                           parms = NULL,
+                           show_intercept = FALSE,
+                           ...) {
   if (is.null(data)) {
     data <- .retrieve_data(x)
   }
@@ -129,16 +136,11 @@ data_plot.bayestestR_eti <- data_plot.hdi
 
 
 
-#' @importFrom rlang .data
-#' @importFrom stats density
-#' @importFrom magrittr "%>%"
 #' @keywords internal
 .compute_densities_hdi <- function(x, hdi, name = "Y") {
   hdi <- hdi[order(hdi$CI, decreasing = TRUE), ]
 
-  out <- x %>%
-    stats::density() %>%
-    .as.data.frame_density()
+  out <- .as.data.frame_density(stats::density(x))
 
   out$HDI_low <- sapply(out$x, .classify_hdi, hdi$CI_low, c(100, 100 * hdi$CI))
   out$HDI_high <- sapply(out$x, .classify_hdi, rev(hdi$CI_high), c(rev(100 * hdi$CI), 100))
@@ -181,9 +183,11 @@ data_plot.bayestestR_eti <- data_plot.hdi
 
 #' Plot method for uncertainty or credible intervals
 #'
-#' The \code{plot()} method for the \code{bayestestR::hdi()} and related function.
+#' The \code{plot()} method for the \code{bayestestR::hdi()} and related
+#' function.
 #'
-#' @param show_zero Logical, if \code{TRUE}, will add a vertical (dotted) line at 0.
+#' @param show_zero Logical, if \code{TRUE}, will add a vertical (dotted) line
+#'   at 0.
 #' @param show_title Logical, if \code{TRUE}, will show the title of the plot.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
@@ -204,7 +208,13 @@ data_plot.bayestestR_eti <- data_plot.hdi
 #' @importFrom ggridges geom_ridgeline_gradient
 #' @importFrom rlang .data
 #' @export
-plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, show_zero = TRUE, show_title = TRUE, n_columns = 1, ...) {
+plot.see_hdi <- function(x,
+                         data = NULL,
+                         show_intercept = FALSE,
+                         show_zero = TRUE,
+                         show_title = TRUE,
+                         n_columns = 1,
+                         ...) {
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x, data = data, show_intercept = show_intercept)
   }
@@ -218,15 +228,16 @@ plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, show_zero = TRU
   # get labels
   labels <- .clean_parameter_names(x$y, grid = !is.null(n_columns))
 
-  p <- x %>%
-    as.data.frame() %>%
-    ggplot(aes(
+  p <- ggplot(
+    as.data.frame(x),
+    aes(
       x = .data$x,
       y = .data$y,
       height = .data$height,
       group = .data$y,
       fill = .data$fill
-    )) +
+    )
+  ) +
     ggridges::geom_ridgeline_gradient() +
     add_plot_attributes(x)
 
@@ -244,7 +255,6 @@ plot.see_hdi <- function(x, data = NULL, show_intercept = FALSE, show_zero = TRU
   } else {
     p <- p + scale_y_discrete(labels = labels)
   }
-
 
 
   if (!is.null(n_columns)) {
