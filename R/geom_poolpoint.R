@@ -7,7 +7,7 @@
 #' @param size_background Size of the white background circle.
 #' @param size_point Size of the ball.
 #' @param jitter Width and height of position jitter.
-#' @param ... Other arguments to be passed to \code{geom_point}.
+#' @param ... Other arguments to be passed to `geom_point`.
 #'
 #' @examples
 #' library(ggplot2)
@@ -46,6 +46,7 @@ geom_pooljitter <- function(label,
                             jitter = 0.1,
                             ...) {
   jitter <- ggplot2::position_jitter(width = jitter, height = jitter)
+
   list(
     geom_point2(size = size_point, position = jitter, ...),
     geom_point2(color = "white", size = size_background, position = jitter, ...),

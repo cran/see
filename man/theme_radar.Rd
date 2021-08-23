@@ -11,6 +11,7 @@ theme_radar(
   plot.title.size = 12,
   plot.title.face = "plain",
   plot.title.space = 15,
+  plot.title.position = "plot",
   legend.position = "right",
   axis.title.space = 15,
   legend.title.size = 11,
@@ -52,6 +53,8 @@ theme_radar_dark(
 
 \item{plot.title.space}{Title spacing.}
 
+\item{plot.title.position}{Alignment of the plot title/subtitle and caption. The setting for plot.title.position applies to both the title and the subtitle. A value of "panel" (the default) means that titles and/or caption are aligned to the plot panels. A value of "plot" means that titles and/or caption are aligned to the entire plot (minus any space for margins and plot tag).}
+
 \item{legend.position}{the position of legends ("none", "left", "right",
 "bottom", "top", or two-element numeric vector)}
 
@@ -74,7 +77,8 @@ theme_radar_dark(
 \item{tags.face}{Tags font face ("plain", "italic", "bold", "bold.italic").}
 }
 \description{
-\code{theme_radar()} is a light, clear theme for ggplot radar-plots, while \code{theme_radar_dark()} is a dark variant of \code{theme_radar()}.
+\code{theme_radar()} is a light, clear theme for ggplot radar-plots, while
+\code{theme_radar_dark()} is a dark variant of \code{theme_radar()}.
 }
 \examples{
 if (require("ggplot2") && require("dplyr") && require("tidyr")) {
@@ -97,5 +101,5 @@ if (require("ggplot2") && require("dplyr") && require("tidyr")) {
 }
 }
 \seealso{
-\code{\link{coord_radar}}
+\code{\link[=coord_radar]{coord_radar()}}
 }

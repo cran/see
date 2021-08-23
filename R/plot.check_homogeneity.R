@@ -1,6 +1,7 @@
 #' Plot method for homogeneity of variances checks
 #'
-#' The \code{plot()} method for the \code{performance::check_homogeneity()} function.
+#' The `plot()` method for the `performance::check_homogeneity()`
+#' function.
 #'
 #' @inheritParams data_plot
 #'
@@ -12,7 +13,6 @@
 #' result <- check_homogeneity(model)
 #' result
 #' plot(result)
-#' @importFrom insight get_data find_predictors get_response
 #' @importFrom rlang .data
 #' @export
 plot.see_check_homogeneity <- function(x, data = NULL, ...) {
@@ -30,7 +30,7 @@ plot.see_check_homogeneity <- function(x, data = NULL, ...) {
 
   if (length(pred) > 1) {
     l <- lapply(dat[, pred], as.character)
-    for (i in pred[1:(length(pred) - 1)]) l[[i]] <- sprintf("%s*", l[[i]])
+    for (i in pred[1:(length(pred) - 1)]) l[[i]] <- sprintf("%s \u00D7 ", l[[i]])
     x <- do.call(c, l)
     group_labels <- do.call(paste0, l)
     group <- rep(group_labels, each = length(pred))
@@ -47,18 +47,70 @@ plot.see_check_homogeneity <- function(x, data = NULL, ...) {
     stringsAsFactors = FALSE
   )
 
-
-  p <- if (length(pred) > 1) {
-    ggplot(data = dat, aes(x = .data$x, y = .data$y, fill = .data$group)) +
-      geom_violin()
+  if (length(pred) > 1) {
+    # group-mean-center response
+    dat$y <- dat$y - stats::ave(
+      dat[["y"]],
+      dat[["group"]],
+      FUN = mean, na.rm = TRUE
+    )
+    p <- ggplot(data = dat, aes(x = .data$group, y = .data$y, fill = .data$group)) +
+      geom_violin() +
+      if (requireNamespace("ggrepel", quietly = TRUE)) {
+        ggrepel::geom_label_repel(
+          aes(label = .data$group),
+          y = 0, fill = "white",
+          data = data.frame(group = unique(dat$group)),
+          direction = "y",
+          segment.colour = NA
+        )
+      } else {
+        geom_label(
+          aes(label = .data$group),
+          y = 0, fill = "white",
+          data = data.frame(group = unique(dat$group))
+        )
+      }
   } else {
-    ggplot(data = dat, aes(x = .data$x, y = .data$y)) +
-      geom_violin(fill = "#2980b9")
+    # group-mean-center response
+    dat$y <- dat$y - stats::ave(
+      dat[["y"]],
+      dat[["x"]],
+      FUN = mean, na.rm = TRUE
+    )
+    p <- ggplot(data = dat, aes(x = .data$x, y = .data$y, fill = .data$x)) +
+      geom_violin() +
+      if (requireNamespace("ggrepel", quietly = TRUE)) {
+        ggrepel::geom_label_repel(
+          aes(label = .data$x),
+          y = 0, fill = "white",
+          data = data.frame(x = unique(dat$x)),
+          direction = "y",
+          segment.colour = NA
+        )
+      } else {
+        geom_label(
+          aes(label = .data$x),
+          y = 0, fill = "white",
+          data = data.frame(x = unique(dat$x))
+        )
+      }
   }
 
   p +
     scale_fill_flat_d() +
     scale_x_discrete(labels = NULL) +
-    theme_modern() +
-    labs(x = NULL, y = insight::find_response(model), fill = NULL, title = method)
+    theme_modern(
+      base_size = 12,
+      plot.title.space = 3,
+      axis.title.space = 5
+    ) +
+    guides(fill = "none") +
+    labs(
+      x = NULL,
+      y = paste0(insight::find_response(model), "\n(group mean-centered)"),
+      title = method,
+      subtitle = "Groups should be evenly spread"
+    ) +
+    theme(plot.title.position = "plot")
 }

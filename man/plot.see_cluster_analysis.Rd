@@ -10,7 +10,7 @@
 \item{x}{An object.}
 
 \item{data}{The original data used to create this object. Can be a
-statistical model or such.}
+statistical model.}
 
 \item{n_columns}{For models with multiple components (like fixed and random,
 count and zero-inflated), defines the number of columns for the
@@ -24,7 +24,8 @@ panel-layout. If \code{NULL}, a single, integrated plot is shown.}
 A ggplot2-object.
 }
 \description{
-The \code{plot()} method for the \code{parameters::cluster_analysis()} function.
+The \code{plot()} method for the \code{parameters::cluster_analysis()}
+function.
 }
 \examples{
 library(parameters)

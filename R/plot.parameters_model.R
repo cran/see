@@ -1,10 +1,13 @@
 #' Plot method for model parameters
 #'
-#' The \code{plot()} method for the \code{parameters::model_parameters()} function.
+#' The `plot()` method for the `parameters::model_parameters()` function.
 #'
-#' @param type Indicating the type of plot. Only applies for model parameters from meta-analysis objects (e.g. \pkg{metafor}).
-#' @param component Indicate which component of the model should be plotted.
-#' @param weight_points Logical, if \code{TRUE}, for meta-analysis objects, point size will be adjusted according to the study-weights.
+#' @param type Character indicating the type of plot. Only applies for model
+#'   parameters from meta-analysis objects (e.g. \pkg{metafor}).
+#' @param component Character indicating which component of the model should be
+#'   plotted.
+#' @param weight_points Logical. If `TRUE`, for meta-analysis objects, point
+#'   size will be adjusted according to the study-weights.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_bayesfactor_models
@@ -20,9 +23,17 @@
 #' result <- model_parameters(m)
 #' result
 #' plot(result)
-#' @importFrom bayestestR reshape_ci
 #' @export
-plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8, size_text = NULL, sort = NULL, n_columns = NULL, type = c("forest", "funnel"), weight_points = TRUE, ...) {
+plot.see_parameters_model <- function(x,
+                                      show_intercept = FALSE,
+                                      size_point = .8,
+                                      size_text = NA,
+                                      sort = NULL,
+                                      n_columns = NULL,
+                                      type = c("forest", "funnel"),
+                                      weight_points = TRUE,
+                                      show_labels = FALSE,
+                                      ...) {
   if (!any(grepl("Coefficient", colnames(x), fixed = TRUE))) {
     colnames(x)[which.min(match(colnames(x), c("Median", "Mean", "Map")))] <- "Coefficient"
   }
@@ -38,7 +49,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   zi_coefficient_name <- attributes(x)$zi_coefficient_name
 
   # add coefficients and CIs?
-  add_values <- !is.null(size_text) && !is.na(size_text)
+  add_values <- isTRUE(show_labels)
 
   # ordinal model? needed for free facet scales later...
   ordinal_model <- isTRUE(attributes(x)$ordinal_model)
@@ -180,57 +191,67 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
     x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
   }
 
+
   if (is_meta || is_meta_bma) {
+
     # plot setup for metafor-objects
-    p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$group)) +
-      geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
-      geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = size_point, fatten = x$size_point, shape = x$shape) +
-      coord_flip() +
+    p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
+      geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
+      geom_pointrange(aes(xmin = .data$CI_low, xmax = .data$CI_high), size = size_point, fatten = x$size_point, shape = x$shape) +
       theme_modern(legend.position = "none") +
       scale_color_material() +
-      guides(color = FALSE, size = FALSE, shape = FALSE)
+      guides(color = "none", size = "none", shape = "none")
+
   } else if (sum(grepl("^CI_low", colnames(x))) > 1) {
+
     # plot setup for model parameters with multiple CIs
-    x <- bayestestR::reshape_ci(x)
+    x <- datawizard::reshape_ci(x)
     x$CI <- as.character(x$CI)
-    p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$CI)) +
-      geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
+    p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient, color = .data$CI)) +
+      geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
       geom_pointrange(
-        aes(ymin = .data$CI_low, ymax = .data$CI_high),
+        aes(xmin = .data$CI_low, xmax = .data$CI_high),
         size = size_point,
         position = position_dodge(1 / length(unique(x$CI)))
       ) +
-      coord_flip() +
       theme_modern() +
       scale_color_material()
+
   } else {
+
     # plot setup for regular model parameters
     x$group <- as.factor(x$Coefficient < y_intercept)
-    p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$group)) +
-      geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
-      geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = size_point) +
-      coord_flip() +
+    p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
+      geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
+      geom_pointrange(aes(xmin = .data$CI_low, xmax = .data$CI_high), size = size_point) +
       theme_modern(legend.position = "none") +
       scale_color_material()
   }
 
 
   if (!is.null(pretty_names)) {
-    p <- p + scale_x_discrete(labels = pretty_names)
+    p <- p + scale_y_discrete(labels = pretty_names)
   }
+
+  # find min/max range based on CI
+  min_ci <- min(x$CI_low, na.rm = TRUE)
+  max_ci <- max(x$CI_high, na.rm = TRUE)
 
   # add coefficients and CIs?
   if (add_values) {
     # add some space to the right panel for text
-    space_factor <- sqrt(ceiling(diff(c(min(x$CI_low), max(x$CI_high)))) / 5)
-    new_range <- pretty(c(min(x$CI_low), max(x$CI_high) + space_factor))
+    space_factor <- sqrt(ceiling(diff(c(min_ci, max_ci))) / 5)
+    new_range <- pretty(c(min_ci, max_ci + space_factor))
 
-    p <- p +
-      geom_text(
-        mapping = aes(label = .data$Estimate_CI, y = Inf),
-        colour = "black", hjust = "inward", size = size_text
-      ) +
-      ylim(c(min(new_range), max(new_range)))
+    # expand scale range and add numbers to the right border
+    if (!any(is.infinite(new_range)) && !any(is.na(new_range))) {
+      p <- p +
+        geom_text(
+          mapping = aes(label = .data$Estimate_CI, x = Inf),
+          colour = "black", hjust = "inward", size = size_text
+        ) +
+        xlim(c(min(new_range), max(new_range)))
+    }
   }
 
   # check for exponentiated estimates. in such cases, we transform the y-axis
@@ -238,16 +259,20 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   # do this, we create a pretty range of values, and then look for lowest and
   # largest data points that are within this range. Thereby we have the pretty
   # values we can use as breaks and labels for the scale...
+
   if (exponentiated_coefs) {
     range <- 2^c(-24:16)
-    x_low <- which.min(min(x$CI_low) > range) - 1
-    x_high <- which.max(max(x$CI_high) < range)
+    x_low <- which.min(min_ci > range) - 1
+    x_high <- which.max(max_ci < range)
+
     if (add_values) {
       # add some space to the right panel for text
-      new_range <- pretty(2 * max(x$CI_high))
+      new_range <- pretty(2 * max_ci)
       x_high <- which.max(max(new_range) < range)
     }
-    p <- p + scale_y_log10(
+
+    p <- p + scale_x_continuous(
+      trans = "log",
       breaks = range[x_low:x_high],
       limits = c(range[x_low], range[x_high]),
       labels = sprintf("%g", range[x_low:x_high])
@@ -258,7 +283,7 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   if (is.null(n_columns)) n_columns <- ifelse(sum(has_component, has_response, has_effects) > 1, 2, 1)
 
   if (ordinal_model) {
-    facet_scales <- "free_y"
+    facet_scales <- "free_x"
   } else {
     facet_scales <- "free"
   }
@@ -294,21 +319,21 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
   if (isTRUE(is_meta)) {
     measure <- .meta_measure(meta_measure)
     p + labs(
-      x = "",
-      y = measure,
+      y = "",
+      x = measure,
       colour = "CI"
     )
   } else {
     if (isTRUE(axis_title_in_facet)) {
       p + labs(
-        x = "Parameter",
-        y = NULL,
+        y = "Parameter",
+        x = NULL,
         colour = "CI"
       )
     } else {
       p + labs(
-        x = "Parameter",
-        y = ifelse(is.null(coefficient_name), ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"), coefficient_name),
+        y = "Parameter",
+        x = ifelse(is.null(coefficient_name), ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"), coefficient_name),
         colour = "CI"
       )
     }
@@ -317,8 +342,6 @@ plot.see_parameters_model <- function(x, show_intercept = FALSE, size_point = .8
 
 
 
-#' @importFrom effectsize change_scale
-#' @importFrom stats qnorm
 .funnel_plot <- function(x, size_point = 3, meta_measure = NULL) {
   max_y <- max(pretty(max(x$SE) * 105)) / 100
   measure <- .meta_measure(meta_measure)

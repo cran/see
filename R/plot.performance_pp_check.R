@@ -1,4 +1,3 @@
-#' @importFrom stats reshape
 #' @export
 data_plot.performance_pp_check <- function(x, ...) {
   columns <- colnames(x)
@@ -38,9 +37,9 @@ data_plot.performance_pp_check <- function(x, ...) {
 
 #' Plot method for posterior predictive checks
 #'
-#' The \code{plot()} method for the \code{performance::pp_check()} function.
+#' The `plot()` method for the `performance::pp_check()` function.
 #'
-#' @param line_alpha Alpha value of lines indicating \code{yrep}.
+#' @param line_alpha Numeric value specifying alpha of lines indicating `yrep`.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_check_normality
 #' @inheritParams plot.see_parameters_distribution
@@ -69,7 +68,7 @@ print.see_performance_pp_check <- function(x,
 
   if (isTRUE(check_range)) {
     p2 <- .plot_pp_check_range(orig_x, size_bar)
-    plots(p1, p2)
+    graphics::plot(plots(p1, p2, n_columns = 1))
   } else {
     suppressWarnings(graphics::plot(p1))
   }

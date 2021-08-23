@@ -85,7 +85,7 @@ data_plot.parameters_sem <- function(x,
 # Plot --------------------------------------------------------------------
 #' @param threshold_coefficient Numeric, threshold at which value coefficients will be displayed.
 #' @param threshold_p Numeric, threshold at which value p-values will be displayed.
-#' @param ci Logical, whether confidence intervals should be added to the plot.#'
+#' @param ci Logical, whether confidence intervals should be added to the plot.
 #' @importFrom rlang .data
 #' @rdname plot.see_parameters_model
 #' @export
@@ -111,11 +111,11 @@ plot.see_parameters_sem <- function(x,
   }
 
   if (!requireNamespace("ggraph", quietly = TRUE)) {
-    stop("Package 'ggraph' required for this function to work. Please install it by running `install.packages('ggraph')`.")
+    insight::check_if_installed("ggraph")
   }
 
   if (!requireNamespace("tidygraph", quietly = TRUE)) {
-    stop("Package 'tidygraph' required for this function to work. Please install it by running `install.packages('tidygraph')`.")
+    insight::check_if_installed("tidygraph")
   }
 
   p <- ggraph::ggraph(tidygraph::tbl_graph(x$nodes, x$edges), ...) +
@@ -162,14 +162,14 @@ plot.see_parameters_sem <- function(x,
     ggraph::geom_node_point(aes(colour = .data$Latent, shape = .data$Latent), size = size_point) +
     ggraph::geom_node_text(aes(label = .data$Name)) +
     ggraph::scale_edge_colour_gradient2(
-      guide = FALSE,
+      guide = "none",
       high = "#4CAF50",
       mid = "#FFF9C4",
       low = "#E91E63"
     ) +
-    scale_alpha(guide = FALSE, range = c(0, 1)) +
+    scale_alpha(guide = "none", range = c(0, 1)) +
     scale_shape_manual(values = c(`FALSE` = 15, `TRUE` = 19)) +
-    ggraph::scale_edge_alpha(guide = FALSE, range = c(0, 1)) +
+    ggraph::scale_edge_alpha(guide = "none", range = c(0, 1)) +
     scale_x_continuous(expand = expansion(c(.10, .10))) +
     scale_y_continuous(expand = expansion(c(.10, .10))) +
     ggraph::theme_graph() +

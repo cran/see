@@ -1,7 +1,7 @@
 #' Plot method for (non-)constant error variance checks
 #'
-#' The \code{plot()} method for the
-#' \code{performance::check_heteroscedasticity()} function.
+#' The `plot()` method for the
+#' `performance::check_heteroscedasticity()` function.
 #'
 #' @inheritParams data_plot
 #'
@@ -13,8 +13,6 @@
 #' result <- check_heteroscedasticity(m)
 #' result
 #' plot(result, data = m) # data required for pkgdown
-#' @importFrom stats residuals rstandard fitted
-#' @importFrom insight get_variance_residual model_info
 #' @export
 plot.see_check_heteroscedasticity <- function(x, data = NULL, ...) {
   if (is.null(data)) {

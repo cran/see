@@ -1,4 +1,3 @@
-#' @importFrom insight clean_parameters
 #' @export
 data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
   if (is.null(data)) {
@@ -8,9 +7,7 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
   params <- NULL
 
   if (inherits(data, "emmGrid")) {
-    if (!requireNamespace("emmeans", quietly = TRUE)) {
-      stop("Package 'emmeans' required for this function to work. Please install it.", call. = FALSE)
-    }
+    insight::check_if_installed("emmeans")
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
   } else if (inherits(data, c("stanreg", "brmsfit"))) {
     params <- insight::clean_parameters(data)
@@ -144,7 +141,7 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
 
 #' Plot method for probability of direction
 #'
-#' The \code{plot()} method for the \code{bayestestR::p_direction()} function.
+#' The `plot()` method for the `bayestestR::p_direction()` function.
 #'
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
@@ -163,7 +160,6 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
 #' }
 #' }
 #' @importFrom rlang .data
-#' @importFrom ggridges geom_ridgeline_gradient
 #' @export
 plot.see_p_direction <- function(x,
                                  data = NULL,

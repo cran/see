@@ -29,19 +29,20 @@ data_plot.parameters_distribution <- function(x, data = NULL, ...) {
 # Plot --------------------------------------------------------------------
 #' Plot method for describing distributions of vectors
 #'
-#' The \code{plot()} method for the \code{parameters::describe_distribution()}
+#' The `plot()` method for the `parameters::describe_distribution()`
 #' function.
 #'
-#' @param dispersion Logical, if \code{TRUE}, will add range of dispersion for
-#'   each variable to the plot.
-#' @param dispersion_alpha Transparency level of dispersion ribbon.
-#' @param dispersion_color Color of dispersion ribbon.
-#' @param dispersion_style Character, style of dispersion area. \code{"ribbon"}
-#'   for a ribbon, \code{"curve"} for a normal-curve.
-#' @param highlight Vector with names of categories in \code{x} that should be
+#' @param dispersion Logical. If `TRUE`, a range of dispersion for
+#'   each variable to the plot will be added.
+#' @param dispersion_alpha Numeric value specifying the transparency level of dispersion ribbon.
+#' @param dispersion_color Character specifying the color of dispersion ribbon.
+#' @param dispersion_style Character describing the style of dispersion area.
+#'   `"ribbon"` for a ribbon, `"curve"` for a normal-curve.
+#' @param highlight A vector with names of categories in `x` that should be
 #'   highlighted.
-#' @param highlight_color Vector of color values for highlighted categories. The
-#'   remaining (non-highlighted) categories will be filled with a lighter grey.
+#' @param highlight_color A vector of color values for highlighted categories.
+#'   The remaining (non-highlighted) categories will be filled with a lighter
+#'   grey.
 #' @param size_bar Size of bar geoms.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_check_normality
@@ -108,7 +109,6 @@ plot.see_parameters_distribution <- function(x,
 
 
 
-#' @importFrom stats dnorm
 .plot_see_parameters_distribution <- function(x,
                                               dispersion_alpha,
                                               dispersion_color,

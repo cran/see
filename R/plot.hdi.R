@@ -39,9 +39,7 @@ data_plot.bayestestR_eti <- data_plot.hdi
   }
 
   if (inherits(data, "emmGrid")) {
-    if (!requireNamespace("emmeans", quietly = TRUE)) {
-      stop("Package 'emmeans' required for this function to work. Please install it.", call. = FALSE)
-    }
+    insight::check_if_installed("emmeans")
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
   } else if (inherits(data, c("stanreg", "brmsfit"))) {
     params <- insight::clean_parameters(data)
@@ -183,12 +181,12 @@ data_plot.bayestestR_eti <- data_plot.hdi
 
 #' Plot method for uncertainty or credible intervals
 #'
-#' The \code{plot()} method for the \code{bayestestR::hdi()} and related
+#' The `plot()` method for the `bayestestR::hdi()` and related
 #' function.
 #'
-#' @param show_zero Logical, if \code{TRUE}, will add a vertical (dotted) line
+#' @param show_zero Logical. If `TRUE`, will add a vertical (dotted) line
 #'   at 0.
-#' @param show_title Logical, if \code{TRUE}, will show the title of the plot.
+#' @param show_title Logical. If `TRUE`, will show the title of the plot.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_cluster_analysis
@@ -205,7 +203,6 @@ data_plot.bayestestR_eti <- data_plot.hdi
 #'   plot(result)
 #' }
 #' }
-#' @importFrom ggridges geom_ridgeline_gradient
 #' @importFrom rlang .data
 #' @export
 plot.see_hdi <- function(x,

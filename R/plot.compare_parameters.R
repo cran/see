@@ -1,8 +1,10 @@
 #' Plot method for comparison of model parameters
 #'
-#' The \code{plot()} method for the \code{parameters::compare_parameters()} function.
+#' The `plot()` method for the `parameters::compare_parameters()`
+#' function.
 #'
-#' @param dodge_position Numeric, indicates the amount of "dodging" (spacing) between geoms.
+#' @param dodge_position Numeric value specifying the amount of "dodging"
+#'   (spacing) between geoms.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_bayesfactor_models
@@ -24,7 +26,15 @@
 #'   plot(result)
 #' }
 #' @export
-plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = .8, size_text = NULL, dodge_position = .8, sort = NULL, n_columns = NULL, ...) {
+plot.see_compare_parameters <- function(x,
+                                        show_intercept = FALSE,
+                                        size_point = .8,
+                                        size_text = NA,
+                                        dodge_position = .8,
+                                        sort = NULL,
+                                        n_columns = NULL,
+                                        show_labels = FALSE,
+                                        ...) {
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x)
   }
@@ -36,7 +46,7 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
   y_intercept <- ifelse(exponentiated_coefs, 1, 0)
 
   # add coefficients and CIs?
-  add_values <- !is.null(size_text) && !is.na(size_text)
+  add_values <- isTRUE(show_labels)
 
   # ordinal model? needed for free facet scales later...
   ordinal_model <- isTRUE(attributes(x)$ordinal_model)
@@ -83,10 +93,9 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
     x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
   }
 
-  p <- ggplot(x, aes(x = .data$Parameter, y = .data$Coefficient, color = .data$group)) +
-    geom_hline(aes(yintercept = y_intercept), linetype = "dotted") +
-    geom_pointrange(aes(ymin = .data$CI_low, ymax = .data$CI_high), size = size_point, position = position_dodge(dodge_position)) +
-    coord_flip() +
+  p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
+    geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
+    geom_pointrange(aes(xmin = .data$CI_low, xmax = .data$CI_high), size = size_point, position = position_dodge(dodge_position)) +
     theme_modern() +
     scale_color_material()
 
@@ -102,7 +111,7 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
         colour = "black", hjust = "inward", size = size_text,
         position = position_dodge2(dodge_position)
       ) +
-      ylim(c(min(new_range), max(new_range)))
+      xlim(c(min(new_range), max(new_range)))
   }
 
   # check for exponentiated estimates. in such cases, we transform the y-axis
@@ -119,7 +128,8 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
       new_range <- pretty(2 * max(x$CI_high))
       x_high <- which.max(max(new_range) < range)
     }
-    p <- p + scale_y_log10(
+    p <- p + scale_x_continuous(
+      trans = "log",
       breaks = range[x_low:x_high],
       limits = c(range[x_low], range[x_high]),
       labels = sprintf("%g", range[x_low:x_high])
@@ -130,7 +140,7 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
   if (is.null(n_columns)) n_columns <- ifelse(sum(has_component, has_response, has_effects) > 1, 2, 1)
 
   if (ordinal_model) {
-    facet_scales <- "free_y"
+    facet_scales <- "free_x"
   } else {
     facet_scales <- "free"
   }
@@ -157,14 +167,14 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
 
   if (isTRUE(axis_title_in_facet)) {
     p + labs(
-      x = "Parameter",
-      y = NULL,
+      y = "Parameter",
+      x = NULL,
       colour = "Model"
     )
   } else {
     p + labs(
-      x = "Parameter",
-      y = "Estimate",
+      y = "Parameter",
+      x = "Estimate",
       colour = "Model"
     )
   }
@@ -175,7 +185,7 @@ plot.see_compare_parameters <- function(x, show_intercept = FALSE, size_point = 
 
 #' @export
 data_plot.see_compare_parameters <- function(x, ...) {
-  col_coefficient <- which(grepl("^Coefficient\\.", colnames(x)))
+  col_coefficient <- which(grepl("^(Coefficient|Log-Odds|Log-Mean|Odds Ratio|Risk Ratio|IRR)\\.", colnames(x)))
   col_ci_low <- which(grepl("^CI_low\\.", colnames(x)))
   col_ci_high <- which(grepl("^CI_high\\.", colnames(x)))
   col_p <- which(grepl("^p\\.", colnames(x)))

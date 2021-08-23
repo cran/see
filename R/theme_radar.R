@@ -1,10 +1,11 @@
 #' Themes for radar plots
 #'
-#' \code{theme_radar()} is a light, clear theme for ggplot radar-plots, while \code{theme_radar_dark()} is a dark variant of \code{theme_radar()}.
+#' `theme_radar()` is a light, clear theme for ggplot radar-plots, while
+#' `theme_radar_dark()` is a dark variant of `theme_radar()`.
 #'
 #' @inheritParams theme_modern
 #'
-#' @seealso \code{\link{coord_radar}}
+#' @seealso [coord_radar()]
 #'
 #' @examples
 #' if (require("ggplot2") && require("dplyr") && require("tidyr")) {
@@ -31,6 +32,7 @@ theme_radar <- function(base_size = 11,
                         plot.title.size = 12,
                         plot.title.face = "plain",
                         plot.title.space = 15,
+                        plot.title.position = "plot",
                         legend.position = "right",
                         axis.title.space = 15,
                         legend.title.size = 11,
@@ -47,6 +49,7 @@ theme_radar <- function(base_size = 11,
     plot.title.size = plot.title.size,
     plot.title.face = plot.title.face,
     plot.title.space = plot.title.space,
+    plot.title.position = plot.title.position,
     legend.position = legend.position,
     axis.title.space = axis.title.space,
     legend.title.size = legend.title.size,

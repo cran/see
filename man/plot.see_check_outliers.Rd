@@ -12,26 +12,30 @@
   colors = c("#3aaf85", "#1b6ca8", "#cd201f"),
   rescale_distance = TRUE,
   type = c("dots", "bars"),
+  show_labels = TRUE,
   ...
 )
 }
 \arguments{
 \item{x}{An object.}
 
-\item{size_text}{Size of text labels.}
+\item{size_text}{Numeric value specifying size of text labels.}
 
-\item{size_line}{Size of line geoms.}
+\item{size_line}{Numeric value specifying size of line geoms.}
 
-\item{dot_alpha}{ALpha level of the confidence bands and point-geoms.}
+\item{dot_alpha}{Numeric value specifying alpha level of the
+confidence bands and point-geoms.}
 
 \item{colors}{Character vector of length two, indicating the colors (in
 hex-format) for points and line.}
 
-\item{rescale_distance}{Logical, if \code{TRUE}, distance values are rescaled
+\item{rescale_distance}{Logical. If \code{TRUE}, distance values are rescaled
 to a range from 0 to 1. This is mainly due to better catch the differences
 between distance values.}
 
 \item{type}{Character vector, indicating the type of plot.}
+
+\item{show_labels}{Logical. If \code{TRUE}, text labels are displayed.}
 
 \item{...}{Arguments passed to or from other methods.}
 }

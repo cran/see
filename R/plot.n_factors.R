@@ -37,11 +37,19 @@ data_plot.n_factors <- function(x, data = NULL, type = "bar", ...) {
   dataplot$y <- dataplot$n_Methods / sum(dataplot$n_Methods)
   rownames(dataplot) <- NULL
 
-  attr(dataplot, "info") <- list(
-    "xlab" = paste("Number of", lab),
-    "ylab" = "Agreement between methods",
-    "title" = paste("How many", lab, "to retain")
-  )
+  if (type == "line") {
+    attr(dataplot, "info") <- list(
+      "ylab" = paste("Number of", lab),
+      "xlab" = "Consensus between methods",
+      "title" = paste("How many", lab, "to retain")
+    )
+  } else {
+    attr(dataplot, "info") <- list(
+      "xlab" = paste("Number of", lab),
+      "ylab" = "Consensus between methods",
+      "title" = paste("How many", lab, "to retain")
+    )
+  }
 
   class(dataplot) <- unique(c("data_plot", "see_n_factors", class(dataplot)))
   dataplot
@@ -56,9 +64,10 @@ data_plot.n_clusters <- data_plot.n_factors
 
 #' Plot method for numbers of clusters to extract or factors to retain
 #'
-#' The \code{plot()} method for the \code{parameters::n_factors()} and \code{parameters::n_clusters()}
+#' The `plot()` method for the `parameters::n_factors()` and `parameters::n_clusters()`
 #'
-#' @param size Depending on \code{type}, size of bars, lines or segments.
+#' @param size Depending on `type`, a numeric value specifying size of bars,
+#'   lines, or segments.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_check_normality
 #'
@@ -73,8 +82,13 @@ data_plot.n_clusters <- data_plot.n_factors
 #' }
 #' @importFrom rlang .data
 #' @export
-plot.see_n_factors <- function(x, data = NULL, type = c("bar", "line", "area"), size = 1, ...) {
+plot.see_n_factors <- function(x,
+                               data = NULL,
+                               type = c("bar", "line", "area"),
+                               size = 1,
+                               ...) {
   type <- match.arg(type)
+
   if (!"data_plot" %in% class(x)) {
     x <- data_plot(x, data = data, type = type)
   }
@@ -90,24 +104,34 @@ plot.see_n_factors <- function(x, data = NULL, type = c("bar", "line", "area"), 
   if (type == "area") {
     ggplot(x, aes(x = .data$x, y = .data$y)) +
       geom_area(fill = flat_colors("grey")) +
-      geom_segment(aes(x = .data$x[which.max(.data$y)], xend = .data$x[which.max(.data$y)], y = 0, yend = max(.data$y)), color = flat_colors("red"), linetype = "dashed") +
-      geom_point(aes(x = .data$x[which.max(.data$y)], y = max(.data$y)), color = flat_colors("red")) +
+      geom_segment(
+        aes(
+          x = .data$x[which.max(.data$y)],
+          xend = .data$x[which.max(.data$y)],
+          y = 0,
+          yend = max(.data$y)
+        ),
+        color = flat_colors("red"),
+        linetype = "dashed"
+      ) +
+      geom_point(aes(x = .data$x[which.max(.data$y)], y = max(.data$y)),
+        color = flat_colors("red")
+      ) +
       scale_y_continuous(labels = .percents) +
       scale_x_continuous(breaks = 1:max(x$x)) +
       add_plot_attributes(x)
   } else if (type == "line") {
-    ggplot(x, aes(x = .data$x, y = .data$y, colour = .data$group)) +
-      geom_segment(aes(y = 0, xend = .data$x, yend = .data$y), size = size) +
+    ggplot(x, aes(y = .data$x, x = .data$y, colour = .data$group)) +
+      geom_segment(aes(x = 0, yend = .data$x, xend = .data$y), size = size) +
       geom_point(size = 2 * size) +
-      coord_flip() +
-      guides(colour = FALSE) +
-      scale_y_continuous(labels = .percents) +
+      guides(colour = "none") +
+      scale_x_continuous(labels = .percents) +
       scale_color_manual(values = unname(flat_colors(c("grey", "red")))) +
       add_plot_attributes(x)
   } else {
     ggplot(x, aes(x = .data$x, y = .data$y, fill = .data$fill)) +
       geom_bar(stat = "identity", width = size) +
-      guides(fill = FALSE) +
+      guides(fill = "none") +
       scale_y_continuous(labels = .percents) +
       add_plot_attributes(x) +
       scale_x_continuous(breaks = 1:max(x$x)) +

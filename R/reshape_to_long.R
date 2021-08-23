@@ -1,4 +1,5 @@
-#' @importFrom stats reshape
+# TODO: retire in favor of {datawizard}?
+
 #' @keywords internal
 .reshape_to_long <- function(x,
                              names_to = "group",

@@ -1,8 +1,9 @@
 #' Material design color palette
 #'
-#' The palette based on material design colors (https://www.materialui.co/color).
-#' Use \code{scale_color_material_d()} for \emph{discrete} categories and
-#' \code{scale_color_material_c()} for a \emph{continuous} scale.
+#' The palette based on [material design
+#' colors](https://materialui.co/color). Use `scale_color_material_d()` for
+#' *discrete* categories and `scale_color_material_c()` for a *continuous*
+#' scale.
 #'
 #' @inheritParams palette_material
 #' @inheritParams scale_color_flat
@@ -133,7 +134,8 @@ material_colors_list <- c(
 
 #' Extract material design colors as hex codes
 #'
-#' Can be used to get the hex code of specific colors from the material design color palette. Use \code{material_colors()} to see all available color.
+#' Can be used to get the hex code of specific colors from the material design
+#' color palette. Use `material_colors()` to see all available color.
 #'
 #' @inheritParams flat_colors
 #'
@@ -173,14 +175,14 @@ material_palettes <- list(
 
 #' Material design color palette
 #'
-#' The palette based on material design colors (https://www.materialui.co/colors).
+#' The palette based on [material design
+#' colors](https://materialui.co/color).
 #'
 #' @inheritParams palette_flat
 #'
 #' @details This function is usually not called directly, but from within
-#'   \code{\link[=scale_color_material]{scale_color_material()}}.
+#'   [`scale_color_material()`][scale_color_material].
 #'
-#' @importFrom grDevices colorRampPalette
 #' @export
 palette_material <- function(palette = "contrast", reverse = FALSE, ...) {
   pal <- material_palettes[[palette]]

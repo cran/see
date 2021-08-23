@@ -10,6 +10,7 @@
   size_text = 3.5,
   text_color = "black",
   size = 1,
+  show_labels = TRUE,
   ...
 )
 }
@@ -18,11 +19,14 @@
 
 \item{type}{Character vector, indicating the type of plot.}
 
-\item{size_text}{Size of text labels.}
+\item{size_text}{Numeric value specifying size of text labels.}
 
-\item{text_color}{Color of text labels.}
+\item{text_color}{Character specifying color of text labels.}
 
-\item{size}{Depending on \code{type}, size of bars, lines or segments.}
+\item{size}{Depending on \code{type}, a numeric value specifying size of bars,
+lines, or segments.}
+
+\item{show_labels}{Logical. If \code{TRUE}, text labels are displayed.}
 
 \item{...}{Arguments passed to or from other methods.}
 }

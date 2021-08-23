@@ -7,16 +7,18 @@
 palette_see(palette = "contrast", reverse = FALSE, ...)
 }
 \arguments{
-\item{palette}{Character name of palette. Depending on the color scale, can be \code{"full"}, \code{"ice"}, \code{"rainbow"}, \code{"complement"}, \code{"contrast"} or \code{"light"} (for dark themes).}
+\item{palette}{Character name of palette. Depending on the color scale, can
+be \code{"full"}, \code{"ice"}, \code{"rainbow"}, \code{"complement"},
+\code{"contrast"} or \code{"light"} (for dark themes).}
 
 \item{reverse}{Boolean indicating whether the palette should be reversed.}
 
 \item{...}{Additional arguments to pass to \code{\link[=colorRampPalette]{colorRampPalette()}}.}
 }
 \description{
-See design color palette.
+See design color palette
 }
 \details{
 This function is usually not called directly, but from within
-  \code{\link[=scale_color_see]{scale_color_see()}}.
+\code{\link[=scale_color_see]{scale_color_see()}}.
 }

@@ -10,11 +10,12 @@
   x,
   show_intercept = FALSE,
   size_point = 0.8,
-  size_text = NULL,
+  size_text = NA,
   sort = NULL,
   n_columns = NULL,
   type = c("forest", "funnel"),
   weight_points = TRUE,
+  show_labels = FALSE,
   ...
 )
 
@@ -34,43 +35,51 @@
 \item{x}{An object.}
 
 \item{show_intercept}{Logical, if \code{TRUE}, the intercept-parameter is included
-in the plot. By default, it is hidden because in many cases the intercept-parameter
-has a posterior distribution on a very different location, so density curves of
-posterior distributions for other parameters are hardly visible.}
+in the plot. By default, it is hidden because in many cases the
+intercept-parameter has a posterior distribution on a very different
+location, so density curves of posterior distributions for other parameters
+are hardly visible.}
 
-\item{size_point}{Size of point-geoms.}
+\item{size_point}{Numeric specifying size of point-geoms.}
 
-\item{size_text}{Size of text labels.}
+\item{size_text}{Numeric value specifying size of text labels.}
 
-\item{sort}{\describe{
-  \item{\emph{Plotting model parameters}}{
-  If \code{NULL}, coefficients are plotted in the order as they appear in the summary. Use \code{sort = "ascending"} (or \code{sort = TRUE})) resp. \code{sort = "descending"} to sort coefficients in ascending or descending order.
-  }
-  \item{\emph{Plotting Bayes factors}}{
-  Sort pie-slices by posterior probability (descending)?
-  }
+\item{sort}{The behavior of this argument depends on the plotting contexts.
+\itemize{
+\item \emph{Plotting model parameters}:
+If \code{NULL}, coefficients are plotted in the order as they appear in the
+summary. Setting \code{sort = "ascending"} or \code{sort = "descending"} sorts
+coefficients in ascending or descending order, respectively.
+Setting \code{sort = TRUE} is the same as \code{sort = "ascending"}.
+\item \emph{Plotting Bayes factors}:
+Sort pie-slices by posterior probability (descending)?
 }}
 
 \item{n_columns}{For models with multiple components (like fixed and random,
 count and zero-inflated), defines the number of columns for the
 panel-layout. If \code{NULL}, a single, integrated plot is shown.}
 
-\item{type}{Indicating the type of plot. Only applies for model parameters from meta-analysis objects (e.g. \pkg{metafor}).}
+\item{type}{Character indicating the type of plot. Only applies for model
+parameters from meta-analysis objects (e.g. \pkg{metafor}).}
 
-\item{weight_points}{Logical, if \code{TRUE}, for meta-analysis objects, point size will be adjusted according to the study-weights.}
+\item{weight_points}{Logical. If \code{TRUE}, for meta-analysis objects, point
+size will be adjusted according to the study-weights.}
+
+\item{show_labels}{Logical. If \code{TRUE}, text labels are displayed.}
 
 \item{...}{Arguments passed to or from other methods.}
 
 \item{data}{The original data used to create this object. Can be a
-statistical model or such.}
+statistical model.}
 
-\item{component}{Indicate which component of the model should be plotted.}
+\item{component}{Character indicating which component of the model should be
+plotted.}
 
 \item{threshold_coefficient}{Numeric, threshold at which value coefficients will be displayed.}
 
 \item{threshold_p}{Numeric, threshold at which value p-values will be displayed.}
 
-\item{ci}{Logical, whether confidence intervals should be added to the plot.#'}
+\item{ci}{Logical, whether confidence intervals should be added to the plot.}
 }
 \value{
 A ggplot2-object.

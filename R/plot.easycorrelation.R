@@ -1,9 +1,9 @@
 #' Plot method for Gaussian Graphical Models
 #'
-#' The \code{plot()} method for the \code{correlation::correlation()} function.
+#' The `plot()` method for the `correlation::correlation()` function.
 #'
-#' @param node_color Color of node- or circle-geoms.
-#' @param text_color Color of text labels.
+#' @param node_color Character specifying color of node- or circle-geoms.
+#' @param text_color Character specifying color of text labels.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_check_normality
 #' @inheritParams plot.see_bayesfactor_parameters
@@ -17,21 +17,26 @@
 #' result <- correlation(mtcars, partial = TRUE)
 #' plot(result)
 #' }
-#' @importFrom utils sessionInfo
 #' @export
-plot.see_easycorrelation <- function(x, size_point = 22, text_color = "white", node_color = "#647687", ...) {
+plot.see_easycorrelation <- function(x,
+                                     size_point = 22,
+                                     text_color = "white",
+                                     node_color = "#647687",
+                                     ...) {
+  insight::check_if_installed("ggraph")
+
   if (!requireNamespace("ggraph", quietly = TRUE)) {
-    stop("Package 'ggraph' required for this function to work. Please install it.", call. = FALSE)
   } else {
     si <- utils::sessionInfo()
     other_packages <- names(si$otherPkgs)
     if (!is.null(other_packages) && !("ggraph" %in% other_packages)) {
-      message("Package 'ggraph' needs to be loaded. Please load it by typing 'library(ggraph)' into the console.")
+      insight::check_if_installed("ggraph")
       return(NULL)
     }
   }
+
   if (!requireNamespace("tidygraph", quietly = TRUE)) {
-    stop("Package 'tidygraph' required for this function to work. Please install it.", call. = FALSE)
+    insight::check_if_installed("tidygraph")
   }
 
   data <- tidygraph::as_tbl_graph(x)
@@ -43,7 +48,7 @@ plot.see_easycorrelation <- function(x, size_point = 22, text_color = "white", n
       ggraph::geom_node_text(aes(label = .data$name), colour = text_color) +
       ggraph::scale_edge_color_gradient2(low = "#a20025", high = "#008a00", name = "r") +
       ggraph::theme_graph() +
-      guides(edge_width = FALSE) +
+      guides(edge_width = "none") +
       scale_x_continuous(expand = expand_scale(c(.10, .10))) +
       scale_y_continuous(expand = expand_scale(c(.10, .10)))
   )

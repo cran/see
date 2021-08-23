@@ -1,4 +1,3 @@
-#' @importFrom insight clean_parameters
 #' @export
 data_plot.p_significance <- function(x,
                                      data = NULL,
@@ -12,9 +11,8 @@ data_plot.p_significance <- function(x,
   params <- NULL
 
   if (inherits(data, "emmGrid")) {
-    if (!requireNamespace("emmeans", quietly = TRUE)) {
-      stop("Package 'emmeans' required for this function to work. Please install it.", call. = FALSE)
-    }
+    insight::check_if_installed("emmeans")
+
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
   } else if (inherits(data, c("stanreg", "brmsfit"))) {
     params <- insight::clean_parameters(data)
@@ -152,7 +150,7 @@ data_plot.p_significance <- function(x,
 
 #' Plot method for practical significance
 #'
-#' The \code{plot()} method for the \code{bayestestR::p_significance()} function.
+#' The `plot()` method for the `bayestestR::p_significance()` function.
 #'
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
@@ -171,7 +169,6 @@ data_plot.p_significance <- function(x,
 #' }
 #' }
 #' @importFrom rlang .data
-#' @importFrom ggridges geom_ridgeline_gradient
 #' @export
 plot.see_p_significance <- function(x,
                                     data = NULL,
@@ -228,7 +225,7 @@ plot.see_p_significance <- function(x,
 
   p <- p +
     geom_vline(aes(xintercept = 0), linetype = "dotted") +
-    guides(fill = FALSE, color = FALSE, group = FALSE)
+    guides(fill = "none", color = "none", group = "none")
 
 
   if (length(unique(x$y)) == 1 && is.numeric(x$y)) {

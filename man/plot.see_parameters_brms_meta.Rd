@@ -13,28 +13,32 @@
   rope_alpha = 0.15,
   rope_color = "cadetblue",
   normalize_height = TRUE,
+  show_labels = TRUE,
   ...
 )
 }
 \arguments{
 \item{x}{An object.}
 
-\item{size_point}{Size of point-geoms.}
+\item{size_point}{Numeric specifying size of point-geoms.}
 
-\item{size_line}{Size of line geoms.}
+\item{size_line}{Numeric value specifying size of line geoms.}
 
-\item{size_text}{Size of text labels.}
+\item{size_text}{Numeric value specifying size of text labels.}
 
-\item{posteriors_alpha}{Alpha value of the posterior distributions.}
+\item{posteriors_alpha}{Numeric value specifying alpha for the posterior
+distributions.}
 
-\item{rope_alpha}{Transparency level of ROPE ribbon.}
+\item{rope_alpha}{Numeric specifying transparency level of ROPE ribbon.}
 
-\item{rope_color}{Color of ROPE ribbon.}
+\item{rope_color}{Character specifying color of ROPE ribbon.}
 
-\item{normalize_height}{Logical, if \code{TRUE}, height of mcmc-areas is
+\item{normalize_height}{Logical. If \code{TRUE}, height of mcmc-areas is
 "normalized", to avoid overlap. In certain cases when the range of a
 posterior distribution is narrow for some parameters, this may result in
 very flat mcmc-areas. In such cases, set \code{normalize_height = FALSE}.}
+
+\item{show_labels}{Logical. If \code{TRUE}, text labels are displayed.}
 
 \item{...}{Arguments passed to or from other methods.}
 }
@@ -47,15 +51,13 @@ function when used with brms-meta-analysis models.
 }
 \details{
 \subsection{Colors of density areas and errorbars}{
-  To change the colors of the density areas, use \code{scale_fill_manual()}
-  with named color-values, e.g. \code{scale_fill_manual(values = c("Study" =
-  "blue", "Overall" = "green"))}.
-  To change the color of the error bars, use \code{scale_color_manual(values
-  = c("Errorbar" = "red"))}.
+To change the colors of the density areas, use \code{scale_fill_manual()}
+with named color-values, e.g. \code{scale_fill_manual(values = c("Study" = "blue", "Overall" = "green"))}.
+To change the color of the error bars, use \code{scale_color_manual(values = c("Errorbar" = "red"))}.
 }
 \subsection{Show or hide estimates and CI}{
-  Use \code{size_text = NULL} or \code{size_text = NA} to hide the textual
-  output of estimates and credible intervals.
+Use \code{show_labels = FALSE} to hide the textual
+output of estimates and credible intervals.
 }
 }
 \examples{

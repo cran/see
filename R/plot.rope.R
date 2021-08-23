@@ -7,9 +7,7 @@ data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...) {
   params <- NULL
 
   if (inherits(data, "emmGrid")) {
-    if (!requireNamespace("emmeans", quietly = TRUE)) {
-      stop("Package 'emmeans' required for this function to work. Please install it.", call. = FALSE)
-    }
+    insight::check_if_installed("emmeans")
     data <- as.data.frame(as.matrix(emmeans::as.mcmc.emmGrid(data, names = FALSE)))
   } else if (inherits(data, c("stanreg", "brmsfit"))) {
     params <- insight::clean_parameters(data)
@@ -65,15 +63,11 @@ data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...) {
 
 
 
-
-
-
-
 # Plot --------------------------------------------------------------------
 
 #' Plot method for Region of Practical Equivalence
 #'
-#' The \code{plot()} method for the \code{bayestestR::rope()}.
+#' The `plot()` method for the `bayestestR::rope()`.
 #'
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters

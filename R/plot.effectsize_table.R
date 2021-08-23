@@ -1,6 +1,6 @@
 #' Plot method for effect size tables
 #'
-#' The \code{plot()} method for the \code{effectsize::effectsize()} function.
+#' The `plot()` method for the `effectsize::effectsize()` function.
 #'
 #' @inheritParams data_plot
 #'
@@ -38,7 +38,7 @@ plot.see_effectsize_table <- function(x, ...) {
     geom_vline(xintercept = 0) +
     scale_color_manual(
       values = c("FALSE" = "green", "TRUE" = "blue"),
-      guide = FALSE
+      guide = "none"
     ) +
     labs(x = es_lab) +
     theme_modern()
@@ -89,44 +89,3 @@ plot.see_equivalence_test_effectsize <- function(x, ...) {
     ) +
     theme_modern()
 }
-
-
-
-
-
-## TODO remove once effectsize 0.4.0 is on CRAN
-
-# helper ------------------------------
-
-.is_effectsize_name <- function(x) {
-  if (length(x) > 1) {
-    sapply(x, .retrieve_es_name)
-  } else {
-    .retrieve_es_name(x)
-  }
-}
-
-
-.retrieve_es_name <- function(x) {
-  x %in% unlist(.es_names)
-}
-
-#' List of effect size names
-#' @keywords internal
-.es_names <- list(
-  onetail = c(
-    "Eta_Sq",
-    "Eta_Sq_partial",
-    "Epsilon_Sq",
-    "Epsilon_Sq_partial",
-    "Omega_Sq",
-    "Omega_Sq_partial",
-    "Cohens_f",
-    "Cohens_f_partial",
-    "cramers_v",
-    "cramers_v_adjusted",
-    "phi",
-    "phi_adjusted"
-  ),
-  twotail = c("d", "r", "Cohens_d", "Hedges_g", "Glass_delta")
-)

@@ -1,10 +1,11 @@
 #' Plot method for checking outliers
 #'
-#' The \code{plot()} method for the \code{performance::check_outliers()}
+#' The `plot()` method for the `performance::check_outliers()`
 #' function.
 #'
-#' @param size_text Size of text labels.
-#' @param rescale_distance Logical, if \code{TRUE}, distance values are rescaled
+#' @param show_labels Logical. If `TRUE`, text labels are displayed.
+#' @param size_text Numeric value specifying size of text labels.
+#' @param rescale_distance Logical. If `TRUE`, distance values are rescaled
 #'   to a range from 0 to 1. This is mainly due to better catch the differences
 #'   between distance values.
 #' @inheritParams data_plot
@@ -30,6 +31,7 @@ plot.see_check_outliers <- function(x,
                                     colors = c("#3aaf85", "#1b6ca8", "#cd201f"),
                                     rescale_distance = TRUE,
                                     type = c("dots", "bars"),
+                                    show_labels = TRUE,
                                     ...) {
   type <- match.arg(type)
   influential_obs <- attributes(x)$influential_obs
@@ -38,6 +40,7 @@ plot.see_check_outliers <- function(x,
   if (type == "dots" && !is.null(influential_obs) && (is.null(methods) || length(methods) == 1)) {
     .plot_diag_outliers_new(
       influential_obs,
+      show_labels = show_labels,
       size_text = size_text,
       size_line = size_line,
       dot_alpha_level = dot_alpha,
@@ -45,7 +48,7 @@ plot.see_check_outliers <- function(x,
     )
   } else {
     if (length(methods == 1)) {
-      .plot_diag_outliers(x, size_text, rescale_distance)
+      .plot_diag_outliers(x, show_labels = show_labels, size_text = size_text, rescale_distance = rescale_distance)
     } else {
       .plot_outliers_multimethod(x, rescale_distance)
     }
@@ -53,8 +56,6 @@ plot.see_check_outliers <- function(x,
 }
 
 
-#' @importFrom stats reshape
-#' @importFrom effectsize normalize
 #' @export
 data_plot.check_outliers <- function(x, data = NULL, rescale_distance = TRUE, ...) {
   data <- attributes(x)$data
@@ -82,8 +83,8 @@ data_plot.check_outliers <- function(x, data = NULL, rescale_distance = TRUE, ..
   d_long
 }
 
-
-.plot_diag_outliers <- function(x, size_text = 3.5, rescale_distance = TRUE) {
+#' @importFrom rlang `%||%`
+.plot_diag_outliers <- function(x, show_labels = TRUE, size_text = 3.5, rescale_distance = TRUE) {
   d <- data_plot(x, rescale_distance = rescale_distance)
   d$Id <- 1:nrow(d)
   d$Outliers <- as.factor(attr(x, "data", exact = TRUE)[["Outlier"]])
@@ -108,7 +109,7 @@ data_plot.check_outliers <- function(x, data = NULL, rescale_distance = TRUE, ..
     x_lab <- method
   }
 
-  if (is.null(size_text)) size_text <- 3.5
+  size_text <- size_text %||% 3.5
 
   p <- ggplot(d, aes(x = .data$Distance, fill = .data$Outliers, label = .data$Id)) +
     geom_histogram() +
@@ -120,7 +121,7 @@ data_plot.check_outliers <- function(x, data = NULL, rescale_distance = TRUE, ..
       fill = NULL
     ) +
     scale_fill_manual(values = c("#2c3e50", "#c0392b")) +
-    guides(fill = FALSE, color = FALSE, label = FALSE)
+    guides(fill = "none", color = "none", label = "none")
 
   if (!is.null(threshold) && !is.na(threshold)) {
     p <- p +
@@ -132,10 +133,12 @@ data_plot.check_outliers <- function(x, data = NULL, rescale_distance = TRUE, ..
   }
 
 
-  if (requireNamespace("ggrepel", quietly = TRUE)) {
-    p <- p + ggrepel::geom_text_repel(y = 2.5, size = size_text, na.rm = TRUE)
-  } else {
-    p <- p + geom_text(y = 2.5, size = size_text, na.rm = TRUE)
+  if (isTRUE(show_labels)) {
+    if (requireNamespace("ggrepel", quietly = TRUE)) {
+      p <- p + ggrepel::geom_text_repel(y = 2.5, size = size_text, na.rm = TRUE)
+    } else {
+      p <- p + geom_text(y = 2.5, size = size_text, na.rm = TRUE)
+    }
   }
 
   p

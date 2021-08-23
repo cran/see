@@ -1,4 +1,3 @@
-#' @importFrom insight clean_parameters
 #' @export
 data_plot.estimate_density <- function(x,
                                        data = NULL,
@@ -68,19 +67,21 @@ data_plot.estimate_density <- function(x,
 
 #' Plot method for density estimation of posterior samples
 #'
-#' The \code{plot()} method for the \code{bayestestR::estimate_density()} function.
+#' The `plot()` method for the `bayestestR::estimate_density()` function.
 #'
-#' @param stack Logical, if \code{TRUE}, densities are plotted as stacked lines.
+#' @param stack Logical. If `TRUE`, densities are plotted as stacked lines.
 #'   Else, densities are plotted for each parameter among each other.
-#' @param priors Logical, if \code{TRUE}, prior distributions are simulated
-#'   (using \code{\link[bayestestR:simulate_prior]{simulate_prior()}}) and added
+#' @param priors Logical. If `TRUE`, prior distributions are simulated
+#'   (using [bayestestR::simulate_prior()]) and added
 #'   to the plot.
-#' @param priors_alpha Alpha value of the prior distributions.
-#' @param posteriors_alpha Alpha value of the posterior distributions.
-#' @param centrality The point-estimate (centrality index) to compute. May be
-#'   \code{"median"}, \code{"mean"} or \code{"MAP"}.
-#' @param ci Value of probability of the CI (between 0 and 1) to be estimated.
-#'   Default to .95.
+#' @param priors_alpha Numeric value specifying alpha for the prior
+#'   distributions.
+#' @param posteriors_alpha Numeric value specifying alpha for the posterior
+#'   distributions.
+#' @param centrality Character specifying the point-estimate (centrality index)
+#'   to compute. Can be `"median"`, `"mean"` or `"MAP"`.
+#' @param ci Numeric value of probability of the CI (between 0 and 1) to be
+#'   estimated. Default to `.95`.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_cluster_analysis
@@ -98,7 +99,6 @@ data_plot.estimate_density <- function(x,
 #' }
 #' }
 #' @importFrom rlang .data
-#' @importFrom ggridges geom_ridgeline
 #' @export
 plot.see_estimate_density <- function(x,
                                       stack = TRUE,
@@ -209,7 +209,7 @@ plot.see_estimate_density <- function(x,
 
 
   if (length(unique(x$Parameter)) == 1) {
-    p <- p + guides(color = FALSE)
+    p <- p + guides(color = "none")
   }
 
 
@@ -236,8 +236,6 @@ data_plot.estimate_density_df <- data_plot.estimate_density
 
 
 #' @importFrom rlang .data
-#' @importFrom ggridges geom_ridgeline
-#' @importFrom stats setNames
 #' @export
 plot.see_estimate_density_df <- function(x,
                                          stack = TRUE,
@@ -264,7 +262,7 @@ plot.see_estimate_density_df <- function(x,
 
 
   if (length(unique(x$Parameter)) == 1) {
-    p <- p + guides(color = FALSE)
+    p <- p + guides(color = "none")
   }
 
 

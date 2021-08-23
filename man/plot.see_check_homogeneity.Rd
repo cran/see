@@ -10,7 +10,7 @@
 \item{x}{An object.}
 
 \item{data}{The original data used to create this object. Can be a
-statistical model or such.}
+statistical model.}
 
 \item{...}{Arguments passed to or from other methods.}
 }
@@ -18,7 +18,8 @@ statistical model or such.}
 A ggplot2-object.
 }
 \description{
-The \code{plot()} method for the \code{performance::check_homogeneity()} function.
+The \code{plot()} method for the \code{performance::check_homogeneity()}
+function.
 }
 \examples{
 library(performance)

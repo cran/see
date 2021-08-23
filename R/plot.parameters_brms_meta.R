@@ -1,6 +1,3 @@
-#' @importFrom insight format_ci
-#' @importFrom bayestestR estimate_density
-#' @importFrom effectsize change_scale
 #' @export
 data_plot.parameters_brms_meta <- function(x, data = NULL, normalize_height = TRUE, ...) {
   if (is.null(data)) {
@@ -67,13 +64,13 @@ data_plot.parameters_brms_meta <- function(x, data = NULL, normalize_height = TR
 
 #' Plot method for Model Parameters from Bayesian Meta-Analysis
 #'
-#' The \code{plot()} method for the \code{parameters::model_parameters()}
+#' The `plot()` method for the `parameters::model_parameters()`
 #' function when used with brms-meta-analysis models.
 #'
-#' @param normalize_height Logical, if \code{TRUE}, height of mcmc-areas is
+#' @param normalize_height Logical. If `TRUE`, height of mcmc-areas is
 #'   "normalized", to avoid overlap. In certain cases when the range of a
 #'   posterior distribution is narrow for some parameters, this may result in
-#'   very flat mcmc-areas. In such cases, set \code{normalize_height = FALSE}.
+#'   very flat mcmc-areas. In such cases, set `normalize_height = FALSE`.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_rope
 #' @inheritParams plot.see_check_normality
@@ -85,14 +82,14 @@ data_plot.parameters_brms_meta <- function(x, data = NULL, normalize_height = TR
 #'
 #' @details
 #' \subsection{Colors of density areas and errorbars}{
-#'   To change the colors of the density areas, use \code{scale_fill_manual()}
-#'   with named color-values, e.g. \code{scale_fill_manual(values = c("Study" =
-#'   "blue", "Overall" = "green"))}.
-#'   To change the color of the error bars, use \code{scale_color_manual(values
-#'   = c("Errorbar" = "red"))}.
+#'   To change the colors of the density areas, use `scale_fill_manual()`
+#'   with named color-values, e.g. `scale_fill_manual(values = c("Study" =
+#'   "blue", "Overall" = "green"))`.
+#'   To change the color of the error bars, use `scale_color_manual(values
+#'   = c("Errorbar" = "red"))`.
 #' }
 #' \subsection{Show or hide estimates and CI}{
-#'   Use \code{size_text = NULL} or \code{size_text = NA} to hide the textual
+#'   Use `show_labels = FALSE` to hide the textual
 #'   output of estimates and credible intervals.
 #' }
 #'
@@ -125,7 +122,6 @@ data_plot.parameters_brms_meta <- function(x, data = NULL, normalize_height = TR
 #'   plot(mp)
 #' }
 #' }
-#' @importFrom ggridges geom_ridgeline
 #' @export
 plot.see_parameters_brms_meta <- function(x,
                                           size_point = 2,
@@ -135,6 +131,7 @@ plot.see_parameters_brms_meta <- function(x,
                                           rope_alpha = 0.15,
                                           rope_color = "cadetblue",
                                           normalize_height = TRUE,
+                                          show_labels = TRUE,
                                           ...) {
 
   # save model for later use
@@ -195,7 +192,15 @@ plot.see_parameters_brms_meta <- function(x,
       shape = 21
     )
 
-  if (!is.null(size_text) && !is.na(size_text)) {
+  p <- p +
+    theme_lucid() +
+    scale_y_discrete() +
+    scale_fill_manual(values = c("Study" = unname(metro_colors("light blue")), "Overall" = unname(metro_colors("amber")))) +
+    scale_colour_manual(values = c("Study" = unname(metro_colors("light blue")), "Overall" = unname(metro_colors("amber")))) +
+    guides(fill = "none", colour = "none") +
+    add_plot_attributes(x)
+
+  if (isTRUE(show_labels)) {
     # add some space to the right panel for text
     space_factor <- sqrt(ceiling(diff(c(min(x$x), max(x$x)))) / 5)
     new_range <- pretty(c(min(x$x), max(x$x) + space_factor))
@@ -207,20 +212,9 @@ plot.see_parameters_brms_meta <- function(x,
         hjust = "inward",
         size = size_text
       ) +
-      xlim(c(min(new_range), max(new_range)))
-  }
-
-  p <- p +
-    theme_lucid() +
-    scale_y_discrete() +
-    scale_fill_manual(values = c("Study" = unname(metro_colors("light blue")), "Overall" = unname(metro_colors("amber")))) +
-    scale_colour_manual(values = c("Study" = unname(metro_colors("light blue")), "Overall" = unname(metro_colors("amber")))) +
-    guides(fill = "none", colour = "none") +
-    add_plot_attributes(x)
-
-  # no panel grids when we have text
-  if (!is.null(size_text) && !is.na(size_text)) {
-    p <- p + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+      xlim(c(min(new_range), max(new_range))) +
+      # no panel grids when we have text
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
   }
 
   p
