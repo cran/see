@@ -2,7 +2,7 @@ Type: Package
 Package: see
 Title: Visualisation Toolbox for 'easystats' and Extra Geoms, Themes
         and Color Palettes for 'ggplot2'
-Version: 0.6.7
+Version: 0.6.8
 Authors@R: 
     c(person(given = "Daniel",
              family = "Lüdecke",
@@ -69,9 +69,9 @@ Suggests: brms, coda, correlation, dplyr, emmeans, ggdist, ggraph,
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
-RoxygenNote: 7.1.1.9001
+RoxygenNote: 7.1.2
 NeedsCompilation: no
-Packaged: 2021-08-23 06:57:57 UTC; DL
+Packaged: 2021-10-03 12:29:44 UTC; DL
 Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>,
     @strengejacke),
   Dominique Makowski [aut, inv] (<https://orcid.org/0000-0001-5375-9967>,
@@ -86,4 +86,4 @@ Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>,
   Matthew Smith [rev] (@SmithMatt90),
   Jakob Bossek [rev] (@BossekJakob)
 Repository: CRAN
-Date/Publication: 2021-08-23 08:00:02 UTC
+Date/Publication: 2021-10-03 13:00:01 UTC

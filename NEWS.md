@@ -1,3 +1,22 @@
+# see 0.6.8
+
+## New features
+
+* Add option to show density layers for Bayesian and bootstrapped models in
+  `plot()` for `parameters::model_parameters()`.
+
+* Negative coefficients in `plot()` for `parameters::model_parameters()` are
+  now always red.
+  
+* Improve support for `parameters::model_parameters()` from *emmeans* objects.
+
+* Updated code and examples to work with new API decisions made for the
+  *performance* package.
+
+## Bug fixes
+
+* Fix density plots for frequentist models.
+
 # see 0.6.5
 
 ## General
