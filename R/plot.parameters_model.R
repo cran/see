@@ -11,8 +11,8 @@
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_bayesfactor_models
-#' @inheritParams plot.see_cluster_analysis
 #' @inheritParams plot.see_check_normality
+#' @inheritParams plot.see_check_outliers
 #' @inheritParams plot.see_parameters_brms_meta
 #' @param show_estimate Should the point estimate of each parameter be shown?
 #'   (default: `TRUE`)
@@ -23,6 +23,9 @@
 #'   (default: `FALSE`)
 #' @param log_scale Should exponentiated coefficients (e.g., odds-ratios) be
 #'   plotted on a log scale? (default: `FALSE`)
+#' @param n_columns For models with multiple components (like fixed and random,
+#'   count and zero-inflated), defines the number of columns for the
+#'   panel-layout. If `NULL`, a single, integrated plot is shown.
 #'
 #' @return A ggplot2-object.
 #'
@@ -66,7 +69,8 @@ plot.see_parameters_model <- function(x,
             function(param) paste(param, "=", x[[param]])
           )
         ), 1,
-        paste, collapse = ", "
+        paste,
+        collapse = ", "
       )
       x$Parameter <- collapsed_params
     } else {
@@ -190,7 +194,7 @@ plot.see_parameters_model <- function(x,
         rows_to = "Iteration",
         values_to = "Coefficient"
       )
-      group <- x[,c("Parameter"), drop = FALSE]
+      group <- x[, c("Parameter"), drop = FALSE]
       group$group <- factor(x$Coefficient < y_intercept, levels = c(FALSE, TRUE))
       data <- merge(data, group, by = "Parameter")
       if (isTRUE(exponentiated_coefs)) {
@@ -198,45 +202,45 @@ plot.see_parameters_model <- function(x,
       }
 
       density_layer <- ggdist::stat_slab(
-        aes(fill = after_scale(.data$color)),
+        ggplot2::aes(fill = ggplot2::after_scale(.data$color)),
         size = NA, alpha = .2,
         data = data
       )
     } else if (isTRUE(exponentiated_coefs)) {
       density_layer <- ggdist::stat_dist_slab(
-        aes(
+        ggplot2::aes(
           dist = "lnorm",
           arg1 = log(.data$Coefficient),
           arg2 = .data$SE / .data$Coefficient,
-          fill = after_scale(.data$color)
+          fill = ggplot2::after_scale(.data$color)
         ),
         size = NA, alpha = .2,
-        data = function(x) x[x$CI == x$CI[1],]
+        data = function(x) x[x$CI == x$CI[1], ]
       )
     } else if (model_attributes$test_statistic == "t-statistic") {
       # t-distribution confidence densities
       density_layer <- ggdist::stat_dist_slab(
-        aes(
+        ggplot2::aes(
           dist = "student_t",
           arg1 = .data$df_error,
           arg2 = .data$Coefficient,
           arg3 = .data$SE,
-          fill = after_scale(.data$color)
+          fill = ggplot2::after_scale(.data$color)
         ),
         size = NA, alpha = .2,
-        data = function(x) x[x$CI == x$CI[1],]
+        data = function(x) x[x$CI == x$CI[1], ]
       )
     } else {
       # normal-approximation confidence densities
       density_layer <- ggdist::stat_dist_slab(
-        aes(
+        ggplot2::aes(
           dist = "norm",
           arg1 = .data$Coefficient,
           arg2 = .data$SE,
-          fill = after_scale(.data$color)
+          fill = ggplot2::after_scale(.data$color)
         ),
         size = NA, alpha = .2,
-        data = function(x) x[x$CI == x$CI[1],]
+        data = function(x) x[x$CI == x$CI[1], ]
       )
     }
   }
@@ -326,11 +330,11 @@ plot.see_parameters_model <- function(x,
   if (is_meta || is_meta_bma) {
 
     # plot setup for metafor-objects
-    p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
-      geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
+    p <- ggplot2::ggplot(x, ggplot2::aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = y_intercept), linetype = "dotted") +
       theme_modern(legend.position = "none") +
       scale_color_material() +
-      guides(color = "none", size = "none", shape = "none")
+      ggplot2::guides(color = "none", size = "none", shape = "none")
 
     if (show_density) {
       # p <- p + density_layer
@@ -341,15 +345,15 @@ plot.see_parameters_model <- function(x,
 
     if (show_interval) {
       # TODO: Handle NA boundaries
-      p <- p + geom_errorbar(aes(xmin = .data$CI_low, xmax = .data$CI_high),
-                             width = 0,
-                             size = size_point)
+      p <- p + ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$CI_low, xmax = .data$CI_high),
+        width = 0,
+        size = size_point
+      )
     }
 
     if (show_estimate) {
-      p <- p + geom_point(size = x$size_point * size_point, shape = x$shape)
+      p <- p + ggplot2::geom_point(size = x$size_point * size_point, shape = x$shape)
     }
-
   } else if (isTRUE(multiple_ci)) {
 
     # plot setup for model parameters with multiple CIs
@@ -362,9 +366,11 @@ plot.see_parameters_model <- function(x,
       color_scale <- scale_color_material()
     }
 
-    p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient,
-                       size = rev(.data$CI), color = .data$group)) +
-      geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
+    p <- ggplot2::ggplot(x, ggplot2::aes(
+      y = .data$Parameter, x = .data$Coefficient,
+      size = rev(.data$CI), color = .data$group
+    )) +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = y_intercept), linetype = "dotted") +
       theme_modern(legend.position = "none") +
       color_scale
 
@@ -374,19 +380,18 @@ plot.see_parameters_model <- function(x,
 
     if (show_interval) {
       # TODO: Handle NA boundaries
-      p <- p + geom_errorbar(
-        aes(xmin = .data$CI_low, xmax = .data$CI_high),
+      p <- p + ggplot2::geom_errorbar(
+        ggplot2::aes(xmin = .data$CI_low, xmax = .data$CI_high),
         width = 0
       ) +
-        scale_size_ordinal(range = c(size_point, 3 * size_point))
+        ggplot2::scale_size_ordinal(range = c(size_point, 3 * size_point))
     }
 
     if (show_estimate) {
-      p <- p + geom_point(
+      p <- p + ggplot2::geom_point(
         size = 4 * size_point
       )
     }
-
   } else {
 
     # plot setup for regular model parameters
@@ -397,8 +402,8 @@ plot.see_parameters_model <- function(x,
       color_scale <- scale_color_material()
     }
 
-    p <- ggplot(x, aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
-      geom_vline(aes(xintercept = y_intercept), linetype = "dotted") +
+    p <- ggplot2::ggplot(x, ggplot2::aes(y = .data$Parameter, x = .data$Coefficient, color = .data$group)) +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = y_intercept), linetype = "dotted") +
       theme_modern(legend.position = "none") +
       color_scale
 
@@ -408,26 +413,28 @@ plot.see_parameters_model <- function(x,
 
     if (show_interval) {
       # TODO: Handle NA boundaries
-      p <- p + geom_errorbar(aes(xmin = .data$CI_low, xmax = .data$CI_high),
-                             width = 0,
-                             size = size_point)
+      p <- p + ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$CI_low, xmax = .data$CI_high),
+        width = 0,
+        size = size_point
+      )
     }
 
     if (show_estimate) {
       if (show_density) {
-        p <- p + geom_point(size = 4 * size_point,
-                            fill = "white",
-                            shape = 21)
+        p <- p + ggplot2::geom_point(
+          size = 4 * size_point,
+          fill = "white",
+          shape = 21
+        )
       } else {
-        p <- p + geom_point(size = 4 * size_point)
+        p <- p + ggplot2::geom_point(size = 4 * size_point)
       }
     }
-
   }
 
 
   if (!is.null(pretty_names)) {
-    p <- p + scale_y_discrete(labels = pretty_names)
+    p <- p + ggplot2::scale_y_discrete(labels = pretty_names)
   }
 
   # find min/max range based on CI
@@ -551,7 +558,7 @@ plot.see_parameters_model <- function(x,
   measure <- .meta_measure(meta_measure)
 
   dat_funnel <- data.frame(
-    se_range = effectsize::change_scale(1:(nrow(x) * 10), to = c(0, max_y))
+    se_range = datawizard::data_rescale(1:(nrow(x) * 10), to = c(0, max_y))
   )
   estimate <- x$Coefficient[x$Parameter == "Overall"]
 

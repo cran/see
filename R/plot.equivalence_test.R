@@ -4,7 +4,7 @@
 #'
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
-#' @inheritParams plot.see_cluster_analysis
+#' @inheritParams plot.see_parameters_model
 #'
 #' @return A ggplot2-object.
 #'
@@ -137,6 +137,8 @@ plot.see_equivalence_test <- function(x,
   rope.line.alpha <- 1.25 * rope_alpha
   if (rope.line.alpha > 1) rope.line.alpha <- 1
 
+
+  insight::check_if_installed("ggridges")
 
   p <- ggplot(tmp, aes_string(x = "estimate", y = "predictor", fill = "grp")) +
     annotate(
@@ -279,6 +281,8 @@ plot.see_equivalence_test_df <- function(x,
   rope.line.alpha <- 1.25 * rope_alpha
 
   if (rope.line.alpha > 1) rope.line.alpha <- 1
+
+  insight::check_if_installed("ggridges")
 
   p <- ggplot(tmp, aes_string(x = "estimate", y = "predictor", fill = "grp")) +
     annotate(

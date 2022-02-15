@@ -110,13 +110,32 @@
 #'   geom_from_list(list(geom = "smooth", color = "red")) +
 #'   geom_from_list(list(aes = list(x = "Sepal.Length"), geom = "ggside::geom_xsidedensity")) +
 #'   geom_from_list(list(geom = "ggside::scale_xsidey_continuous", breaks = NULL))
+#'
+#' # Example 6 (ggraph) --------------------------
+#' if (require("tidygraph", quietly = TRUE) &&
+#'   require("ggraph", quietly = TRUE)) {
+#'   # Prepare graph
+#'   nodes <- data.frame(name = c("Dom", "Mattan", "Daniel", "Brenton"))
+#'   edges <- data.frame(
+#'     from = c(1, 1, 1, 2, 3, 3, 4, 4, 4),
+#'     to = c(2, 3, 4, 1, 1, 2, 1, 2, 3)
+#'   )
+#'   data <- tidygraph::tbl_graph(nodes = nodes, edges = edges)
+#'
+#'   ggraph(data, layout = "kk") +
+#'     geom_from_list(list(geom = "ggraph::geom_edge_arc")) +
+#'     geom_from_list(list(geom = "ggraph::geom_node_point", size = 10)) +
+#'     geom_from_list(list(geom = "ggraph::geom_node_label", aes = list(label = "name")))
+#' }
 #' @export
 geom_from_list <- function(x, ...) {
 
   # Additional parameters ------------------------------------------------------
   args <- x[!names(x) %in% c("geom", "aes", "data", "width", "height", "position", "show.legend")]
 
-  if(is.null(x$geom)) return(NULL)
+  if (is.null(x$geom)) {
+    return(NULL)
+  }
 
   if (inherits(x$geom, "function")) {
     return(do.call(x$geom, args))
@@ -131,6 +150,9 @@ geom_from_list <- function(x, ...) {
   if (x$geom == "labs") {
     return(do.call(ggplot2::labs, args))
   }
+  if (x$geom == "guides") {
+    return(do.call(ggplot2::guides, args))
+  }
   if (x$geom == "coord_flip") {
     return(do.call(ggplot2::coord_flip, args))
   }
@@ -141,9 +163,9 @@ geom_from_list <- function(x, ...) {
     return(do.call(ggplot2::facet_grid, args))
   }
   if (x$geom == "smooth") {
-    if(!is.null(x$aes)) args$mapping <- do.call(ggplot2::aes_string, x$aes)
-    if(!"method" %in% names(args)) args$method <- "loess"
-    if(!"formula" %in% names(args)) args$formula <- "y ~ x"
+    if (!is.null(x$aes)) args$mapping <- do.call(ggplot2::aes_string, x$aes)
+    if (!"method" %in% names(args)) args$method <- "loess"
+    if (!"formula" %in% names(args)) args$formula <- "y ~ x"
     return(do.call(ggplot2::geom_smooth, args))
   }
   if (startsWith(x$geom, "scale_")) {
@@ -157,8 +179,13 @@ geom_from_list <- function(x, ...) {
   }
   if (startsWith(x$geom, "ggside::")) {
     insight::check_if_installed("ggside")
-    if(!is.null(x$aes)) args$mapping <- do.call(ggplot2::aes_string, x$aes)
-    return(do.call(eval(parse(text=x$geom)), args))
+    if (!is.null(x$aes)) args$mapping <- do.call(ggplot2::aes_string, x$aes)
+    return(do.call(eval(parse(text = x$geom)), args))
+  }
+  if (startsWith(x$geom, "ggraph::")) {
+    insight::check_if_installed("ggraph")
+    if (!is.null(x$aes)) args$mapping <- do.call(ggplot2::aes_string, x$aes)
+    return(do.call(eval(parse(text = x$geom)), args))
   }
 
   # Default parameters
@@ -211,7 +238,7 @@ geom_from_list <- function(x, ...) {
   }
 
   # Show.legend
-  if("show.legend" %in% names(x)) {
+  if ("show.legend" %in% names(x)) {
     show.legend <- x$show.legend
   } else {
     show.legend <- NA

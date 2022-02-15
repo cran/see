@@ -9,7 +9,6 @@
 #'   plotting [bayestestR::si()].
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
-#' @inheritParams plot.see_cluster_analysis
 #'
 #' @return A ggplot2-object.
 #'
@@ -23,7 +22,7 @@
 #'   plot(result)
 #' }
 #' }
-#' @importFrom rlang .data
+#' @importFrom ggplot2 .data
 #' @export
 plot.see_si <- function(x,
                         si_color = "#0171D3",

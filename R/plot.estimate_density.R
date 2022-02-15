@@ -23,7 +23,7 @@ data_plot.estimate_density <- function(x,
   # summary
   split_columns <- intersect(c("Parameter", "Effects", "Component"), colnames(dataplot))
   datasplit <- split(dataplot, dataplot[split_columns])
-  summary <- do.call(rbind, .compact_list(lapply(datasplit, function(i) {
+  summary <- do.call(rbind, datawizard::compact_list(lapply(datasplit, function(i) {
     if (length(i$x) > 0) {
       Estimate <- as.numeric(bayestestR::point_estimate(i$x, centrality = centrality))
       CI <- as.numeric(bayestestR::ci(i$x, ci = ci))
@@ -84,7 +84,7 @@ data_plot.estimate_density <- function(x,
 #'   estimated. Default to `.95`.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
-#' @inheritParams plot.see_cluster_analysis
+#' @inheritParams plot.see_parameters_model
 #' @inheritParams plot.see_check_normality
 #'
 #' @return A ggplot2-object.
@@ -98,7 +98,7 @@ data_plot.estimate_density <- function(x,
 #'   plot(result)
 #' }
 #' }
-#' @importFrom rlang .data
+#' @importFrom ggplot2 .data
 #' @export
 plot.see_estimate_density <- function(x,
                                       stack = TRUE,
@@ -150,6 +150,8 @@ plot.see_estimate_density <- function(x,
 
     # add prior layer
     if (priors) {
+      insight::check_if_installed("ggridges")
+
       p <- p +
         .add_prior_layer_ridgeline(
           model,
@@ -165,6 +167,8 @@ plot.see_estimate_density <- function(x,
         scale_fill_flat(reverse = TRUE) +
         scale_colour_flat(reverse = TRUE)
     } else {
+      insight::check_if_installed("ggridges")
+
       p <- p +
         ggridges::geom_ridgeline(aes(fill = "Posterior"),
           alpha = posteriors_alpha,
@@ -235,7 +239,7 @@ plot.see_estimate_density <- function(x,
 data_plot.estimate_density_df <- data_plot.estimate_density
 
 
-#' @importFrom rlang .data
+#' @importFrom ggplot2 .data
 #' @export
 plot.see_estimate_density_df <- function(x,
                                          stack = TRUE,
@@ -249,6 +253,8 @@ plot.see_estimate_density_df <- function(x,
     p <- ggplot(x, aes(x = .data$x, y = .data$y, color = .data$Parameter)) +
       geom_line(size = size_line)
   } else {
+    insight::check_if_installed("ggridges")
+
     p <- ggplot(x, aes(x = .data$x, y = .data$Parameter, height = .data$y)) +
       ggridges::geom_ridgeline()
   }

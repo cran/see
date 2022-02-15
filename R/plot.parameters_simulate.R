@@ -15,7 +15,7 @@ data_plot.parameters_simulate <- function(x,
 
   # normalize height
   if (isTRUE(normalize_height)) {
-    out$y <- effectsize::change_scale(out$y, to = c(0, .9))
+    out$y <- datawizard::data_rescale(out$y, to = c(0, .9))
   }
 
   if (length(unique(params$Effects)) > 1) {
@@ -71,7 +71,6 @@ data_plot.parameters_simulate <- function(x,
 #' @inheritParams data_plot
 #' @inheritParams plot.see_estimate_density
 #' @inheritParams plot.see_bayesfactor_parameters
-#' @inheritParams plot.see_cluster_analysis
 #'
 #' @return A ggplot2-object.
 #'

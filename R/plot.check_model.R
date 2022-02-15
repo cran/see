@@ -1,4 +1,4 @@
-#' @importFrom rlang .data `%||%`
+#' @importFrom ggplot2 .data
 #' @export
 plot.see_check_model <- function(x,
                                  style = theme_lucid,
@@ -41,7 +41,7 @@ plot.see_check_model <- function(x,
 
   if (is.null(check)) check <- "all"
 
-  if ("NCV" %in% names(x) && any(c("ncv", "linearity", "all") %in% check)) {
+  if ("NCV" %in% names(x) && !is.null(x$NCV) && any(c("ncv", "linearity", "all") %in% check)) {
     p$NCV <- .plot_diag_linearity(
       x$NCV,
       size_point,
@@ -53,7 +53,7 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("HOMOGENEITY" %in% names(x) && any(c("homogeneity", "all") %in% check)) {
+  if ("HOMOGENEITY" %in% names(x) && !is.null(x$HOMOGENEITY) && any(c("homogeneity", "all") %in% check)) {
     p$HOMOGENEITY <- .plot_diag_homogeneity(
       x$HOMOGENEITY,
       size_point,
@@ -65,7 +65,7 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("VIF" %in% names(x) && any(c("vif", "all") %in% check)) {
+  if ("VIF" %in% names(x) && !is.null(x$VIF) && any(c("vif", "all") %in% check)) {
     p$VIF <- .plot_diag_vif(
       x$VIF,
       theme_style = style,
@@ -73,7 +73,7 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("OUTLIERS" %in% names(x) && any(c("outliers", "all") %in% check)) {
+  if ("INFLUENTIAL" %in% names(x) && !is.null(x$INFLUENTIAL) && any(c("outliers", "influential", "all") %in% check)) {
     p$OUTLIERS <- .plot_diag_outliers_new(
       x$INFLUENTIAL,
       show_labels = show_labels,
@@ -85,7 +85,7 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("QQ" %in% names(x) && any(c("qq", "all") %in% check)) {
+  if ("QQ" %in% names(x) && !is.null(x$QQ) && any(c("qq", "all") %in% check)) {
     p$QQ <- .plot_diag_qq(
       x$QQ,
       size_point,
@@ -98,7 +98,7 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("NORM" %in% names(x) && any(c("normality", "all") %in% check)) {
+  if ("NORM" %in% names(x) && !is.null(x$NORM) && any(c("normality", "all") %in% check)) {
     p$NORM <- .plot_diag_norm(
       x$NORM,
       size_line,
@@ -108,7 +108,7 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("REQQ" %in% names(x) && any(c("reqq", "all") %in% check)) {
+  if ("REQQ" %in% names(x) && !is.null(x$REQQ) && any(c("reqq", "all") %in% check)) {
     ps <- .plot_diag_reqq(
       x$REQQ,
       size_point,
@@ -144,10 +144,10 @@ plot.see_check_model <- function(x,
   levels(x$group) <- c("low (< 5)", "moderate (< 10)", "high (>= 10)")
   names(colors) <- c("low (< 5)", "moderate (< 10)", "high (>= 10)")
 
-  p <- ggplot(x, aes(x = .data$x, y = .data$y, fill = .data$group))
+  p <- ggplot2::ggplot(x, ggplot2::aes(x = .data$x, y = .data$y, fill = .data$group))
 
   if (ylim > 5) {
-    p <- p + geom_rect(
+    p <- p + ggplot2::geom_rect(
       xmin = -Inf,
       xmax = Inf,
       ymin = 0,
@@ -157,7 +157,7 @@ plot.see_check_model <- function(x,
       alpha = .025
     )
 
-    p <- p + geom_rect(
+    p <- p + ggplot2::geom_rect(
       xmin = -Inf,
       xmax = Inf,
       ymin = 5,
@@ -169,7 +169,7 @@ plot.see_check_model <- function(x,
   }
 
   if (ylim > 10) {
-    p <- p + geom_rect(
+    p <- p + ggplot2::geom_rect(
       xmin = -Inf,
       xmax = Inf,
       ymin = 10,
@@ -181,8 +181,8 @@ plot.see_check_model <- function(x,
   }
 
   p <- p +
-    geom_col(width = 0.7) +
-    labs(
+    ggplot2::geom_col(width = 0.7) +
+    ggplot2::labs(
       title = "Collinearity",
       subtitle = "Higher bars (>5) indicate potential collinearity issues",
       x = NULL,
@@ -190,21 +190,21 @@ plot.see_check_model <- function(x,
       fill = NULL
     ) +
     # geom_text(aes(label = round(.data$y, 1)), nudge_y = 1) +
-    scale_fill_manual(values = colors) +
+    ggplot2::scale_fill_manual(values = colors) +
     theme_style(
       base_size = 10,
       plot.title.space = 3,
       axis.title.space = 5
     ) +
-    ylim(c(0, ylim)) +
-    theme(
+    ggplot2::ylim(c(0, ylim)) +
+    ggplot2::theme(
       legend.position = "bottom",
-      legend.margin = margin(0, 0, 0, 0),
-      legend.box.margin = margin(-5, -5, -5, -5)
+      legend.margin = ggplot2::margin(0, 0, 0, 0),
+      legend.box.margin = ggplot2::margin(-5, -5, -5, -5)
     )
 
   if ("facet" %in% colnames(x)) {
-    p <- p + facet_wrap(~facet, nrow = 1, scales = "free")
+    p <- p + ggplot2::facet_wrap(~facet, nrow = 1, scales = "free")
   }
 
   p
@@ -217,19 +217,19 @@ plot.see_check_model <- function(x,
                             alpha_level = .2,
                             theme_style = theme_lucid,
                             colors = unname(social_colors(c("green", "blue", "red")))) {
-  ggplot(x, aes(x = .data$x)) +
-    geom_ribbon(
-      mapping = aes(ymin = 0, ymax = .data$y),
+  ggplot2::ggplot(x, ggplot2::aes(x = .data$x)) +
+    ggplot2::geom_ribbon(
+      mapping = ggplot2::aes(ymin = 0, ymax = .data$y),
       colour = NA,
       fill = colors[2],
       alpha = alpha_level
     ) +
-    geom_line(
-      mapping = aes(y = .data$curve),
+    ggplot2::geom_line(
+      mapping = ggplot2::aes(y = .data$curve),
       colour = colors[1],
       size = size_line
     ) +
-    labs(
+    ggplot2::labs(
       x = "Residuals",
       y = "Density",
       title = "Normality of Residuals",
@@ -240,7 +240,7 @@ plot.see_check_model <- function(x,
       plot.title.space = 3,
       axis.title.space = 5
     ) +
-    scale_y_continuous(labels = NULL)
+    ggplot2::scale_y_continuous(labels = NULL)
 }
 
 
@@ -280,21 +280,21 @@ plot.see_check_model <- function(x,
     )
 
     qq_stuff <- list(
-      geom_qq(
+      ggplot2::geom_qq(
         shape = 16, stroke = 0,
         size = size_point,
         colour = colors[2] # "#2c3e50"
       ),
-      geom_qq_line(
+      ggplot2::geom_qq_line(
         size = size_line,
         colour = colors[1]
       )
     )
     y_lab <- "Sample Quantiles"
   }
-  ggplot(x, aes(sample = .data$y)) +
+  ggplot2::ggplot(x, ggplot2::aes(sample = .data$y)) +
     qq_stuff +
-    labs(
+    ggplot2::labs(
       title = "Normality of Residuals",
       subtitle = "Dots should fall along the line",
       y = y_lab,
@@ -319,7 +319,7 @@ plot.see_check_model <- function(x,
                           colors = unname(social_colors(c("green", "blue", "red"))),
                           dot_alpha_level = .8) {
   if (requireNamespace("qqplotr", quietly = TRUE)) {
-    p_plot <- ggplot(x, aes(sample = .data$res)) +
+    p_plot <- ggplot2::ggplot(x, ggplot2::aes(sample = .data$res)) +
       qqplotr::stat_pp_band(alpha = alpha_level, detrend = detrend) +
       qqplotr::stat_pp_line(
         size = size_line,
@@ -345,8 +345,8 @@ plot.see_check_model <- function(x,
     dparms <- MASS::fitdistr(x$res, densfun = "normal")
     x$y <- do.call(stats::pnorm, c(list(q = x$res), dparms$estimate))
 
-    p_plot <- ggplot(x, aes(x = .data$probs, y = .data$y)) +
-      geom_abline(
+    p_plot <- ggplot2::ggplot(x, ggplot2::aes(x = .data$probs, y = .data$y)) +
+      ggplot2::geom_abline(
         slope = 1,
         size = size_line,
         colour = colors[1]
@@ -361,7 +361,7 @@ plot.see_check_model <- function(x,
   }
 
   p_plot +
-    labs(
+    ggplot2::labs(
       title = "Normality of Residuals (PP plot)",
       subtitle = "Dots should fall along the line",
       y = "Cummulative Probability",
@@ -384,13 +384,13 @@ plot.see_check_model <- function(x,
                                    theme_style = theme_lucid,
                                    colors = unname(social_colors(c("green", "blue", "red"))),
                                    dot_alpha_level = .8) {
-  ggplot(x, aes(x = .data$x, .data$y)) +
+  ggplot2::ggplot(x, ggplot2::aes(x = .data$x, .data$y)) +
     geom_point2(
       colour = colors[2],
       size = size_point,
       alpha = dot_alpha_level
     ) +
-    stat_smooth(
+    ggplot2::stat_smooth(
       method = "loess",
       se = TRUE,
       alpha = alpha_level,
@@ -398,7 +398,7 @@ plot.see_check_model <- function(x,
       size = size_line,
       colour = colors[1]
     ) +
-    labs(
+    ggplot2::labs(
       title = "Homogeneity of Variance",
       subtitle = "Reference line should be flat and horizontal",
       y = expression(sqrt("|Std. residuals|")),
@@ -420,13 +420,13 @@ plot.see_check_model <- function(x,
                                  theme_style = theme_lucid,
                                  colors = unname(social_colors(c("green", "blue", "red"))),
                                  dot_alpha_level = .8) {
-  ggplot(x, aes(x = .data$x, y = .data$y)) +
+  ggplot2::ggplot(x, ggplot2::aes(x = .data$x, y = .data$y)) +
     geom_point2(
       colour = colors[2],
       size = size_point,
       alpha = dot_alpha_level
     ) +
-    geom_smooth(
+    ggplot2::geom_smooth(
       method = "loess",
       se = TRUE,
       formula = y ~ x,
@@ -434,8 +434,8 @@ plot.see_check_model <- function(x,
       size = size_line,
       colour = colors[1]
     ) +
-    geom_hline(yintercept = 0, linetype = "dashed") +
-    labs(
+    ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +
+    ggplot2::labs(
       x = "Fitted values",
       y = "Residuals",
       title = "Linearity",
@@ -460,22 +460,22 @@ plot.see_check_model <- function(x,
                             dot_alpha_level = .8) {
   lapply(names(x), function(i) {
     dat <- x[[i]]
-    p <- ggplot(dat, aes(x = .data$x, y = .data$y)) +
-      labs(
+    p <- ggplot2::ggplot(dat, ggplot2::aes(x = .data$x, y = .data$y)) +
+      ggplot2::labs(
         x = "Theoretical Quantiles",
         y = "RE Quantiles",
         title = sprintf("Normality of Random Effects (%s)", i),
         subtitle = "Dots should be plotted along the line"
       ) +
-      stat_smooth(
+      ggplot2::stat_smooth(
         method = "lm",
         alpha = alpha_level,
         size = size_line,
         formula = y ~ x,
         colour = colors[1]
       ) +
-      geom_errorbar(
-        aes(ymin = .data$conf.low, ymax = .data$conf.high),
+      ggplot2::geom_errorbar(
+        ggplot2::aes(ymin = .data$conf.low, ymax = .data$conf.high),
         width = 0,
         colour = colors[2],
         alpha = dot_alpha_level
@@ -492,7 +492,7 @@ plot.see_check_model <- function(x,
       )
 
     if (nlevels(dat$facet) > 1 && isTRUE(panel)) {
-      p <- p + facet_wrap(~facet, scales = "free")
+      p <- p + ggplot2::facet_wrap(~facet, scales = "free")
     }
 
     p

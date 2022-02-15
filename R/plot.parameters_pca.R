@@ -18,13 +18,21 @@ data_plot.parameters_pca <- function(x, data = NULL, ...) {
   )
   dataplot$Variable <- factor(dataplot$Variable, levels = rev(unique(dataplot$Variable)))
 
+  # Title
+  if (inherits(x, "parameters_efa")) {
+    title <- "Factor Analysis"
+  } else {
+    title <- "Principal Component Analysis"
+  }
+
   rotation_name <- attr(x, "rotation", exact = TRUE)
 
   if (rotation_name == "none") {
-    title <- "Loadings from Principal Component Analysis (no rotation)"
+    title <- paste("Loadings from", title, "(no rotation)")
   } else {
-    title <- sprintf("Rotated loadings from Principal Component Analysis (%s-rotation)", rotation_name)
+    title <- paste0("Rotated loadings from ", title, "(", rotation_name, ")")
   }
+
 
   attr(dataplot, "info") <- list(
     "xlab" = "",
@@ -47,12 +55,10 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #'
 #' The `plot()` method for the `parameters::principal_components()` function.
 #'
+#' @param text_color Character specifying color of text labels.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
-#' @inheritParams plot.see_cluster_analysis
 #' @inheritParams plot.see_check_outliers
-#' @inheritParams plot.see_check_normality
-#' @inheritParams plot.see_easycorrelation
 #' @inheritParams plot.see_n_factors
 #'
 #' @return A ggplot2-object.
@@ -63,7 +69,7 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #' result <- principal_components(mtcars[, 1:7], n = "all", threshold = 0.2)
 #' result
 #' plot(result)
-#' @importFrom rlang .data
+#' @importFrom ggplot2 .data
 #' @export
 plot.see_parameters_pca <- function(x,
                                     type = c("bar", "line"),

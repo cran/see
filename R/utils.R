@@ -10,36 +10,6 @@
 
 
 
-.compact_list <- function(x) {
-  if (!is.null(x) && length(x) > 0 && is.list(x)) {
-    x[!sapply(x, function(i) length(i) == 0 || is.null(i) || any(i == "NULL", na.rm = TRUE))]
-  } else {
-    x
-  }
-}
-
-
-
-# is string empty?
-.is_empty_object <- function(x) {
-  if (is.list(x)) {
-    x <- tryCatch(
-      {
-        .compact_list(x)
-      },
-      error = function(x) {
-        x
-      }
-    )
-  }
-  # this is an ugly fix because of ugly tibbles
-  if (inherits(x, c("tbl_df", "tbl"))) x <- as.data.frame(x)
-  x <- suppressWarnings(x[!is.na(x)])
-  length(x) == 0 || is.null(x)
-}
-
-
-
 
 # safe conversion from factor to numeric
 .factor_to_numeric <- function(x) {
@@ -184,4 +154,18 @@
 
 .is_integer <- function(x) {
   is.numeric(x) && all(floor(x) == x, na.rm = T)
+}
+
+
+#' Default value for `NULL`
+#'
+#' @param x,y If `x` is NULL, will return `y`; otherwise returns `x`.
+#' @name op-null-default
+#' @examples
+#' 4 %||% 5
+#' NULL %||% 1
+#' @keywords internal
+#' @noRd
+`%||%` <- function(x, y) {
+  if (is.null(x)) y else x
 }
