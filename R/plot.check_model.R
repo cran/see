@@ -15,6 +15,8 @@ plot.see_check_model <- function(x,
   alpha_level <- attr(x, "alpha")
   dot_alpha_level <- attr(x, "dot_alpha")
   detrend <- attr(x, "detrend")
+  model_info <- attr(x, "model_info")
+  overdisp_type <- attr(x, "overdisp_type")
 
   if (missing(style) && !is.null(attr(x, "theme"))) {
     theme_style <- unlist(strsplit(attr(x, "theme"), "::", fixed = TRUE))
@@ -41,6 +43,16 @@ plot.see_check_model <- function(x,
 
   if (is.null(check)) check <- "all"
 
+  if ("PP_CHECK" %in% names(x) && !is.null(x$PP_CHECK) && any(c("pp_check", "all") %in% check)) {
+    x$NORM <- NULL
+    p$PP_CHECK <- plot.see_performance_pp_check(
+      x$PP_CHECK,
+      style = style,
+      check_model = TRUE,
+      adjust_legend = TRUE
+    )
+  }
+
   if ("NCV" %in% names(x) && !is.null(x$NCV) && any(c("ncv", "linearity", "all") %in% check)) {
     p$NCV <- .plot_diag_linearity(
       x$NCV,
@@ -50,6 +62,27 @@ plot.see_check_model <- function(x,
       theme_style = style,
       colors = colors,
       dot_alpha_level = dot_alpha_level
+    )
+  }
+
+  if ("BINNED_RESID" %in% names(x) && !is.null(x$BINNED_RESID) && any(c("binned_residuals", "all") %in% check)) {
+    x$HOMOGENEITY <- NULL
+    p$BINNED_RESID <- plot.see_binned_residuals(
+      x$BINNED_RESID,
+      style = style,
+      colors = colors[3:2],
+      adjust_legend = TRUE,
+      check_model = TRUE
+    )
+  }
+
+  if ("OVERDISPERSION" %in% names(x) && !is.null(x$OVERDISPERSION) && any(c("overdispersion", "all") %in% check)) {
+    p$OVERDISPERSION <- .plot_diag_overdispersion(
+      x$OVERDISPERSION,
+      style = style,
+      colors = colors[c(1, 2)],
+      size_line = size_line,
+      type = overdisp_type
     )
   }
 
@@ -65,14 +98,6 @@ plot.see_check_model <- function(x,
     )
   }
 
-  if ("VIF" %in% names(x) && !is.null(x$VIF) && any(c("vif", "all") %in% check)) {
-    p$VIF <- .plot_diag_vif(
-      x$VIF,
-      theme_style = style,
-      colors = colors
-    )
-  }
-
   if ("INFLUENTIAL" %in% names(x) && !is.null(x$INFLUENTIAL) && any(c("outliers", "influential", "all") %in% check)) {
     p$OUTLIERS <- .plot_diag_outliers_new(
       x$INFLUENTIAL,
@@ -82,6 +107,14 @@ plot.see_check_model <- function(x,
       theme_style = style,
       colors = colors,
       dot_alpha_level = dot_alpha_level
+    )
+  }
+
+  if ("VIF" %in% names(x) && !is.null(x$VIF) && any(c("vif", "all") %in% check)) {
+    p$VIF <- .plot_diag_vif(
+      x$VIF,
+      theme_style = style,
+      colors = colors
     )
   }
 
@@ -497,4 +530,53 @@ plot.see_check_model <- function(x,
 
     p
   })
+}
+
+
+
+.plot_diag_overdispersion <- function(x,
+                                      theme_style = theme_lucid,
+                                      colors = c("#3aaf85", "#1b6ca8"),
+                                      size_line = .8,
+                                      type = 1,
+                                      ...) {
+  if (is.null(type) || type == 1) {
+    p <- ggplot2::ggplot(x) +
+      ggplot2::aes(x = .data$Predicted) +
+      ggplot2::geom_smooth(ggplot2::aes(y = .data$V), size = size_line, color = colors[2], se = FALSE) +
+      ggplot2::geom_smooth(ggplot2::aes(y = .data$Res2), size = size_line, color = colors[1]) +
+      ggplot2::labs(
+        title = "Overdispersion and zero-inflation",
+        subtitle = "Observed residual variance (green) should follow predicted residual variance (blue)",
+        x = "Predicted mean",
+        y = "Residual variance"
+      ) +
+      theme_style(
+        base_size = 10,
+        plot.title.space = 3,
+        axis.title.space = 5
+      )
+  } else {
+    p <- ggplot2::ggplot(x) +
+      ggplot2::aes(x = .data$Predicted) +
+      ggplot2::geom_point(ggplot2::aes(y = .data$StdRes)) +
+      ggplot2::geom_hline(
+        yintercept = c(-2, 2, -4, 4),
+        linetype = c("solid", "solid", "dashed", "dashed"),
+        color = c(rep(colors[1], 2), rep(colors[2], 2))
+      ) +
+      ggplot2::labs(
+        title = "Overdispersion and zero-inflation",
+        subtitle = "Most points should be within solid lines, few points outside dashed lines",
+        x = "Predicted mean",
+        y = "Standardized resiuduals"
+      ) +
+      theme_style(
+        base_size = 10,
+        plot.title.space = 3,
+        axis.title.space = 5
+      )
+  }
+
+  p
 }

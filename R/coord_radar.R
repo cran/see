@@ -7,14 +7,13 @@
 #'
 #' @examples
 #' # Create a radar/spider chart with ggplot:
-#' if (require("poorman") && require("tidyr") && require("ggplot2")) {
-#'   data <- iris %>%
-#'     group_by(Species) %>%
-#'     summarise(across(everything(), mean)) %>%
-#'     pivot_longer(-Species)
+#' if (require("poorman") && require("ggplot2")) {
+#'   data <- iris[-5] %>%
+#'     aggregate(list(Species = iris$Species), mean) %>%
+#'     datawizard::reshape_longer(2:5)
 #'
 #'   data %>%
-#'     ggplot(aes(x = name, y = value, color = Species, group = Species)) +
+#'     ggplot(aes(x = Name, y = Value, color = Species, group = Species)) +
 #'     geom_polygon(fill = NA, size = 2) +
 #'     coord_radar(start = -pi / 4)
 #' }

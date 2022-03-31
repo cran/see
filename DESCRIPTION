@@ -2,7 +2,7 @@ Type: Package
 Package: see
 Title: Visualisation Toolbox for 'easystats' and Extra Geoms, Themes
         and Color Palettes for 'ggplot2'
-Version: 0.6.9
+Version: 0.7.0
 Authors@R: 
     c(person(given = "Daniel",
              family = "Lüdecke",
@@ -58,21 +58,21 @@ License: GPL-3
 URL: https://easystats.github.io/see/
 BugReports: https://github.com/easystats/see/issues
 Depends: graphics, grDevices, R (>= 3.4), stats
-Imports: bayestestR (>= 0.11.5), datawizard (>= 0.2.2.9000), effectsize
-        (>= 0.5), ggplot2 (>= 3.3.5), insight (>= 0.14.5), parameters
-        (>= 0.15.0)
+Imports: bayestestR (>= 0.11.5), datawizard (>= 0.4.0), effectsize (>=
+        0.6), ggplot2 (>= 3.3.5), insight (>= 0.17.0), parameters (>=
+        0.17.0)
 Suggests: brms, coda, correlation, emmeans, factoextra, ggdist, ggraph,
         ggrepel, ggridges, ggside, glmmTMB, grid, httr, lavaan, lme4,
-        logspline, MASS, mclust, metafor, modelbased, NbClust,
-        nFactors, patchwork, performance (>= 0.8.0), poorman, psych,
+        logspline, MASS, mclust, mgcv, metafor, modelbased, NbClust,
+        nFactors, patchwork, performance (>= 0.9.0), poorman, psych,
         qqplotr, randomForest, rmarkdown, rstanarm, spelling, splines,
-        testthat (>= 3.1.0), tidygraph, tidyr, vdiffr
+        testthat (>= 3.1.0), tidygraph, vdiffr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 RoxygenNote: 7.1.2
 NeedsCompilation: no
-Packaged: 2022-02-15 20:00:15 UTC; DL
+Packaged: 2022-03-31 10:01:45 UTC; Daniel
 Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>,
     @strengejacke),
   Dominique Makowski [aut, inv] (<https://orcid.org/0000-0001-5375-9967>,
@@ -87,4 +87,4 @@ Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>,
   Matthew Smith [rev] (@SmithMatt90),
   Jakob Bossek [rev] (@BossekJakob)
 Repository: CRAN
-Date/Publication: 2022-02-15 21:50:02 UTC
+Date/Publication: 2022-03-31 11:00:03 UTC

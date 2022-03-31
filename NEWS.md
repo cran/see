@@ -1,3 +1,16 @@
+# see 0.7.0
+
+* Improved plotting for `performance::check_model()`:
+
+  - using more appropriate plots for binomial models
+
+  - the redundant density-plot of normality-checks was replaced by the
+    posterior predictive check plot.
+    
+  - includes a plot to investigate overdispersion for count-models.
+
+* Minor improvements for some plot-methods (colour tweaking, labelling, ...).
+
 # see 0.6.9
 
 * Minor changes to catch up with changes from other easystats-packages.

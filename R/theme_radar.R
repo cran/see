@@ -8,16 +8,15 @@
 #' @seealso [coord_radar()]
 #'
 #' @examples
-#' if (require("ggplot2") && require("poorman") && require("tidyr")) {
-#'   data <- iris %>%
-#'     group_by(Species) %>%
-#'     summarise(across(everything(), mean)) %>%
-#'     pivot_longer(-Species)
+#' if (require("ggplot2") && require("poorman")) {
+#'   data <- iris[-5] %>%
+#'     aggregate(list(Species = iris$Species), mean) %>%
+#'     datawizard::reshape_longer(2:5)
 #'
 #'   data %>%
 #'     ggplot(aes(
-#'       x = name,
-#'       y = value,
+#'       x = Name,
+#'       y = Value,
 #'       color = Species,
 #'       group = Species,
 #'       fill = Species
