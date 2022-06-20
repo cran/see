@@ -18,6 +18,8 @@
 plot.see_check_collinearity <- function(x,
                                         data = NULL,
                                         colors = c("#3aaf85", "#1b6ca8", "#cd201f"),
+                                        size_point = 4,
+                                        size_line = .8,
                                         ...) {
   if (is.null(data)) {
     dat <- insight::compact_list(.retrieve_data(x))
@@ -33,17 +35,24 @@ plot.see_check_collinearity <- function(x,
   dat$group[dat$VIF >= 5 & dat$VIF < 10] <- "moderate"
   dat$group[dat$VIF >= 10] <- "high"
 
-  if (ncol(dat) == 5) {
-    colnames(dat) <- c("x", "y", "se", "facet", "group")
-    dat[, c("x", "y", "facet", "group")]
-  } else {
-    colnames(dat) <- c("x", "y", "se", "group")
-    dat[, c("x", "y", "group")]
+  dat <- datawizard::data_rename(
+    dat,
+    c("Term", "VIF", "SE_factor", "Component"),
+    c("x", "y", "se", "facet")
+  )
+
+  dat <- datawizard::data_select(dat, c("x", "y", "facet", "group"))
+
+  if (insight::n_unique(dat$facet) <= 1) {
+    dat$facet <- NULL
   }
 
-  if (length(unique(dat$facet)) == 1) {
-    dat <- dat[, -which(colnames(dat) == "facet")]
-  }
-
-  .plot_diag_vif(dat, colors = colors)
+  .plot_diag_vif(
+    dat,
+    size_point = size_point,
+    size_line = size_line,
+    colors = colors,
+    ci_data = attributes(x)$CI,
+    is_check_model = FALSE
+  )
 }

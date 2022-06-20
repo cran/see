@@ -2,7 +2,7 @@
 #' @export
 plot.see_check_model <- function(x,
                                  style = theme_lucid,
-                                 colors = c("#3aaf85", "#1b6ca8", "#cd201f"),
+                                 colors = NULL,
                                  ...) {
   p <- list()
 
@@ -23,7 +23,7 @@ plot.see_check_model <- function(x,
     style <- get(theme_style[2], asNamespace(theme_style[1]))
   }
 
-  if (missing(colors)) {
+  if (is.null(colors)) {
     colors <- attr(x, "colors")
   }
 
@@ -49,7 +49,8 @@ plot.see_check_model <- function(x,
       x$PP_CHECK,
       style = style,
       check_model = TRUE,
-      adjust_legend = TRUE
+      adjust_legend = TRUE,
+      colors = colors[1:2]
     )
   }
 
@@ -70,7 +71,7 @@ plot.see_check_model <- function(x,
     p$BINNED_RESID <- plot.see_binned_residuals(
       x$BINNED_RESID,
       style = style,
-      colors = colors[3:2],
+      colors = colors[c(2, 3, 1)],
       adjust_legend = TRUE,
       check_model = TRUE
     )
@@ -113,8 +114,12 @@ plot.see_check_model <- function(x,
   if ("VIF" %in% names(x) && !is.null(x$VIF) && any(c("vif", "all") %in% check)) {
     p$VIF <- .plot_diag_vif(
       x$VIF,
+      size_point = 1.5 * size_point,
+      size_line = size_line,
       theme_style = style,
-      colors = colors
+      colors = colors,
+      ci_data = attributes(x$VIF)$CI,
+      is_check_model = TRUE
     )
   }
 
@@ -167,69 +172,114 @@ plot.see_check_model <- function(x,
 
 
 .plot_diag_vif <- function(x,
+                           size_point,
+                           size_line,
                            theme_style = theme_lucid,
-                           colors = unname(social_colors(c("green", "blue", "red")))) {
-  ylim <- max(x$y, na.rm = TRUE)
+                           colors = unname(social_colors(c("green", "blue", "red"))),
+                           ci_data = NULL,
+                           is_check_model = FALSE) {
+  ylim <- ceiling(max(x$y, na.rm = TRUE))
+  xlim <- nrow(x)
   if (ylim < 10) ylim <- 10
+
+  if (!is.null(ci_data)) {
+    x <- cbind(x, ci_data)
+  } else {
+    x$VIF_CI_low <- NA_real_
+    x$VIF_CI_high <- NA_real_
+  }
 
   # make sure legend is properly sorted
   x$group <- factor(x$group, levels = c("low", "moderate", "high"))
-  levels(x$group) <- c("low (< 5)", "moderate (< 10)", "high (>= 10)")
-  names(colors) <- c("low (< 5)", "moderate (< 10)", "high (>= 10)")
+  levels(x$group) <- c("Low (< 5)", "Moderate (< 10)", "High (\u2265 10)")
+  names(colors) <- c("Low (< 5)", "Moderate (< 10)", "High (\u2265 10)")
 
-  p <- ggplot2::ggplot(x, ggplot2::aes(x = .data$x, y = .data$y, fill = .data$group))
-
-  if (ylim > 5) {
-    p <- p + ggplot2::geom_rect(
+  p <- ggplot2::ggplot(x) +
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      color = .data$group,
+      ymin = .data$VIF_CI_low,
+      ymax = .data$VIF_CI_high
+    ) +
+    ggplot2::annotate(
+      geom = "rect",
       xmin = -Inf,
       xmax = Inf,
-      ymin = 0,
+      ymin = 1,
       ymax = 5,
       fill = colors[1],
       color = NA,
-      alpha = .025
-    )
-
-    p <- p + ggplot2::geom_rect(
+      alpha = .15
+    ) +
+    ggplot2::annotate(
+      geom = "rect",
       xmin = -Inf,
       xmax = Inf,
       ymin = 5,
-      ymax = ifelse(ylim > 10, 10, ylim),
+      ymax = 10,
       fill = colors[2],
       color = NA,
-      alpha = .025
-    )
-  }
-
-  if (ylim > 10) {
-    p <- p + ggplot2::geom_rect(
+      alpha = .15
+    ) +
+    ggplot2::annotate(
+      geom = "rect",
       xmin = -Inf,
       xmax = Inf,
       ymin = 10,
-      ymax = ylim,
+      ymax = Inf,
       fill = colors[3],
       color = NA,
-      alpha = .025
-    )
-  }
-
-  p <- p +
-    ggplot2::geom_col(width = 0.7) +
+      alpha = .15
+    ) +
+    {
+      if (!is.null(ci_data)) {
+        list(
+          ggplot2::geom_linerange(size = size_line),
+          ggplot2::geom_segment(
+            data = x[x$VIF_CI_high > ylim * 1.15, ],
+            mapping = aes(
+              x = .data$x, xend = .data$x,
+              y = .data$y, yend = .data$VIF_CI_high
+            ),
+            lineend = "round",
+            linejoin = "round",
+            arrow = ggplot2::arrow(
+              ends = "last", type = "closed",
+              angle = 20, length = ggplot2::unit(.03, "native")
+            ),
+            show.legend = FALSE
+          )
+        )
+      }
+    } +
+    geom_point2(
+      size = size_point
+    ) +
     ggplot2::labs(
       title = "Collinearity",
-      subtitle = "Higher bars (>5) indicate potential collinearity issues",
+      subtitle = "High collinearity (VIF) may inflate parameter uncertainty",
       x = NULL,
-      y = "Variance Inflation Factor (VIF)",
-      fill = NULL
+      y = paste("Variance Inflation", "Factor (VIF, log-scaled)", sep = ifelse(is_check_model, "\n", " "))
     ) +
-    # geom_text(aes(label = round(.data$y, 1)), nudge_y = 1) +
-    ggplot2::scale_fill_manual(values = colors) +
+    ggplot2::scale_color_manual(
+      values = colors,
+      aesthetics = c("color", "fill"),
+      guide = ggplot2::guide_legend(title = NULL)
+    ) +
     theme_style(
       base_size = 10,
       plot.title.space = 3,
       axis.title.space = 5
     ) +
-    ggplot2::ylim(c(0, ylim)) +
+    ggplot2::scale_y_continuous(
+      limits = c(1, ylim * 1.15),
+      oob = scales::oob_squish,
+      trans = "log10",
+      expand = c(0, 0),
+      breaks = scales::log_breaks(n = 7, base = 10)
+    ) +
+    ggplot2::scale_x_discrete() +
     ggplot2::theme(
       legend.position = "bottom",
       legend.margin = ggplot2::margin(0, 0, 0, 0),
