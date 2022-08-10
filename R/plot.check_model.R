@@ -6,6 +6,8 @@ plot.see_check_model <- function(x,
                                  ...) {
   p <- list()
 
+# read arguments / settings from "check_model()" -----
+
   panel <- attr(x, "panel")
   check <- attr(x, "check")
   size_point <- attr(x, "dot_size")
@@ -14,9 +16,13 @@ plot.see_check_model <- function(x,
   size_text <- attr(x, "text_size")
   alpha_level <- attr(x, "alpha")
   dot_alpha_level <- attr(x, "dot_alpha")
+  show_dots <- attr(x, "show_dots")
   detrend <- attr(x, "detrend")
   model_info <- attr(x, "model_info")
   overdisp_type <- attr(x, "overdisp_type")
+
+
+  # set default values for arguments ------
 
   if (missing(style) && !is.null(attr(x, "theme"))) {
     theme_style <- unlist(strsplit(attr(x, "theme"), "::", fixed = TRUE))
@@ -41,7 +47,12 @@ plot.see_check_model <- function(x,
     dot_alpha_level <- .8
   }
 
-  if (is.null(check)) check <- "all"
+  if (is.null(check)) {
+    check <- "all"
+  }
+
+
+  # build plot panels --------------------
 
   if ("PP_CHECK" %in% names(x) && !is.null(x$PP_CHECK) && any(c("pp_check", "all") %in% check)) {
     x$NORM <- NULL
@@ -62,7 +73,8 @@ plot.see_check_model <- function(x,
       alpha_level,
       theme_style = style,
       colors = colors,
-      dot_alpha_level = dot_alpha_level
+      dot_alpha_level = dot_alpha_level,
+      show_dots = show_dots
     )
   }
 
@@ -73,7 +85,8 @@ plot.see_check_model <- function(x,
       style = style,
       colors = colors[c(2, 3, 1)],
       adjust_legend = TRUE,
-      check_model = TRUE
+      check_model = TRUE,
+      show_dots = show_dots
     )
   }
 
@@ -95,7 +108,8 @@ plot.see_check_model <- function(x,
       alpha_level,
       theme_style = style,
       colors = colors,
-      dot_alpha_level = dot_alpha_level
+      dot_alpha_level = dot_alpha_level,
+      show_dots = show_dots
     )
   }
 
@@ -107,7 +121,8 @@ plot.see_check_model <- function(x,
       size_line = size_line,
       theme_style = style,
       colors = colors,
-      dot_alpha_level = dot_alpha_level
+      dot_alpha_level = dot_alpha_level,
+      show_dots = show_dots
     )
   }
 
@@ -132,7 +147,8 @@ plot.see_check_model <- function(x,
       detrend = detrend,
       theme_style = style,
       colors = colors,
-      dot_alpha_level = dot_alpha_level
+      dot_alpha_level = dot_alpha_level,
+      show_dots = TRUE # qq-plots w/o dots makes no sense
     )
   }
 
@@ -154,16 +170,19 @@ plot.see_check_model <- function(x,
       alpha_level = alpha_level,
       theme_style = style,
       colors = colors,
-      dot_alpha_level = dot_alpha_level
+      dot_alpha_level = dot_alpha_level,
+      show_dots = TRUE # qq-plots w/o dots makes no sense
     )
 
-    for (i in 1:length(ps)) {
+    for (i in seq_along(ps)) {
       p[[length(p) + 1]] <- ps[[i]]
     }
   }
 
   if (panel) {
-    plots(p, n_columns = 2)
+    pw <- plots(p, n_columns = 2)
+    .safe_print_plots(pw)
+    invisible(pw)
   } else {
     return(p)
   }
@@ -336,13 +355,12 @@ plot.see_check_model <- function(x,
                           detrend = FALSE,
                           theme_style = theme_lucid,
                           colors = unname(social_colors(c("green", "blue", "red"))),
-                          dot_alpha_level = .8) {
+                          dot_alpha_level = .8,
+                          show_dots = TRUE) {
   if (requireNamespace("qqplotr", quietly = TRUE)) {
     qq_stuff <- list(
-      qqplotr::stat_qq_band(alpha = alpha_level, detrend = detrend),
-      qqplotr::stat_qq_line(
-        size = size_line,
-        colour = colors[1],
+      qqplotr::stat_qq_band(
+        alpha = alpha_level,
         detrend = detrend
       ),
       qqplotr::stat_qq_point(
@@ -351,6 +369,11 @@ plot.see_check_model <- function(x,
         size = size_point,
         colour = colors[2], # "#2c3e50",
         alpha = dot_alpha_level,
+        detrend = detrend
+      ),
+      qqplotr::stat_qq_line(
+        size = size_line,
+        colour = colors[1],
         detrend = detrend
       )
     )
@@ -363,18 +386,23 @@ plot.see_check_model <- function(x,
     )
 
     qq_stuff <- list(
+      ggplot2::geom_qq_line(
+        size = size_line,
+        colour = colors[1]
+      ),
       ggplot2::geom_qq(
         shape = 16, stroke = 0,
         size = size_point,
         colour = colors[2] # "#2c3e50"
-      ),
-      ggplot2::geom_qq_line(
-        size = size_line,
-        colour = colors[1]
       )
     )
     y_lab <- "Sample Quantiles"
   }
+
+  if (!isTRUE(show_dots)) {
+    qq_stuff[2] <- NULL
+  }
+
   ggplot2::ggplot(x, ggplot2::aes(sample = .data$y)) +
     qq_stuff +
     ggplot2::labs(
@@ -466,13 +494,20 @@ plot.see_check_model <- function(x,
                                    alpha_level = .2,
                                    theme_style = theme_lucid,
                                    colors = unname(social_colors(c("green", "blue", "red"))),
-                                   dot_alpha_level = .8) {
-  ggplot2::ggplot(x, ggplot2::aes(x = .data$x, .data$y)) +
-    geom_point2(
-      colour = colors[2],
-      size = size_point,
-      alpha = dot_alpha_level
-    ) +
+                                   dot_alpha_level = .8,
+                                   show_dots = TRUE) {
+  p <- ggplot2::ggplot(x, ggplot2::aes(x = .data$x, .data$y))
+
+  if (isTRUE(show_dots)) {
+    p <- p +
+      geom_point2(
+        colour = colors[2],
+        size = size_point,
+        alpha = dot_alpha_level
+      )
+  }
+
+  p +
     ggplot2::stat_smooth(
       method = "loess",
       se = TRUE,
@@ -502,13 +537,20 @@ plot.see_check_model <- function(x,
                                  alpha_level = .2,
                                  theme_style = theme_lucid,
                                  colors = unname(social_colors(c("green", "blue", "red"))),
-                                 dot_alpha_level = .8) {
-  ggplot2::ggplot(x, ggplot2::aes(x = .data$x, y = .data$y)) +
-    geom_point2(
-      colour = colors[2],
-      size = size_point,
-      alpha = dot_alpha_level
-    ) +
+                                 dot_alpha_level = .8,
+                                 show_dots = TRUE) {
+  p <- ggplot2::ggplot(x, ggplot2::aes(x = .data$x, y = .data$y))
+
+  if (isTRUE(show_dots)) {
+    p <- p +
+      geom_point2(
+        colour = colors[2],
+        size = size_point,
+        alpha = dot_alpha_level
+      )
+  }
+
+  p +
     ggplot2::geom_smooth(
       method = "loess",
       se = TRUE,
@@ -540,7 +582,8 @@ plot.see_check_model <- function(x,
                             alpha_level = .2,
                             theme_style = theme_lucid,
                             colors = unname(social_colors(c("green", "blue", "red"))),
-                            dot_alpha_level = .8) {
+                            dot_alpha_level = .8,
+                            show_dots = TRUE) {
   lapply(names(x), function(i) {
     dat <- x[[i]]
     p <- ggplot2::ggplot(dat, ggplot2::aes(x = .data$x, y = .data$y)) +
@@ -563,16 +606,21 @@ plot.see_check_model <- function(x,
         colour = colors[2],
         alpha = dot_alpha_level
       ) +
-      geom_point2(
-        colour = colors[2],
-        size = size_point,
-        alpha = dot_alpha_level
-      ) +
       theme_style(
         base_size = 10,
         plot.title.space = 3,
         axis.title.space = 5
       )
+
+    if (isTRUE(show_dots)) {
+      p <- p +
+        geom_point2(
+          colour = colors[2],
+          size = size_point,
+          alpha = dot_alpha_level
+        )
+    }
+
 
     if (nlevels(dat$facet) > 1 && isTRUE(panel)) {
       p <- p + ggplot2::facet_wrap(~facet, scales = "free")

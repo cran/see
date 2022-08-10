@@ -1,7 +1,7 @@
 Type: Package
 Package: see
 Title: Model Visualisation Toolbox for 'easystats' and 'ggplot2'
-Version: 0.7.1
+Version: 0.7.2
 Authors@R: 
     c(person(given = "Daniel",
              family = "Lüdecke",
@@ -57,21 +57,21 @@ License: GPL-3
 URL: https://easystats.github.io/see/
 BugReports: https://github.com/easystats/see/issues
 Depends: graphics, grDevices, R (>= 3.5), stats
-Imports: bayestestR (>= 0.12.1), datawizard (>= 0.4.1), effectsize (>=
-        0.7.0), ggplot2 (>= 3.3.6), scales (>= 1.2.0), insight (>=
-        0.17.1), parameters (>= 0.18.1)
+Imports: bayestestR (>= 0.12.1), datawizard (>= 0.5), effectsize (>=
+        0.7.0), ggplot2 (>= 3.3.6), insight (>= 0.18.0), parameters (>=
+        0.18.1)
 Suggests: brms, coda, correlation, emmeans, factoextra, ggdist, ggraph,
         ggrepel, ggridges, ggside, glmmTMB, grid, httr, lavaan, lme4,
         logspline, MASS, mclust, mgcv, metafor, modelbased, NbClust,
         nFactors, patchwork, performance (>= 0.9.0), poorman, psych,
-        qqplotr, randomForest, rmarkdown, rstanarm, splines, testthat
-        (>= 3.1.0), tidygraph, vdiffr
+        qqplotr, randomForest, rmarkdown, rstanarm, scales (>= 1.2.0),
+        splines, testthat (>= 3.1.0), tidygraph, vdiffr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 NeedsCompilation: no
-Packaged: 2022-06-20 13:51:31 UTC; Daniel
+Packaged: 2022-08-10 10:24:17 UTC; mail
 Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>,
     @strengejacke),
   Dominique Makowski [aut, inv] (<https://orcid.org/0000-0001-5375-9967>,
@@ -86,4 +86,4 @@ Author: Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>,
   Matthew Smith [rev] (@SmithMatt90),
   Jakob Bossek [rev] (@BossekJakob)
 Repository: CRAN
-Date/Publication: 2022-06-20 14:20:02 UTC
+Date/Publication: 2022-08-10 14:30:02 UTC

@@ -93,3 +93,25 @@ plots <- function(...,
 
   return(pw)
 }
+
+
+.safe_print_plots <- function(pw) {
+  pw_drawn <- tryCatch(print(pw), error = function(e) e)
+  if (inherits(pw_drawn, "simpleError")) {
+    if (Sys.getenv("RSTUDIO") == "1") {
+      stop(insight::format_message(
+        "The RStudio 'Plots' window is too small to show this set of plots.",
+        "Please make the window larger."
+      ),
+      call. = FALSE
+      )
+    } else {
+      stop(insight::format_message(
+        "The viewport is too small to show this set of plots.",
+        "Please make it larger."
+      ),
+      call. = FALSE
+      )
+    }
+  }
+}

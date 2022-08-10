@@ -11,12 +11,12 @@
 #' if (require("ggplot2") && require("poorman")) {
 #'   data <- iris[-5] %>%
 #'     aggregate(list(Species = iris$Species), mean) %>%
-#'     datawizard::reshape_longer(2:5)
+#'     datawizard::reshape_longer(c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))
 #'
 #'   data %>%
 #'     ggplot(aes(
-#'       x = Name,
-#'       y = Value,
+#'       x = name,
+#'       y = value,
 #'       color = Species,
 #'       group = Species,
 #'       fill = Species
