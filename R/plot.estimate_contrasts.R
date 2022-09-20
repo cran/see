@@ -7,7 +7,7 @@ data_plot.estimate_contrasts <- function(x, data = NULL, ...) {
 #' @keywords internal
 .data_plot_estimate_contrasts <- function(x, means = NULL, ...) {
   if (is.null(means)) {
-    stop("Please provide the estimated means data obtained via 'estimate_means()'.")
+    stop("Please provide the estimated means data obtained via 'estimate_means()'.", call. = FALSE)
   } else {
     x_name <- names(means)[1]
   }
@@ -71,7 +71,7 @@ data_plot.estimate_contrasts <- function(x, data = NULL, ...) {
 #'
 #' @examples
 #' \donttest{
-#' if (require("modelbased") && require("rstanarm")) {
+#' if (require("modelbased") && require("rstanarm") && require("emmeans")) {
 #'   model <- stan_glm(Sepal.Width ~ Species, data = iris, refresh = 0)
 #'   contrasts <- estimate_contrasts(model)
 #'   means <- estimate_means(model)

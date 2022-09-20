@@ -53,6 +53,11 @@ plot.see_parameters_model <- function(x,
   # retrieve settings ----------------
   model_attributes <- attributes(x)[!names(attributes(x)) %in% c("names", "row.names", "class")]
 
+  # show intercept for intercept-only models
+  if (insight::is_model(x) && insight::is_nullmodel(x)) {
+    show_intercept <- TRUE
+  }
+
   # Clean up column names
   if (!any(grepl("Coefficient", colnames(x), fixed = TRUE))) {
     colnames(x)[which.min(match(colnames(x), c("Median", "Mean", "Map", "MAP", model_attributes$coefficient_name)))] <- "Coefficient"
@@ -189,7 +194,7 @@ plot.see_parameters_model <- function(x,
 
       data <- datawizard::reshape_longer(
         data,
-        colnames_to = "Parameter",
+        names_to = "Parameter",
         rows_to = "Iteration",
         values_to = "Coefficient"
       )
