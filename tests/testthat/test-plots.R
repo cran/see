@@ -1,7 +1,6 @@
-test_that("`plots()` works", {
-  library(ggplot2)
-  library(see)
+requiet("patchwork")
 
+test_that("`plots()` works", {
   p1 <- ggplot(iris, aes(x = Petal.Length, y = Sepal.Width)) +
     geom_point()
   p2 <- ggplot(iris, aes(x = Petal.Length)) +

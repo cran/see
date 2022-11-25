@@ -8,17 +8,17 @@
                                     size_text = NULL,
                                     theme_style = theme_lucid,
                                     colors = unname(social_colors(c("green", "blue grey", "red"))),
-                                    dot_alpha_level = .8,
+                                    dot_alpha_level = 0.8,
                                     show_dots = TRUE) {
-  size_line <- size_line %||% .7
+  size_line <- size_line %||% 0.7
   size_text <- size_text %||% 3
 
   plot_data <- x
   cook.levels <- attributes(x)$cook_levels
   n_params <- attributes(x)$n_params
 
-  min_cook_level <- min(cook.levels)
-  n_above <- sum(plot_data$Cooks_Distance >= min_cook_level)
+  min_cook_level <- min(cook.levels, na.rm = TRUE)
+  n_above <- sum(plot_data$Cooks_Distance >= min_cook_level, na.rm = TRUE)
   label.n <- ifelse(n_above < 5, 5, n_above)
 
   p <- ggplot(plot_data, aes(x = .data$Hat, .data$Std_Residuals))
@@ -78,7 +78,7 @@
       sqrt(crit * n_params * (1 - .hat) / .hat)
     })
 
-    .hat80 <- min(.hat) + diff(range(.hat)) * .8
+    .hat80 <- min(.hat) + diff(range(.hat)) * 0.8
     .cook_labels <- c("Cook's D = ", rep("", length(cook.levels) - 1))
     .cook_lines <- c(
       lapply(seq_along(cook.levels), function(.level) {

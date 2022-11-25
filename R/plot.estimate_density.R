@@ -81,7 +81,7 @@ data_plot.estimate_density <- function(x,
 #' @param centrality Character specifying the point-estimate (centrality index)
 #'   to compute. Can be `"median"`, `"mean"` or `"MAP"`.
 #' @param ci Numeric value of probability of the CI (between 0 and 1) to be
-#'   estimated. Default to `.95`.
+#'   estimated. Default to `0.95`.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
 #' @inheritParams plot.see_parameters_model
@@ -89,14 +89,14 @@ data_plot.estimate_density <- function(x,
 #'
 #' @return A ggplot2-object.
 #'
-#' @examples
+#' @examplesIf require("rstanarm")
 #' \donttest{
-#' if (require("bayestestR") && require("rstanarm")) {
-#'   set.seed(123)
-#'   m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
-#'   result <- estimate_density(m)
-#'   plot(result)
-#' }
+#' library(rstanarm)
+#' library(bayestestR)
+#' set.seed(123)
+#' m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+#' result <- estimate_density(m)
+#' plot(result)
 #' }
 #' @importFrom ggplot2 .data
 #' @export
@@ -105,9 +105,9 @@ plot.see_estimate_density <- function(x,
                                       show_intercept = FALSE,
                                       n_columns = 1,
                                       priors = FALSE,
-                                      priors_alpha = .4,
+                                      priors_alpha = 0.4,
                                       posteriors_alpha = 0.7,
-                                      size_line = .9,
+                                      size_line = 0.9,
                                       size_point = 2,
                                       centrality = "median",
                                       ci = 0.95,
@@ -139,9 +139,9 @@ plot.see_estimate_density <- function(x,
   # remove intercept from output, if requested
   x <- .remove_intercept(x, show_intercept = show_intercept)
 
-  if (stack == TRUE) {
+  if (stack) {
     p <- ggplot(x, aes(x = .data$x, y = .data$y, color = .data$Parameter)) +
-      geom_line(size = size_line) +
+      geom_line(linewidth = size_line) +
       add_plot_attributes(x) +
       scale_color_flat(labels = labels)
   } else {
@@ -190,7 +190,7 @@ plot.see_estimate_density <- function(x,
           xmax = .data$CI_high,
           color = "Posterior"
         ),
-        size = size_line
+        linewidth = size_line
       ) +
       geom_point(
         data = summary,
@@ -243,14 +243,14 @@ data_plot.estimate_density_df <- data_plot.estimate_density
 plot.see_estimate_density_df <- function(x,
                                          stack = TRUE,
                                          n_columns = 1,
-                                         size_line = .9,
+                                         size_line = 0.9,
                                          ...) {
   x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
   labels <- stats::setNames(levels(x$Parameter), levels(x$Parameter))
 
-  if (stack == TRUE) {
+  if (stack) {
     p <- ggplot(x, aes(x = .data$x, y = .data$y, color = .data$Parameter)) +
-      geom_line(size = size_line)
+      geom_line(linewidth = size_line)
   } else {
     insight::check_if_installed("ggridges")
 
@@ -265,11 +265,9 @@ plot.see_estimate_density_df <- function(x,
     p <- p + scale_y_discrete(labels = labels)
   }
 
-
-  if (length(unique(x$Parameter)) == 1) {
+  if (length(unique(x$Parameter)) == 1L) {
     p <- p + guides(color = "none")
   }
-
 
   if ("Group" %in% names(x)) {
     p <- p + facet_wrap(~Group, scales = "free", ncol = n_columns)

@@ -85,7 +85,7 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
       }
     )
   )
-  dataplot$fill2 <- with(dataplot, ifelse(prop >= .5, "Most probable", "Less probable"))
+  dataplot$fill2 <- with(dataplot, ifelse(prop >= 0.5, "Most probable", "Less probable"))
   dataplot <- dataplot[, which(!names(dataplot) %in% c("n", "prop"))]
 
   if (!is.null(levels_order)) {
@@ -150,14 +150,14 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
 #'
 #' @return A ggplot2-object.
 #'
-#' @examples
+#' @examplesIf require("rstanarm")
 #' \donttest{
-#' if (require("bayestestR") && require("rstanarm")) {
-#'   set.seed(123)
-#'   m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
-#'   result <- p_direction(m)
-#'   plot(result)
-#' }
+#' library(rstanarm)
+#' library(bayestestR)
+#' set.seed(123)
+#' m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+#' result <- p_direction(m)
+#' plot(result)
 #' }
 #' @importFrom ggplot2 .data
 #' @export
@@ -165,7 +165,7 @@ plot.see_p_direction <- function(x,
                                  data = NULL,
                                  show_intercept = FALSE,
                                  priors = FALSE,
-                                 priors_alpha = .4,
+                                 priors_alpha = 0.4,
                                  n_columns = 1,
                                  ...) {
   # save model for later use

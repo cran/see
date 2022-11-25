@@ -16,7 +16,7 @@
 #' @export
 plot.see_equivalence_test <- function(x,
                                       rope_color = "#0171D3",
-                                      rope_alpha = .2,
+                                      rope_alpha = 0.2,
                                       show_intercept = FALSE,
                                       n_columns = 1,
                                       ...) {
@@ -106,8 +106,8 @@ plot.see_equivalence_test <- function(x,
   tmp$predictor <- factor(tmp$predictor, levels = rev(unique(tmp$predictor)))
 
   # check if we have multiple panels
-  if ((!"Effects" %in% names(tmp) || length(unique(tmp$Effects)) <= 1) &&
-    (!"Component" %in% names(tmp) || length(unique(tmp$Component)) <= 1)) {
+  if ((!"Effects" %in% names(tmp) || length(unique(tmp$Effects)) <= 1L) &&
+    (!"Component" %in% names(tmp) || length(unique(tmp$Component)) <= 1L)) {
     n_columns <- NULL
   }
 
@@ -137,7 +137,6 @@ plot.see_equivalence_test <- function(x,
   rope.line.alpha <- 1.25 * rope_alpha
   if (rope.line.alpha > 1) rope.line.alpha <- 1
 
-
   insight::check_if_installed("ggridges")
 
   p <- ggplot(tmp, aes_string(x = "estimate", y = "predictor", fill = "grp")) +
@@ -159,13 +158,13 @@ plot.see_equivalence_test <- function(x,
     geom_vline(
       xintercept = 0,
       colour = rope_color,
-      size = .8,
+      size = 0.8,
       alpha = rope.line.alpha
     ) +
     ggridges::geom_density_ridges2(
       rel_min_height = 0.01,
       scale = 2,
-      alpha = .5
+      alpha = 0.5
     ) +
     scale_fill_manual(values = fill.color) +
     labs(x = x.title, y = NULL, fill = legend.title) +
@@ -209,7 +208,7 @@ plot.see_equivalence_test <- function(x,
 #' @export
 plot.see_equivalence_test_df <- function(x,
                                          rope_color = "#0171D3",
-                                         rope_alpha = .2,
+                                         rope_alpha = 0.2,
                                          data = NULL,
                                          n_columns = 1,
                                          ...) {
@@ -303,13 +302,13 @@ plot.see_equivalence_test_df <- function(x,
     geom_vline(
       xintercept = 0,
       colour = rope_color,
-      size = .8,
+      size = 0.8,
       alpha = rope.line.alpha
     ) +
     ggridges::geom_density_ridges2(
       rel_min_height = 0.01,
       scale = 2,
-      alpha = .5
+      alpha = 0.5
     ) +
     scale_fill_manual(values = fill.color) +
     labs(x = x.title, y = NULL, fill = legend.title) +
@@ -330,9 +329,9 @@ plot.see_equivalence_test_df <- function(x,
 #' @rdname plot.see_equivalence_test
 #' @export
 plot.see_equivalence_test_lm <- function(x,
-                                         size_point = .7,
+                                         size_point = 0.7,
                                          rope_color = "#0171D3",
-                                         rope_alpha = .2,
+                                         rope_alpha = 0.2,
                                          show_intercept = FALSE,
                                          n_columns = 1,
                                          ...) {
@@ -418,13 +417,13 @@ plot.see_equivalence_test_lm <- function(x,
       xintercept = .rope,
       linetype = "dashed",
       colour = rope_color,
-      size = .8,
+      size = 0.8,
       alpha = rope.line.alpha
     ) +
     geom_vline(
       xintercept = 0,
       colour = rope_color,
-      size = .8,
+      size = 0.8,
       alpha = rope.line.alpha
     ) +
     geom_pointrange(size = size_point) +

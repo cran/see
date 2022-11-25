@@ -53,7 +53,7 @@ distributions.}
 to compute. Can be \code{"median"}, \code{"mean"} or \code{"MAP"}.}
 
 \item{ci}{Numeric value of probability of the CI (between 0 and 1) to be
-estimated. Default to \code{.95}.}
+estimated. Default to \code{0.95}.}
 
 \item{...}{Arguments passed to or from other methods.}
 }
@@ -64,12 +64,14 @@ A ggplot2-object.
 The \code{plot()} method for the \code{bayestestR::estimate_density()} function.
 }
 \examples{
+\dontshow{if (require("rstanarm")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
-if (require("bayestestR") && require("rstanarm")) {
-  set.seed(123)
-  m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
-  result <- estimate_density(m)
-  plot(result)
+library(rstanarm)
+library(bayestestR)
+set.seed(123)
+m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+result <- estimate_density(m)
+plot(result)
 }
-}
+\dontshow{\}) # examplesIf}
 }

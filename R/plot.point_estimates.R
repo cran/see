@@ -90,15 +90,15 @@ data_plot.map_estimate <- data_plot.point_estimate
 #'
 #' @return A ggplot2-object.
 #'
-#' @examples
+#' @examplesIf require("rstanarm")
 #' \donttest{
-#' if (require("bayestestR") && require("rstanarm")) {
-#'   set.seed(123)
-#'   m <- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
-#'   result <- point_estimate(m, centrality = "median")
-#'   result
-#'   plot(result)
-#' }
+#' library(rstanarm)
+#' library(bayestestR)
+#' set.seed(123)
+#' m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+#' result <- point_estimate(m, centrality = "median")
+#' result
+#' plot(result)
 #' }
 #' @importFrom ggplot2 .data
 #' @export
@@ -110,7 +110,7 @@ plot.see_point_estimate <- function(x,
                                     show_labels = TRUE,
                                     show_intercept = FALSE,
                                     priors = FALSE,
-                                    priors_alpha = .4,
+                                    priors_alpha = 0.4,
                                     ...) {
   # save model for later use
   model <- .retrieve_data(x)
@@ -156,7 +156,7 @@ plot.see_point_estimate <- function(x,
         priors_alpha = priors_alpha,
         fill_color = "#FF9800"
       )
-      posterior_alpha <- .7
+      posterior_alpha <- 0.7
     } else {
       posterior_alpha <- 1
     }
@@ -175,7 +175,7 @@ plot.see_point_estimate <- function(x,
           y = 0,
           yend = mean_y,
           color = "#E91E63",
-          size = 1,
+          linewidth = 1,
           alpha = posterior_alpha
         ) +
         geom_point(
@@ -205,7 +205,7 @@ plot.see_point_estimate <- function(x,
           y = 0,
           yend = median_y,
           color = "#2196F3",
-          size = 1,
+          linewidth = 1,
           alpha = posterior_alpha
         ) +
         geom_point(
@@ -235,7 +235,7 @@ plot.see_point_estimate <- function(x,
           y = 0,
           yend = map_y,
           color = "#4CAF50",
-          size = 1,
+          linewidth = 1,
           alpha = posterior_alpha
         ) +
         geom_point(

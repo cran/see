@@ -20,7 +20,7 @@
 plot.see_bayesfactor_parameters <- function(x,
                                             size_point = 2,
                                             rope_color = "#0171D3",
-                                            rope_alpha = .2,
+                                            rope_alpha = 0.2,
                                             show_intercept = FALSE,
                                             ...) {
   if ("log_BF" %in% names(x) && !"BF" %in% names(x)) {
@@ -58,7 +58,7 @@ plot.see_bayesfactor_parameters <- function(x,
       fill = .data$Distribution
     )
   ) +
-    geom_line(size = 1) +
+    geom_line(linewidth = 1) +
     geom_area(alpha = 0.15, position = "identity") +
     geom_vline(xintercept = hypothesis, linetype = "dashed", colour = "grey50") +
     labs(
