@@ -45,13 +45,19 @@ plot.see_check_heteroscedasticity <- function(x, data = NULL, ...) {
   )
 
   if (is.null(r)) {
-    r <- tryCatch(c(scale(stats::residuals(model))),
+    r <- tryCatch(
+      as.vector(scale(stats::residuals(model))),
       error = function(e) NULL
     )
   }
 
   if (is.null(r)) {
-    warning(sprintf("Homogeneity of variance could not be computed. Cannot extract residual variance from objects of class '%s'.\n", class(model)[1]), call. = FALSE)
+    insight::format_warning(
+      sprintf(
+        "Homogeneity of variance could not be computed. Cannot extract residual variance from objects of class '%s'.",
+        class(model)[1]
+      )
+    )
     return(NULL)
   }
 
@@ -68,6 +74,7 @@ plot.see_check_heteroscedasticity <- function(x, data = NULL, ...) {
     return(1)
   }
   betad <- model$fit$par["betad"]
+
   switch(faminfo$family,
     gaussian = exp(0.5 * betad),
     Gamma = exp(-0.5 * betad),

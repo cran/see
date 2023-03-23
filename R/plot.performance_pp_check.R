@@ -46,11 +46,9 @@ data_plot.performance_pp_check <- function(x, ...) {
 #'
 #' @return A ggplot2-object.
 #'
-#' @examples
-#' if (require("performance")) {
-#'   model <- lm(Sepal.Length ~ Species * Petal.Width + Petal.Length, data = iris)
-#'   check_posterior_predictions(model)
-#' }
+#' @examplesIf require("performance")
+#' model <- lm(Sepal.Length ~ Species * Petal.Width + Petal.Length, data = iris)
+#' check_posterior_predictions(model)
 #' @export
 print.see_performance_pp_check <- function(x,
                                            size_line = 0.5,
@@ -62,7 +60,7 @@ print.see_performance_pp_check <- function(x,
   orig_x <- x
   check_range <- isTRUE(attributes(x)$check_range)
 
-  if (!"data_plot" %in% class(x)) {
+  if (!inherits(x, "data_plot")) {
     x <- data_plot(x)
   }
 
@@ -91,7 +89,7 @@ plot.see_performance_pp_check <- function(x,
   orig_x <- x
   check_range <- isTRUE(attributes(x)$check_range)
 
-  if (!"data_plot" %in% class(x)) {
+  if (!inherits(x, "data_plot")) {
     x <- data_plot(x)
   }
 
@@ -122,7 +120,7 @@ plot.see_performance_pp_check <- function(x,
         x = .data$values,
         group = .data$grp,
         color = .data$key,
-        size = .data$key,
+        linewidth = .data$key,
         alpha = .data$key
       ),
       geom = "line",
@@ -134,17 +132,18 @@ plot.see_performance_pp_check <- function(x,
       "Observed data" = colors[1],
       "Model-predicted data" = colors[2]
     )) +
-    ggplot2::scale_size_manual(
+    ggplot2::scale_linewidth_manual(
       values = c(
-        "Observed data" = 2 * size_line,
+        "Observed data" = 1.7 * size_line,
         "Model-predicted data" = size_line
-      ),
+      )
     ) +
     ggplot2::scale_alpha_manual(
       values = c(
         "Observed data" = 1,
         "Model-predicted data" = line_alpha
-      ), guide = "none"
+      ),
+      guide = "none"
     ) +
     ggplot2::labs(
       x = info$xlab,
@@ -182,7 +181,9 @@ plot.see_performance_pp_check <- function(x,
 }
 
 
-.plot_pp_check_range <- function(x, size_bar = 0.7, colors) {
+.plot_pp_check_range <- function(x,
+                                 size_bar = 0.7,
+                                 colors = unname(social_colors(c("green", "blue")))) {
   original <-
     data.frame(
       x = c(min(x$y), max(x$y)),
@@ -225,7 +226,7 @@ plot.see_performance_pp_check <- function(x,
       data = original,
       mapping = ggplot2::aes(xintercept = .data$x),
       color = colors[1],
-      size = 1
+      linewidth = 1
     ) +
     ggplot2::labs(
       x = NULL, y = NULL,

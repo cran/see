@@ -37,13 +37,24 @@
 #'   theme_modern() +
 #'   scale_color_colorhex_c(palette = 1014416)
 #' @export
-scale_color_colorhex <- function(palette = 1014416, discrete = TRUE, reverse = FALSE, aesthetics = "color", ...) {
+scale_color_colorhex <- function(palette = 1014416,
+                                 discrete = TRUE,
+                                 reverse = FALSE,
+                                 aesthetics = "color",
+                                 ...) {
   pal <- palette_colorhex(palette = palette, reverse = reverse)
   pal_name <- attr(pal, "name")
-  if (is.null(pal_name)) pal_name <- palette
+  if (is.null(pal_name)) {
+    pal_name <- palette
+  }
 
   if (discrete) {
-    discrete_scale(aesthetics = aesthetics, scale_name = paste0("colorhex_", pal_name), palette = pal, ...)
+    discrete_scale(
+      aesthetics = aesthetics,
+      scale_name = paste0("colorhex_", pal_name),
+      palette = pal,
+      ...
+    )
   } else {
     scale_color_gradientn(colours = pal(256), aesthetics = aesthetics, ...)
   }
@@ -55,14 +66,34 @@ scale_color_colorhex <- function(palette = 1014416, discrete = TRUE, reverse = F
 
 #' @rdname scale_color_colorhex
 #' @export
-scale_color_colorhex_d <- function(palette = 1014416, discrete = TRUE, reverse = FALSE, aesthetics = "color", ...) {
-  scale_color_colorhex(palette = palette, discrete = discrete, reverse = reverse, aesthetics = aesthetics, ...)
+scale_color_colorhex_d <- function(palette = 1014416,
+                                   discrete = TRUE,
+                                   reverse = FALSE,
+                                   aesthetics = "color",
+                                   ...) {
+  scale_color_colorhex(
+    palette = palette,
+    discrete = discrete,
+    reverse = reverse,
+    aesthetics = aesthetics,
+    ...
+  )
 }
 
 #' @rdname scale_color_colorhex
 #' @export
-scale_color_colorhex_c <- function(palette = 1014416, discrete = FALSE, reverse = FALSE, aesthetics = "color", ...) {
-  scale_color_colorhex(palette = palette, discrete = discrete, reverse = reverse, aesthetics = aesthetics, ...)
+scale_color_colorhex_c <- function(palette = 1014416,
+                                   discrete = FALSE,
+                                   reverse = FALSE,
+                                   aesthetics = "color",
+                                   ...) {
+  scale_color_colorhex(
+    palette = palette,
+    discrete = discrete,
+    reverse = reverse,
+    aesthetics = aesthetics,
+    ...
+  )
 }
 
 #' @rdname scale_color_colorhex
@@ -87,11 +118,20 @@ scale_colour_colorhex_d <- scale_color_colorhex_d
 
 #' @rdname scale_color_colorhex
 #' @export
-scale_fill_colorhex <- function(palette = 1014416, discrete = TRUE, reverse = FALSE, aesthetics = "fill", ...) {
+scale_fill_colorhex <- function(palette = 1014416,
+                                discrete = TRUE,
+                                reverse = FALSE,
+                                aesthetics = "fill",
+                                ...) {
   pal <- palette_colorhex(palette = palette, reverse = reverse)
 
   if (discrete) {
-    discrete_scale(aesthetics = aesthetics, paste0("colorhex_", palette), palette = pal, ...)
+    discrete_scale(
+      aesthetics = aesthetics,
+      paste0("colorhex_", palette),
+      palette = pal,
+      ...
+    )
   } else {
     scale_fill_gradientn(colours = pal(256), aesthetics = aesthetics, ...)
   }
@@ -100,14 +140,34 @@ scale_fill_colorhex <- function(palette = 1014416, discrete = TRUE, reverse = FA
 
 #' @rdname scale_color_colorhex
 #' @export
-scale_fill_colorhex_d <- function(palette = 1014416, discrete = TRUE, reverse = FALSE, aesthetics = "fill", ...) {
-  scale_fill_colorhex(palette = palette, discrete = discrete, reverse = reverse, aesthetics = aesthetics, ...)
+scale_fill_colorhex_d <- function(palette = 1014416,
+                                  discrete = TRUE,
+                                  reverse = FALSE,
+                                  aesthetics = "fill",
+                                  ...) {
+  scale_fill_colorhex(
+    palette = palette,
+    discrete = discrete,
+    reverse = reverse,
+    aesthetics = aesthetics,
+    ...
+  )
 }
 
 #' @rdname scale_color_colorhex
 #' @export
-scale_fill_colorhex_c <- function(palette = 1014416, discrete = FALSE, reverse = FALSE, aesthetics = "fill", ...) {
-  scale_fill_colorhex(palette = palette, discrete = discrete, reverse = reverse, aesthetics = aesthetics, ...)
+scale_fill_colorhex_c <- function(palette = 1014416,
+                                  discrete = FALSE,
+                                  reverse = FALSE,
+                                  aesthetics = "fill",
+                                  ...) {
+  scale_fill_colorhex(
+    palette = palette,
+    discrete = discrete,
+    reverse = reverse,
+    aesthetics = aesthetics,
+    ...
+  )
 }
 
 
@@ -137,7 +197,9 @@ scale_fill_colorhex_c <- function(palette = 1014416, discrete = FALSE, reverse =
 #' @export
 palette_colorhex <- function(palette = 1014416, reverse = FALSE, ...) {
   if (!is.numeric(palette) && suppressWarnings(is.na(as.numeric(palette)))) {
-    stop("`palette` must be the numeric code for a color palette at <https://www.color-hex.com/>", call. = FALSE)
+    insight::format_error(
+      "`palette` must be the numeric code for a color palette at <https://www.color-hex.com/>"
+    )
   }
 
   if (palette == 1014416) {
@@ -158,13 +220,13 @@ palette_colorhex <- function(palette = 1014416, reverse = FALSE, ...) {
       insight::format_error("Could not reach <color-hex.com/>. Check your internet connection.")
     }
 
-    curl_res <- curl_res[grep("description", curl_res)]
+    curl_res <- grep("description", curl_res, fixed = TRUE, value = TRUE)
     if (!length(curl_res)) {
       insight::format_error(paste0("Requested palette '", palette, "' not found. Check the palette ID."))
     }
 
-    pal <- as.vector(regmatches(curl_res, gregexec("#[a-fA-F0-9]{6}", curl_res))[[1]])
-    pal_name <- regmatches(curl_res, gregexec("content=\"(.*) color palette", curl_res))[[1]][2]
+    pal <- unlist(regmatches(curl_res, gregexpr("#[a-fA-F0-9]{6}", curl_res))[[1]], use.names = FALSE)
+    pal_name <- gsub("(.*)content=\"(.*) color palette(.*)", "\\2", curl_res)
   }
 
   if (reverse) pal <- rev(pal)

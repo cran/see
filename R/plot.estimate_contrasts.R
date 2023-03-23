@@ -31,7 +31,7 @@ data_plot.estimate_contrasts <- function(x, data = NULL, ...) {
 #' @keywords internal
 .data_contrasts_and_means <- function(contrasts, means, x_name, y_name) {
   polygons <- contrasts
-  polygons$group <- 1:nrow(polygons)
+  polygons$group <- seq_len(nrow(polygons))
 
   data_means <- means
   data_means$x <- data_means[, x_name]
@@ -71,7 +71,7 @@ data_plot.estimate_contrasts <- function(x, data = NULL, ...) {
 #'
 #' @examplesIf require("modelbased") && require("rstanarm") && require("emmeans")
 #' \donttest{
-#' model <- stan_glm(Sepal.Width ~ Species, data = iris, refresh = 0)
+#' model <- suppressWarnings(stan_glm(Sepal.Width ~ Species, data = iris, refresh = 0))
 #' contrasts <- estimate_contrasts(model)
 #' means <- estimate_means(model)
 #' plot(contrasts, means)
@@ -79,7 +79,7 @@ data_plot.estimate_contrasts <- function(x, data = NULL, ...) {
 #' @importFrom ggplot2 .data
 #' @export
 plot.see_estimate_contrasts <- function(x, data = NULL, ...) {
-  if (!"data_plot" %in% class(x)) {
+  if (!inherits(x, "data_plot")) {
     x <- data_plot(x, data = data)
   }
 

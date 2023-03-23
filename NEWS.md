@@ -1,3 +1,14 @@
+# see 0.7.5
+
+## Changes
+
+* Changed the default "yellow" color in `palette_okabeito()` to `"#F5C710"`
+  instead of `"#F0E442"` to increase visibility against a white background.
+  For the original Okabe-Ito palette, set `palette = "full_original"` or 
+  `palette = "black_first_original"`.
+
+* Deals with deprecated arguments and functions in recent `{ggplot2}` updates.
+
 # see 0.7.4
 
 ## Changes

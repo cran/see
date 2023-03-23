@@ -1,9 +1,7 @@
 test_that("theme functions work", {
-  requiet("vdiffr")
-  requiet("poorman")
-  skip_if_not(getRversion() >= "4.1")
+  skip_if_not_or_load_if_installed("vdiffr")
+  skip_if_not_or_load_if_installed("poorman")
 
-  library(ggplot2)
 
   data <- iris %>%
     group_by(Species) %>%

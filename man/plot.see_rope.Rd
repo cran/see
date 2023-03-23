@@ -43,15 +43,13 @@ A ggplot2-object.
 The \code{plot()} method for the \code{bayestestR::rope()}.
 }
 \examples{
-\dontshow{if (require("rstanarm")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\donttest{
+\dontshow{if (identical(Sys.getenv("NOT_CRAN"), "true") && require("rstanarm")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(rstanarm)
 library(bayestestR)
 set.seed(123)
-m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+m <<- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
 result <- rope(m)
 result
 plot(result)
-}
 \dontshow{\}) # examplesIf}
 }

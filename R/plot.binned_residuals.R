@@ -7,7 +7,7 @@ plot.see_binned_residuals <- function(x,
                                       style = theme_lucid,
                                       ...) {
   x$se.lo <- -x$se
-  if (length(unique(x$group)) > 1) {
+  if (length(unique(x$group)) > 1L) {
     ltitle <- "Within error bounds"
   } else {
     ltitle <- NULL
@@ -46,14 +46,14 @@ plot.see_binned_residuals <- function(x,
 
   if (isTRUE(insight::check_if_installed("mgcv", quietly = TRUE))) {
     p <- p +
-      ggplot2::stat_smooth(
+      suppressWarnings(ggplot2::stat_smooth(
         ggplot2::aes(y = .data$ybar),
         method = "gam",
         se = FALSE,
         formula = y ~ s(x, bs = "tp"),
         colour = colors[3],
         linewidth = size_line
-      )
+      ))
   }
 
   p <- p +

@@ -24,7 +24,7 @@ data_plot.estimate_density <- function(x,
   split_columns <- intersect(c("Parameter", "Effects", "Component"), colnames(dataplot))
   datasplit <- split(dataplot, dataplot[split_columns])
   summary <- do.call(rbind, insight::compact_list(lapply(datasplit, function(i) {
-    if (length(i$x) > 0) {
+    if (length(i$x) > 0L) {
       Estimate <- as.numeric(bayestestR::point_estimate(i$x, centrality = centrality))
       CI <- as.numeric(bayestestR::ci(i$x, ci = ci))
       out <- data.frame(
@@ -89,15 +89,13 @@ data_plot.estimate_density <- function(x,
 #'
 #' @return A ggplot2-object.
 #'
-#' @examplesIf require("rstanarm")
-#' \donttest{
+#' @examplesIf identical(Sys.getenv("NOT_CRAN"), "true") && require("rstanarm")
 #' library(rstanarm)
 #' library(bayestestR)
 #' set.seed(123)
-#' m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+#' m <<- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
 #' result <- estimate_density(m)
 #' plot(result)
-#' }
 #' @importFrom ggplot2 .data
 #' @export
 plot.see_estimate_density <- function(x,
@@ -124,7 +122,7 @@ plot.see_estimate_density <- function(x,
   )
 
 
-  if (!"data_plot" %in% class(x)) {
+  if (!inherits(x, "data_plot")) {
     x <- data_plot(x, data = model, centrality = centrality, ci = ci, ...)
   }
 

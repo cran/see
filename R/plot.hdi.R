@@ -54,7 +54,7 @@ data_plot.bayestestR_eti <- data_plot.hdi
     data <- as.data.frame(data)
   }
 
-  if (ncol(data) > 1) {
+  if (ncol(data) > 1L) {
     levels_order <- unique(rev(x$Parameter))
     data <- data[levels_order]
     dataplot <- data.frame()
@@ -150,6 +150,7 @@ data_plot.bayestestR_eti <- data_plot.hdi
 
   # normalize
   out$height <- as.vector((out$height - min(out$height, na.rm = TRUE)) / diff(range(out$height, na.rm = TRUE), na.rm = TRUE))
+
   out
 }
 
@@ -193,11 +194,11 @@ data_plot.bayestestR_eti <- data_plot.hdi
 #'
 #' @return A ggplot2-object.
 #'
-#' @examplesIf require("rstanarm") && FALSE
+#' @examplesIf identical(Sys.getenv("NOT_CRAN"), "true") && require("rstanarm")
 #' library(rstanarm)
 #' library(bayestestR)
 #' set.seed(123)
-#' m <<- stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0)
+#' m <<- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
 #' result <- hdi(m)
 #' result
 #' plot(result)
@@ -210,13 +211,13 @@ plot.see_hdi <- function(x,
                          show_title = TRUE,
                          n_columns = 1,
                          ...) {
-  if (!"data_plot" %in% class(x)) {
+  if (!inherits(x, "data_plot")) {
     x <- data_plot(x, data = data, show_intercept = show_intercept)
   }
 
   # check if we have multiple panels
-  if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+  if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1L) &&
+    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1L)) {
     n_columns <- NULL
   }
 

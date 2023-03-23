@@ -162,12 +162,12 @@ plot.see_p_function <- function(x,
     # labelling
     ggplot2::labs(y = expression(paste(italic("p"), "-value")), x = "Range of Estimates", colour = NULL) +
     theme_lucid() +
-    ggplot2::scale_size_manual(values = size_line, guide = "none")
+    ggplot2::scale_linewidth_manual(values = size_line, guide = "none")
 
   # facets for grids, different color/fill when no grids
   if (!is.null(n_columns)) {
     p <- p + ggplot2::facet_wrap(~ .data$Parameter, scales = "free_x", ncol = n_columns)
-  } else if (insight::n_unique(data_ribbon$Parameter) > 1) {
+  } else if (insight::n_unique(data_ribbon$Parameter) > 1L) {
     p <- p +
       scale_color_flat_d(guide = "none") +
       scale_fill_flat_d()

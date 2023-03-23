@@ -64,7 +64,7 @@ plot.see_parameters_model <- function(x,
   }
 
   if (!any(grepl("Parameter", colnames(x), fixed = TRUE))) {
-    if (length(model_attributes$parameter_names) > 1) {
+    if (length(model_attributes$parameter_names) > 1L) {
       collapsed_params <- apply(
         do.call(
           cbind,
@@ -84,7 +84,7 @@ plot.see_parameters_model <- function(x,
 
   # is exp?
   exponentiated_coefs <- isTRUE(model_attributes$exponentiate)
-  y_intercept <- ifelse(exponentiated_coefs, 1, 0)
+  y_intercept <- as.numeric(exponentiated_coefs)
 
   # label for coefficient scale
   coefficient_name <- model_attributes$coefficient_name
@@ -108,7 +108,7 @@ plot.see_parameters_model <- function(x,
   }
 
   # check if multiple CIs
-  if (sum(grepl("^CI_low", colnames(x))) > 1) {
+  if (sum(startsWith(colnames(x), "CI_low")) > 1L) {
     multiple_ci <- TRUE
     x <- datawizard::reshape_ci(x)
   } else {
@@ -133,7 +133,7 @@ plot.see_parameters_model <- function(x,
       if (all(x$Group == "")) {
         x$Group <- NULL
       } else {
-        x <- x[!grepl("^SD/Cor", x$Group), , drop = FALSE]
+        x <- x[!startsWith(x$Group, "SD/Cor"), , drop = FALSE]
       }
     }
     attributes(x) <- c(attributes(x), model_attributes)
@@ -153,10 +153,10 @@ plot.see_parameters_model <- function(x,
   }
 
   # remember components
-  has_effects <- "Effects" %in% colnames(x) && length(unique(x$Effects)) > 1
-  has_component <- "Component" %in% colnames(x) && length(unique(x$Component)) > 1
-  has_response <- "Response" %in% colnames(x) && length(unique(x$Response)) > 1
-  has_subgroups <- "Subgroup" %in% colnames(x) && length(unique(x$Subgroup)) > 1
+  has_effects <- "Effects" %in% colnames(x) && length(unique(x$Effects)) > 1L
+  has_component <- "Component" %in% colnames(x) && length(unique(x$Component)) > 1L
+  has_response <- "Response" %in% colnames(x) && length(unique(x$Response)) > 1L
+  has_subgroups <- "Subgroup" %in% colnames(x) && length(unique(x$Subgroup)) > 1L
 
   mc <- model_attributes$model_class
   cp <- model_attributes$cleaned_parameters
@@ -165,14 +165,12 @@ plot.see_parameters_model <- function(x,
   is_meta_bma <- !is.null(mc) && any(mc %in% c("meta_random", "meta_fixed", "meta_bma"))
 
   # minor fixes for Bayesian models
-  if (!is.null(mc) && !is.null(cp) && any(mc %in% c("stanreg", "stanmvreg", "brmsfit"))) {
-    if (length(cp) == length(x$Parameter)) {
-      x$Parameter <- cp
-    }
+  if (!is.null(mc) && !is.null(cp) && any(mc %in% c("stanreg", "stanmvreg", "brmsfit")) && length(cp) == length(x$Parameter)) {
+    x$Parameter <- cp
   }
 
   if (isTRUE(show_density)) {
-    insight::check_if_installed(c("ggdist"))
+    insight::check_if_installed("ggdist")
 
     # TODO: Handle Effects and Components
     # TODO: Handle meta-analysis models
@@ -186,10 +184,7 @@ plot.see_parameters_model <- function(x,
 
       # MCMC or bootstrapped models
       if (is.null(data)) {
-        stop(
-          insight::format_message("Could not retrieve parameter simulations."),
-          call. = FALSE
-        )
+        insight::format_error("Could not retrieve parameter simulations.")
       }
 
       data <- datawizard::reshape_longer(
@@ -198,7 +193,7 @@ plot.see_parameters_model <- function(x,
         rows_to = "Iteration",
         values_to = "Coefficient"
       )
-      group <- x[, c("Parameter"), drop = FALSE]
+      group <- x[, "Parameter", drop = FALSE]
       group$group <- factor(x$Coefficient < y_intercept, levels = c(FALSE, TRUE))
       data <- merge(data, group, by = "Parameter")
       if (isTRUE(exponentiated_coefs)) {
@@ -311,13 +306,11 @@ plot.see_parameters_model <- function(x,
   }
 
 
-  if (!show_intercept) {
-    if (length(.in_intercepts(x$Parameter)) > 0) {
-      x <- x[!.in_intercepts(x$Parameter), ]
-      if (show_density && (is_bayesian || is_bootstrap)) {
-        data <- data[!.in_intercepts(data$Parameter), ]
-        density_layer$data <- data
-      }
+  if (!show_intercept && length(.in_intercepts(x$Parameter)) > 0L) {
+    x <- x[!.in_intercepts(x$Parameter), ]
+    if (show_density && (is_bayesian || is_bootstrap)) {
+      data <- data[!.in_intercepts(data$Parameter), ]
+      density_layer$data <- data
     }
   }
 
@@ -450,7 +443,7 @@ plot.see_parameters_model <- function(x,
     new_range <- pretty(c(min_ci, max_ci + space_factor))
 
     # expand scale range and add numbers to the right border
-    if (!any(is.infinite(new_range)) && !any(is.na(new_range))) {
+    if (!any(is.infinite(new_range)) && !anyNA(new_range)) {
       p <- p +
         geom_text(
           mapping = aes(label = .data$Estimate_CI, x = Inf),
@@ -468,7 +461,7 @@ plot.see_parameters_model <- function(x,
   # values we can use as breaks and labels for the scale...
 
   if (exponentiated_coefs && log_scale) {
-    range <- 2^c(-24:16)
+    range <- 2^(-24:16)
     x_low <- which.min(min_ci > range) - 1
     x_high <- which.max(max_ci < range)
 
@@ -520,10 +513,10 @@ plot.see_parameters_model <- function(x,
   } else if (has_response) {
     p <- p + facet_wrap(~Response, ncol = n_columns, scales = facet_scales)
   } else if (has_subgroups) {
-    suppressWarnings(p <- p + facet_grid(Subgroup ~ ., scales = "free", space = "free"))
+    suppressWarnings(p <- p + facet_grid(Subgroup ~ ., scales = "free", space = "free")) # nolint
   }
 
-  if (length(model_attributes$parameter_names) > 1) {
+  if (length(model_attributes$parameter_names) > 1L) {
     parameter_label <- "Parameters"
   } else {
     parameter_label <- model_attributes$parameter_names
@@ -547,7 +540,7 @@ plot.see_parameters_model <- function(x,
       p + labs(
         y = parameter_label,
         x = ifelse(is.null(coefficient_name),
-          ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"),
+          ifelse(exponentiated_coefs, "Exp(Estimate)", "Estimate"), # nolint
           coefficient_name
         ),
         colour = "CI"

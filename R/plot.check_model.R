@@ -254,7 +254,10 @@ plot.see_check_model <- function(x,
     {
       if (!is.null(ci_data)) {
         list(
-          ggplot2::geom_linerange(linewidth = size_line),
+          ggplot2::geom_linerange(
+            linewidth = size_line,
+            na.rm = TRUE
+          ),
           ggplot2::geom_segment(
             data = x[x$VIF_CI_high > ylim * 1.15, ],
             mapping = aes(
@@ -275,7 +278,8 @@ plot.see_check_model <- function(x,
       }
     } +
     geom_point2(
-      size = size_point
+      size = size_point,
+      na.rm = TRUE
     ) +
     ggplot2::labs(
       title = "Collinearity",
@@ -326,12 +330,14 @@ plot.see_check_model <- function(x,
       mapping = ggplot2::aes(ymin = 0, ymax = .data$y),
       colour = NA,
       fill = colors[2],
-      alpha = alpha_level
+      alpha = alpha_level,
+      na.rm = TRUE
     ) +
     ggplot2::geom_line(
       mapping = ggplot2::aes(y = .data$curve),
       colour = colors[1],
-      size = size_line
+      linewidth = size_line,
+      na.rm = TRUE
     ) +
     ggplot2::labs(
       x = "Residuals",
@@ -374,7 +380,7 @@ plot.see_check_model <- function(x,
         detrend = detrend
       ),
       qqplotr::stat_qq_line(
-        size = size_line,
+        linewidth = size_line,
         colour = colors[1],
         detrend = detrend
       )
@@ -389,11 +395,14 @@ plot.see_check_model <- function(x,
 
     qq_stuff <- list(
       ggplot2::geom_qq_line(
-        size = size_line,
-        colour = colors[1]
+        linewidth = size_line,
+        colour = colors[1],
+        na.rm = TRUE
       ),
       ggplot2::geom_qq(
-        shape = 16, stroke = 0,
+        shape = 16,
+        na.rm = TRUE,
+        stroke = 0,
         size = size_point,
         colour = colors[2] # "#2c3e50"
       )
@@ -435,7 +444,7 @@ plot.see_check_model <- function(x,
     p_plot <- ggplot2::ggplot(x, ggplot2::aes(sample = .data$res)) +
       qqplotr::stat_pp_band(alpha = alpha_level, detrend = detrend) +
       qqplotr::stat_pp_line(
-        size = size_line,
+        linewidth = size_line,
         colour = colors[1],
         detrend = detrend
       ) +
@@ -453,7 +462,6 @@ plot.see_check_model <- function(x,
       ", please install `qqplotr`."
     )
 
-
     x$probs <- stats::ppoints(x$res)
     dparms <- MASS::fitdistr(x$res, densfun = "normal")
     x$y <- do.call(stats::pnorm, c(list(q = x$res), dparms$estimate))
@@ -461,7 +469,7 @@ plot.see_check_model <- function(x,
     p_plot <- ggplot2::ggplot(x, ggplot2::aes(x = .data$probs, y = .data$y)) +
       ggplot2::geom_abline(
         slope = 1,
-        size = size_line,
+        linewidth = size_line,
         colour = colors[1]
       ) +
       geom_point2(
@@ -558,7 +566,7 @@ plot.see_check_model <- function(x,
       se = TRUE,
       formula = y ~ x,
       alpha = alpha_level,
-      size = size_line,
+      linewidth = size_line,
       colour = colors[1]
     ) +
     ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +

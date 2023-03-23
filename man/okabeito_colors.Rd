@@ -5,9 +5,9 @@
 \alias{oi_colors}
 \title{Extract Okabe-Ito colors as hex codes}
 \usage{
-okabeito_colors(..., original_names = FALSE, black_first = FALSE)
+okabeito_colors(..., original_names = FALSE, black_first = FALSE, amber = TRUE)
 
-oi_colors(..., original_names = FALSE, black_first = FALSE)
+oi_colors(..., original_names = FALSE, black_first = FALSE, amber = TRUE)
 }
 \arguments{
 \item{...}{Character names of colors.}
@@ -20,6 +20,8 @@ Only used if no colors are specified (to see all available colors).}
 \item{black_first}{Logical. Should black be first (\code{TRUE}) or last (\code{FALSE}, default)
 in the color palette? Only used if no colors are specified (to see all
 available colors).}
+
+\item{amber}{If amber color should replace yellow in the palette.}
 }
 \value{
 A character vector with color-codes.
