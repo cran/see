@@ -35,7 +35,7 @@ plot.see_binned_residuals <- function(x,
   }
 
   # show or hide dots - may be useful for large models with many observations
-  if (isTRUE(dots[["show_dots"]])) {
+  if (!isTRUE(dots[["show_dots"]]) && insight::n_unique(x$group) > 1) {
     x$ybar[x$group == "yes"] <- NA
     x$CI_low[x$group == "yes"] <- NA
     x$CI_high[x$group == "yes"] <- NA
@@ -46,14 +46,14 @@ plot.see_binned_residuals <- function(x,
 
   if (isTRUE(insight::check_if_installed("mgcv", quietly = TRUE))) {
     p <- p +
-      suppressWarnings(ggplot2::stat_smooth(
+      ggplot2::stat_smooth(
         ggplot2::aes(y = .data$ybar),
         method = "gam",
         se = FALSE,
         formula = y ~ s(x, bs = "tp"),
         colour = colors[3],
         linewidth = size_line
-      ))
+      )
   }
 
   p <- p +
