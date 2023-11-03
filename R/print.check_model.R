@@ -5,7 +5,17 @@ print.see_check_model <- function(x,
                                   type = "density",
                                   n_columns = 2,
                                   ...) {
-  suppressWarnings(suppressMessages(plot(
+  # set default - we need to evaluate "type" here, because when it's passed
+  # to plot(), "type" is no longer recognized as "missing()"
+  plot_type <- attr(x, "type")
+
+  if (missing(type) && !is.null(plot_type) && plot_type %in% c("density", "discrete_dots", "discrete_interval", "discrete_both")) { # nolint
+    type <- plot_type
+  } else {
+    type <- match.arg(type, choices = c("density", "discrete_dots", "discrete_interval", "discrete_both"))
+  }
+
+  suppressWarnings(suppressMessages(graphics::plot(
     x,
     style = style,
     colors = colors,

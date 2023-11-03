@@ -33,6 +33,8 @@ data_plot.parameters_pca <- function(x, data = NULL, ...) {
     title <- paste0("Rotated loadings from ", title, " (", rotation_name, ")")
   }
 
+  # remove missing values in y, to avoid warning
+  dataplot <- dataplot[!is.na(dataplot$y), ]
 
   attr(dataplot, "info") <- list(
     "xlab" = "",
@@ -55,6 +57,10 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #'
 #' The `plot()` method for the `parameters::principal_components()` function.
 #'
+#' @param type Character vector, indicating the type of plot.
+#'   Options are three different shapes to represent component loadings;
+#'    `"bar"` (default) for a horizontal bar chart, or
+#'    `"line"` for a horizontal point and line chart.
 #' @param text_color Character specifying color of text labels.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
@@ -69,7 +75,7 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #' result <- principal_components(mtcars[, 1:7], n = "all", threshold = 0.2)
 #' result
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_parameters_pca <- function(x,
                                     type = c("bar", "line"),

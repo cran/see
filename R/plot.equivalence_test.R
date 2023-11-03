@@ -48,13 +48,13 @@ plot.see_equivalence_test <- function(x,
   }
 
   # if we have intercept-only models, keep at least the intercept
-  intercepts <- which(.in_intercepts(x$Parameter))
+  intercepts <- which(.is_intercept(x$Parameter))
   if (length(intercepts) && nrow(x) > length(intercepts) && !show_intercept) {
     x <- x[-intercepts, ]
   }
 
   cp <- insight::clean_parameters(model)
-  intercepts <- which(.in_intercepts(cp$Parameter))
+  intercepts <- which(.is_intercept(cp$Parameter))
   if (length(intercepts) && nrow(x) > length(intercepts) && !show_intercept) {
     cp <- cp[-intercepts, ]
   }
@@ -105,12 +105,7 @@ plot.see_equivalence_test <- function(x,
   tmp <- merge(tmp, cp, by = "predictor")
   tmp$predictor <- factor(tmp$predictor, levels = rev(unique(tmp$predictor)))
 
-  has_multiple_panels <-
-    (!"Effects" %in% names(tmp) || length(unique(tmp$Effects)) <= 1L) &&
-      (!"Component" %in% names(tmp) || length(unique(tmp$Component)) <= 1L)
-
-  # check if we have multiple panels
-  if (has_multiple_panels) {
+  if (.has_multiple_panels(tmp)) {
     n_columns <- NULL
   }
 
@@ -380,7 +375,7 @@ plot.see_equivalence_test_lm <- function(x,
   }
 
   # if we have intercept-only models, keep at least the intercept
-  intercepts <- which(.in_intercepts(x$Parameter))
+  intercepts <- which(.is_intercept(x$Parameter))
   if (length(intercepts) && nrow(x) > length(intercepts) && !show_intercept) {
     x <- x[-intercepts, ]
   }

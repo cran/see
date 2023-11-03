@@ -95,7 +95,7 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
   groups <- unique(dataplot$y)
   if (!show_intercept) {
     dataplot <- .remove_intercept(dataplot, column = "y", show_intercept)
-    groups <- unique(setdiff(groups, .intercepts()))
+    groups <- unique(setdiff(groups, .intercept_names))
   }
 
   if (length(groups) == 1) {
@@ -157,7 +157,7 @@ data_plot.p_direction <- function(x, data = NULL, show_intercept = FALSE, ...) {
 #' m <<- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
 #' result <- p_direction(m)
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_p_direction <- function(x,
                                  data = NULL,
@@ -174,11 +174,12 @@ plot.see_p_direction <- function(x,
     x <- data_plot(x, data = data, show_intercept = show_intercept)
   }
 
-  # check if we have multiple panels
-  if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+  if (.has_multiple_panels(x)) {
     n_columns <- NULL
   }
+
+  # get parameter names for filtering
+  params <- unique(x$y)
 
   # get labels
   labels <- .clean_parameter_names(x$y, grid = !is.null(n_columns))
@@ -203,6 +204,7 @@ plot.see_p_direction <- function(x,
   if (priors) {
     p <- p + .add_prior_layer_ridgeline(
       model,
+      parameter = params,
       show_intercept = show_intercept,
       priors_alpha = priors_alpha
     )

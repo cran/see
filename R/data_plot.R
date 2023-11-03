@@ -67,10 +67,6 @@
 #' x <- hdi(model)
 #' plot(x) + theme_modern()
 #'
-#' data <- rnorm(1000, 1)
-#' x <- p_direction(data)
-#' plot(x)
-#'
 #' x <- p_direction(model, verbose = FALSE)
 #' plot(x)
 #'
@@ -97,8 +93,8 @@ data_plot <- function(x, ...) {
 #' information to the plot.
 #'
 #' @inheritParams data_plot
-#' @examples
-#' \dontrun{
+#' @examplesIf require("rstanarm", quietly = TRUE)
+#' \donttest{
 #' library(rstanarm)
 #' library(bayestestR)
 #' library(see)
@@ -160,7 +156,7 @@ add_plot_attributes <- function(x) {
 
     if (is.null(dat)) {
       # last try
-      model <- .dynGet(obj_name, ifnotfound = NULL)
+      dat <- .dynGet(obj_name, ifnotfound = NULL)
     }
   }
 

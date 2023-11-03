@@ -1,4 +1,35 @@
+# see 0.8.1
+
+## Major Changes
+
+* This release changes the licensing model of `{see}` to an MIT license.
+
+## New features
+
+* There is now a `plot()` method for outputs of `datawizard::data_tabulate()`
+  (#293).
+
+## Minor Changes
+
+* The `print()` method for `performance::check_model()` now also evaluates the
+  default plot type for posterior predictive checks.
+
+* QQ/PP-plots now default to drawing simultaneous testing bands (when the
+  `qqplotr` package is available). Previous behavior can be restored by setting
+  `method = "pointwise"`.
+
+* Plot method for `performance::check_normality()` now default to a detrended
+  QQ-plot. Previous behavior can be restored by setting `type = "density"`.
+
+* Plot method for `binned_residuals()` gains a `show_smooth` argument, to show
+  or hide the smooth line.
+
+* Plot method for `check_predictions()` gains a `x_limits` argument, to limit
+  the x-axis-range. This can be useful to "zoom in" certain parts of the plot.
+
 # see 0.8.0
+
+## Major Changes
 
 * `plot()` for `performance::check_model()` no longer produces a normal QQ plot
   for GLMs. Instead, it now shows a half-normal QQ plot of the absolute value of

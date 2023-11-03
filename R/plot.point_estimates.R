@@ -98,7 +98,7 @@ data_plot.map_estimate <- data_plot.point_estimate
 #' result <- point_estimate(m, centrality = "median")
 #' result
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_point_estimate <- function(x,
                                     data = NULL,
@@ -132,7 +132,7 @@ plot.see_point_estimate <- function(x,
       x_lab <- "Parameter Value"
     }
 
-    if (!show_intercept && .has_intercept(x_lab)) {
+    if (!show_intercept && .is_intercept(x_lab)) {
       return(NULL)
     }
 

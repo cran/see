@@ -9,13 +9,20 @@
 #' scales for 'ggplot2'. Color scales are based on
 #' <https://materialui.co/colors>.
 #'
-#' References: Lüdecke et al. (2021) \doi{10.21105/joss.03393}.
+#' References: Luedecke et al. (2021) \doi{10.21105/joss.03393}.
 #'
 #' @docType package
 #' @aliases see see-package
 #' @name see-package
 #' @keywords internal
 "_PACKAGE"
+
+## see namespace: start
+##
+#' @import ggplot2
+#'
+## see namespace: end
+NULL
 
 # Suppress R CMD check note
 # Namespace in Imports field not imported from: PKG

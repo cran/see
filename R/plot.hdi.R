@@ -108,7 +108,7 @@ data_plot.bayestestR_eti <- data_plot.hdi
   groups <- unique(dataplot$y)
   if (!show_intercept) {
     dataplot <- .remove_intercept(dataplot, column = "y", show_intercept)
-    groups <- unique(setdiff(groups, .intercepts()))
+    groups <- unique(setdiff(groups, .intercept_names))
   }
 
   if (length(groups) == 1) {
@@ -121,10 +121,10 @@ data_plot.bayestestR_eti <- data_plot.hdi
   dataplot <- .fix_facet_names(dataplot)
 
   attr(dataplot, "info") <- list(
-    "xlab" = "Possible parameter values",
-    "ylab" = ylab,
-    "legend_fill" = legend_title,
-    "title" = plot_title
+    xlab = "Possible parameter values",
+    ylab = ylab,
+    legend_fill = legend_title,
+    title = plot_title
   )
 
   class(dataplot) <- c("data_plot", "see_hdi", class(dataplot))
@@ -199,10 +199,10 @@ data_plot.bayestestR_eti <- data_plot.hdi
 #' library(bayestestR)
 #' set.seed(123)
 #' m <- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
-#' result <- hdi(m)
+#' result <- bayestestR::hdi(m)
 #' result
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_hdi <- function(x,
                          data = NULL,

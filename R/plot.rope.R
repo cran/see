@@ -42,7 +42,7 @@ data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...) {
   groups <- unique(dataplot$y)
   if (!show_intercept) {
     dataplot <- .remove_intercept(dataplot, column = "y", show_intercept = show_intercept)
-    groups <- unique(setdiff(groups, .intercepts()))
+    groups <- unique(setdiff(groups, .intercept_names))
   }
 
   if (length(groups) == 1) {
@@ -83,7 +83,7 @@ data_plot.rope <- function(x, data = NULL, show_intercept = FALSE, ...) {
 #' result <- rope(m)
 #' result
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_rope <- function(x,
                           data = NULL,
@@ -96,9 +96,7 @@ plot.see_rope <- function(x,
     x <- data_plot(x, data = data, show_intercept = show_intercept)
   }
 
-  # check if we have multiple panels
-  if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+  if (.has_multiple_panels(x)) {
     n_columns <- NULL
   }
 

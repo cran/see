@@ -61,8 +61,8 @@ output of estimates and credible intervals.
 }
 }
 \examples{
-\dontshow{if (require("brms") && require("metafor")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\dontshow{if (require("brms") && require("metafor") && require("RcppEigen")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\donttest{
 library(parameters)
 library(brms)
 library(metafor)
@@ -84,7 +84,9 @@ priors <- c(
   prior(normal(0, 1), class = Intercept),
   prior(cauchy(0, 0.5), class = sd)
 )
-model <- brm(yi | se(vi) ~ 1 + (1 | author), data = dat)
+model <- suppressWarnings(
+  brm(yi | se(vi) ~ 1 + (1 | author), data = dat)
+)
 
 # result
 mp <- model_parameters(model)

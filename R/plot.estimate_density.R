@@ -51,11 +51,11 @@ data_plot.estimate_density <- function(x,
 
   attr(dataplot, "summary") <- summary
   attr(dataplot, "info") <- list(
-    "xlab" = "Values",
-    "ylab" = "Density",
-    "legend_fill" = "Parameter",
-    "legend_color" = "Parameter",
-    "title" = "Estimated Density Function"
+    xlab = "Values",
+    ylab = "Density",
+    legend_fill = "Parameter",
+    legend_color = "Parameter",
+    title = "Estimated Density Function"
   )
 
   class(dataplot) <- c("data_plot", "see_estimate_density", class(dataplot))
@@ -96,7 +96,7 @@ data_plot.estimate_density <- function(x,
 #' m <<- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
 #' result <- estimate_density(m)
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_estimate_density <- function(x,
                                       stack = TRUE,
@@ -123,13 +123,20 @@ plot.see_estimate_density <- function(x,
 
 
   if (!inherits(x, "data_plot")) {
-    x <- data_plot(x, data = model, centrality = centrality, ci = ci, ...)
+    x <- data_plot(x,
+      data = model,
+      centrality = centrality,
+      ci = ci,
+      ...
+    )
   }
 
-  if ((!"Effects" %in% names(x) || length(unique(x$Effects)) <= 1) &&
-    (!"Component" %in% names(x) || length(unique(x$Component)) <= 1)) {
+  if (.has_multiple_panels(x)) {
     n_columns <- NULL
   }
+
+  # get parameter names for filtering
+  params <- unique(x$y)
 
   # get labels
   labels <- .clean_parameter_names(x$Parameter, grid = !is.null(n_columns))
@@ -152,6 +159,7 @@ plot.see_estimate_density <- function(x,
       p <- p +
         .add_prior_layer_ridgeline(
           model,
+          parameter = params,
           show_intercept = show_intercept,
           priors_alpha = priors_alpha,
           show_ridge_line = FALSE
@@ -236,7 +244,7 @@ plot.see_estimate_density <- function(x,
 data_plot.estimate_density_df <- data_plot.estimate_density
 
 
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_estimate_density_df <- function(x,
                                          stack = TRUE,

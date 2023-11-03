@@ -7,9 +7,11 @@
   return(x)
 }
 
+
 .as.data.frame_density <- function(x, ...) {
   data.frame(x = x$x, y = x$y)
 }
+
 
 # safe conversion from factor to numeric
 .factor_to_numeric <- function(x) {
@@ -27,6 +29,11 @@
   as.numeric(as.character(x))
 }
 
+
+.has_multiple_panels <- function(x) {
+  (!"Effects" %in% names(x) || insight::n_unique(x$Effects) <= 1L) &&
+    (!"Component" %in% names(x) || insight::n_unique(x$Component) <= 1L)
+}
 
 
 .clean_parameter_names <- function(params, grid = FALSE) {
@@ -87,33 +94,33 @@
 }
 
 
-
 .fix_facet_names <- function(x) {
   if ("Component" %in% names(x)) {
     x$Component <- as.character(x$Component)
-    if (!"Effects" %in% names(x)) {
-      x$Component[x$Component == "conditional"] <- "Conditional"
-      x$Component[x$Component == "zero_inflated"] <- "Zero-Inflated"
-      x$Component[x$Component == "dispersion"] <- "Dispersion"
-      x$Component[x$Component == "simplex"] <- "Monotonic Effects"
-    } else {
+    if ("Effects" %in% names(x)) {
       x$Component[x$Component == "conditional"] <- "(Conditional)"
       x$Component[x$Component == "zero_inflated"] <- "(Zero-Inflated)"
       x$Component[x$Component == "dispersion"] <- "(Dispersion)"
       x$Component[x$Component == "simplex"] <- "(Monotonic Effects)"
+    } else {
+      x$Component[x$Component == "conditional"] <- "Conditional"
+      x$Component[x$Component == "zero_inflated"] <- "Zero-Inflated"
+      x$Component[x$Component == "dispersion"] <- "Dispersion"
+      x$Component[x$Component == "simplex"] <- "Monotonic Effects"
     }
   }
+
   if ("Effects" %in% names(x)) {
     x$Effects <- as.character(x$Effects)
     x$Effects[x$Effects == "fixed"] <- "Fixed Effects"
     x$Effects[x$Effects == "random"] <- "Random Effects"
   }
+
   x
 }
 
 
-
-.intercepts <- function() {
+.intercept_names <-
   c(
     "(intercept)_zi",
     "intercept (zero-inflated)",
@@ -123,21 +130,16 @@
     "b_intercept",
     "b_zi_intercept"
   )
-}
 
 
-.has_intercept <- function(x) {
+.is_intercept <- function(x) {
   x <- tolower(x)
-  x %in% .intercepts() | !is.na(x) & startsWith(x, "intercept")
+  x %in% .intercept_names | grepl("(?i)intercept[^a-zA-Z]", x)
 }
-
-
-.in_intercepts <- .has_intercept
-
 
 .remove_intercept <- function(x, column = "Parameter", show_intercept = FALSE) {
   if (!show_intercept) {
-    remove <- which(.in_intercepts(x[[column]]))
+    remove <- which(.is_intercept(x[[column]]))
     if (length(remove)) x <- x[-remove, ]
   }
   x

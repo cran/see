@@ -1,9 +1,10 @@
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_binned_residuals <- function(x,
                                       size_line = 0.7,
                                       size_point = 2.2,
                                       colors = social_colors(c("blue", "red", "green")),
+                                      show_smooth = FALSE,
                                       style = theme_lucid,
                                       ...) {
   x$se.lo <- -x$se
@@ -16,6 +17,11 @@ plot.see_binned_residuals <- function(x,
 
   # set defaults
   term <- attr(x, "term", exact = TRUE)
+  if (is.null(dots[["show_dots"]])) {
+    show_dots <- isTRUE(attr(x, "show_dots", exact = TRUE))
+  } else {
+    show_dots <- isTRUE(dots[["show_dots"]])
+  }
 
   if (missing(style) && !is.null(attr(x, "theme"))) {
     theme_style <- unlist(strsplit(attr(x, "theme"), "::", fixed = TRUE))
@@ -35,16 +41,18 @@ plot.see_binned_residuals <- function(x,
   }
 
   # show or hide dots - may be useful for large models with many observations
-  if (!isTRUE(dots[["show_dots"]]) && insight::n_unique(x$group) > 1) {
+  if (!show_dots && insight::n_unique(x$group) > 1) {
     x$ybar[x$group == "yes"] <- NA
     x$CI_low[x$group == "yes"] <- NA
     x$CI_high[x$group == "yes"] <- NA
+    # remove missing values, to avoid warning
+    x <- x[!is.na(x$ybar), ]
   }
 
   p <- ggplot2::ggplot(data = x, ggplot2::aes(x = .data$xbar)) +
     ggplot2::geom_abline(slope = 0, intercept = 0, colour = "grey80")
 
-  if (isTRUE(insight::check_if_installed("mgcv", quietly = TRUE))) {
+  if (isTRUE(insight::check_if_installed("mgcv", quietly = TRUE)) && show_smooth) {
     p <- p +
       ggplot2::stat_smooth(
         ggplot2::aes(y = .data$ybar),

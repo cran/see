@@ -17,10 +17,10 @@
 #' library(bayestestR)
 #' set.seed(123)
 #' m <<- suppressWarnings(stan_glm(Sepal.Length ~ Petal.Width * Species, data = iris, refresh = 0))
-#' result <- si(m)
+#' result <- si(m, verbose = FALSE)
 #' result
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_si <- function(x,
                         si_color = "#0171D3",
@@ -32,9 +32,9 @@ plot.see_si <- function(x,
   x$ind <- x$Parameter
 
   # if we have intercept-only models, keep at least the intercept
-  intercepts_data <- which(.in_intercepts(plot_data$ind))
+  intercepts_data <- which(.is_intercept(plot_data$ind))
   if (length(intercepts_data) && (nrow(plot_data) > length(intercepts_data)) && !show_intercept) {
-    intercepts_si <- which(.in_intercepts(x$ind))
+    intercepts_si <- which(.is_intercept(x$ind))
     x <- x[-intercepts_si, ]
     plot_data <- plot_data[-intercepts_data, ]
   }

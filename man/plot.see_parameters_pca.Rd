@@ -17,7 +17,10 @@
 \arguments{
 \item{x}{An object.}
 
-\item{type}{Character vector, indicating the type of plot.}
+\item{type}{Character vector, indicating the type of plot.
+Options are three different shapes to represent component loadings;
+\code{"bar"} (default) for a horizontal bar chart, or
+\code{"line"} for a horizontal point and line chart.}
 
 \item{size_text}{Numeric value specifying size of text labels.}
 
@@ -42,4 +45,5 @@ data(mtcars)
 result <- principal_components(mtcars[, 1:7], n = "all", threshold = 0.2)
 result
 plot(result)
+
 }

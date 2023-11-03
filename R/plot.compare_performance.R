@@ -40,10 +40,10 @@ data_plot.compare_performance <- function(x, data = NULL, ...) {
   dataplot$values[dataplot$values > 1] <- 1
 
   attr(dataplot, "info") <- list(
-    "xlab" = "",
-    "ylab" = "",
-    "title" = "Comparison of Model Indices",
-    "legend_color" = "Models"
+    xlab = "",
+    ylab = "",
+    title = "Comparison of Model Indices",
+    legend_color = "Models"
   )
 
   class(dataplot) <- c("data_plot", "see_compare_performance", "data.frame")
@@ -72,7 +72,7 @@ data_plot.compare_performance <- function(x, data = NULL, ...) {
 #' result <- compare_performance(lm1, lm2, lm3)
 #' result
 #' plot(result)
-#' @importFrom ggplot2 .data
+#'
 #' @export
 plot.see_compare_performance <- function(x, size_line = 1, ...) {
   # We may think of plotting the "performance scores" as bar plots,
