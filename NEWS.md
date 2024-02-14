@@ -1,3 +1,13 @@
+# see 0.8.2
+
+## Minor Changes
+
+* `plot.n_factors()` now shows a dashed line over the bars, indicating the
+  cumulate explained variance by the number of factors.
+
+* `plot.check_outliers()` now dodges the x-axis labels, to avoid overlapping
+  labels.
+
 # see 0.8.1
 
 ## Major Changes
