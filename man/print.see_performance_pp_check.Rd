@@ -8,6 +8,7 @@
 \method{print}{see_performance_pp_check}(
   x,
   size_line = 0.5,
+  size_point = 2,
   line_alpha = 0.15,
   size_bar = 0.7,
   style = theme_lucid,
@@ -20,6 +21,7 @@
 \method{plot}{see_performance_pp_check}(
   x,
   size_line = 0.5,
+  size_point = 2,
   line_alpha = 0.15,
   size_bar = 0.7,
   style = theme_lucid,
@@ -33,6 +35,8 @@
 \item{x}{An object.}
 
 \item{size_line}{Numeric value specifying size of line geoms.}
+
+\item{size_point}{Numeric specifying size of point-geoms.}
 
 \item{line_alpha}{Numeric value specifying alpha of lines indicating \code{yrep}.}
 
@@ -60,7 +64,8 @@ A ggplot2-object.
 The \code{plot()} method for the \code{performance::check_predictions()} function.
 }
 \examples{
-\dontshow{if (require("performance")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(performance)
+
 model <- lm(Sepal.Length ~ Species * Petal.Width + Petal.Length, data = iris)
 check_predictions(model)
 
@@ -74,7 +79,6 @@ model <- glm(
 )
 out <- check_predictions(model)
 plot(out, type = "discrete_dots")
-\dontshow{\}) # examplesIf}
 }
 \seealso{
 See also the vignette about \href{https://easystats.github.io/performance/articles/check_model.html}{\code{check_model()}}.

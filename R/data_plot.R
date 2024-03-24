@@ -103,10 +103,10 @@ data_plot <- function(x, ...) {
 #' model <- suppressWarnings(stan_glm(
 #'   Sepal.Length ~ Petal.Width + Species + Sepal.Width,
 #'   data = iris,
-#'   chains = 2, iter = 200
+#'   chains = 2, iter = 200, refresh = 0
 #' ))
 #'
-#' result <- hdi(model, ci = c(0.5, 0.75, 0.9, 0.95))
+#' result <- bayestestR::hdi(model, ci = c(0.5, 0.75, 0.9, 0.95))
 #' data <- data_plot(result, data = model)
 #'
 #' p <- ggplot(
@@ -147,6 +147,11 @@ add_plot_attributes <- function(x) {
   # retrieve model
   obj_name <- attr(x, "object_name", exact = TRUE)
   dat <- NULL
+
+  # for simulated residuals, we save all necessary information in the object
+  if (inherits(x, "performance_simres")) {
+    return(x$fittedModel)
+  }
 
   if (!is.null(obj_name)) {
     # first try, parent frame

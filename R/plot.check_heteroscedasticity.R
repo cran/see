@@ -9,9 +9,9 @@
 #'
 #' @seealso See also the vignette about [`check_model()`](https://easystats.github.io/performance/articles/check_model.html).
 #'
-#' @examplesIf require("performance")
+#' @examples
 #' m <- lm(mpg ~ wt + cyl + gear + disp, data = mtcars)
-#' result <- check_heteroscedasticity(m)
+#' result <- performance::check_heteroscedasticity(m)
 #' result
 #' plot(result, data = m) # data required for pkgdown
 #' @export
@@ -39,6 +39,10 @@ plot.see_check_heteroscedasticity <- function(x, data = NULL, ...) {
       stats::rstandard(model)
     },
     error = function(e) {
+      # debugging
+      if (getOption("easystats_erros", FALSE)) {
+        insight::format_error(e$message)
+      }
       NULL
     }
   )

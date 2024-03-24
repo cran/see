@@ -1,3 +1,20 @@
+# see 0.8.3
+
+## Major changes
+
+- New `plot()` method for simulated residuals (implemented in the _performance_
+  package).
+
+- `plot()` for `check_model()` was revised and now includes more accurate Q-Q
+  plots for non-Gaussian models.
+
+## Minor Changes
+
+- `plot.check_model()` now passes arguments `size_point` and `size_line` to the
+  posterior predictive check plot.
+
+- Minor changes regarding the latest update of _ggplot2_.
+
 # see 0.8.2
 
 ## Minor Changes
