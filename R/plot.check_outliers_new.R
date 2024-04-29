@@ -4,8 +4,12 @@
                                     ref.linetype = "dashed",
                                     show_labels = TRUE,
                                     size_line = NULL,
+                                    size_point = 2,
                                     size_text = NULL,
+                                    size_axis_title = base_size,
+                                    size_title = 12,
                                     theme_style = theme_lucid,
+                                    base_size = 10,
                                     colors = unname(social_colors(c("green", "blue grey", "red"))),
                                     dot_alpha_level = 0.8,
                                     show_dots = TRUE) {
@@ -23,7 +27,12 @@
   p <- ggplot(plot_data, aes(x = .data$Hat, .data$Std_Residuals))
 
   if (isTRUE(show_dots)) {
-    p <- p + geom_point2(aes(colour = .data$Influential), na.rm = na.rm, alpha = dot_alpha_level)
+    p <- p + geom_point2(
+      aes(colour = .data$Influential),
+      na.rm = na.rm,
+      alpha = dot_alpha_level,
+      size = size_point
+    )
   }
 
   p <- p +
@@ -42,7 +51,8 @@
       method = "loess",
       na.rm = na.rm,
       se = FALSE,
-      color = colors[1]
+      color = colors[1],
+      linewidth = size_line
     ) +
     scale_colour_manual(values = c(OK = colors[2], Influential = colors[3])) +
     (if (isTRUE(show_labels)) {
@@ -128,7 +138,13 @@
 
     p <- p +
       .cook_lines +
-      theme_style(base_size = 10, plot.title.space = 3, axis.title.space = 5) +
+      theme_style(
+        base_size = base_size,
+        plot.title.space = 3,
+        axis.title.space = 5,
+        plot.title.size = size_title,
+        axis.title.size = size_axis_title
+      ) +
       guides(colour = "none", text = "none")
   }
 

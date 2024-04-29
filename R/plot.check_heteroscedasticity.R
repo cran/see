@@ -4,6 +4,7 @@
 #' `performance::check_heteroscedasticity()` function.
 #'
 #' @inheritParams data_plot
+#' @inheritParams plot.see_check_normality
 #'
 #' @return A ggplot2-object.
 #'
@@ -15,7 +16,14 @@
 #' result
 #' plot(result, data = m) # data required for pkgdown
 #' @export
-plot.see_check_heteroscedasticity <- function(x, data = NULL, ...) {
+plot.see_check_heteroscedasticity <- function(x,
+                                              data = NULL,
+                                              size_point = 2,
+                                              size_line = 0.8,
+                                              size_title = 12,
+                                              size_axis_title = base_size,
+                                              base_size = 10,
+                                              ...) {
   if (is.null(data)) {
     model <- .retrieve_data(x)
   } else {
@@ -68,7 +76,15 @@ plot.see_check_heteroscedasticity <- function(x, data = NULL, ...) {
     x = stats::fitted(model),
     y = sqrt(abs(r))
   )
-  .plot_diag_homogeneity(dat, size_point = 2, size_line = 0.8, ...)
+  .plot_diag_homogeneity(
+    dat,
+    size_point = size_point,
+    size_line = size_line,
+    base_size = base_size,
+    size_title = size_title,
+    size_axis_title = size_axis_title,
+    ...
+  )
 }
 
 

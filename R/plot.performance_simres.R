@@ -33,6 +33,9 @@
 plot.see_performance_simres <- function(x,
                                         size_line = 0.8,
                                         size_point = 2,
+                                        size_title = 12,
+                                        size_axis_title = base_size,
+                                        base_size = 10,
                                         alpha = 0.2,
                                         dot_alpha = 0.8,
                                         colors = c("#3aaf85", "#1b6ca8"),
@@ -144,9 +147,11 @@ plot.see_performance_simres <- function(x,
       y = y_lab
     ) +
     style(
-      base_size = 10,
+      base_size = base_size,
       plot.title.space = 3,
-      axis.title.space = 5
+      axis.title.space = 5,
+      plot.title.size = size_title,
+      axis.title.size = size_axis_title
     )
 }
 

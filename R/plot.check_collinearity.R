@@ -18,8 +18,11 @@
 plot.see_check_collinearity <- function(x,
                                         data = NULL,
                                         colors = c("#3aaf85", "#1b6ca8", "#cd201f"),
-                                        size_point = 4,
+                                        size_point = 3.5,
                                         size_line = 0.8,
+                                        size_title = 12,
+                                        size_axis_title = base_size,
+                                        base_size = 10,
                                         ...) {
   if (is.null(data)) {
     dat <- insight::compact_list(.retrieve_data(x))
@@ -51,6 +54,9 @@ plot.see_check_collinearity <- function(x,
     dat,
     size_point = size_point,
     size_line = size_line,
+    size_title = size_title,
+    size_axis_title = size_axis_title,
+    base_size = base_size,
     colors = colors,
     ci_data = attributes(x)$CI,
     is_check_model = FALSE
@@ -62,6 +68,9 @@ plot.see_check_collinearity <- function(x,
                            size_point,
                            size_line,
                            theme_style = theme_lucid,
+                           size_title = 12,
+                           size_axis_title = 10,
+                           base_size = 10,
                            colors = unname(social_colors(c("green", "blue", "red"))),
                            ci_data = NULL,
                            is_check_model = FALSE) {
@@ -161,9 +170,11 @@ plot.see_check_collinearity <- function(x,
       guide = ggplot2::guide_legend(title = NULL)
     ) +
     theme_style(
-      base_size = 10,
+      base_size = base_size,
       plot.title.space = 3,
-      axis.title.space = 5
+      axis.title.space = 5,
+      plot.title.size = size_title,
+      axis.title.size = size_axis_title
     ) +
     ggplot2::scale_y_continuous(
       limits = c(1, ylim * 1.15),

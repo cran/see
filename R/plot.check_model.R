@@ -34,6 +34,9 @@ plot.see_check_model <- function(x,
   size_line <- attr(x, "line_size")
   show_labels <- attr(x, "show_labels") %||% TRUE
   size_text <- attr(x, "text_size")
+  base_size <- attr(x, "base_size")
+  size_axis_title <- attr(x, "axis_title_size")
+  size_title <- attr(x, "title_size")
   alpha_level <- attr(x, "alpha")
   dot_alpha_level <- attr(x, "dot_alpha")
   show_dots <- attr(x, "show_dots")
@@ -74,6 +77,18 @@ plot.see_check_model <- function(x,
     dot_alpha_level <- 0.8
   }
 
+  if (is.null(base_size)) {
+    base_size <- 10
+  }
+
+  if (is.null(size_axis_title)) {
+    size_axis_title <- base_size
+  }
+
+  if (is.null(size_title)) {
+    size_title <- 12
+  }
+
   if (is.null(check)) {
     check <- "all"
   }
@@ -88,6 +103,9 @@ plot.see_check_model <- function(x,
       style = style,
       size_line = size_line,
       size_point = size_point,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       type = type,
       check_model = TRUE,
       adjust_legend = TRUE,
@@ -98,10 +116,13 @@ plot.see_check_model <- function(x,
   if ("NCV" %in% names(x) && !is.null(x$NCV) && any(c("ncv", "linearity", "all") %in% check)) {
     p$NCV <- .plot_diag_linearity(
       x$NCV,
-      size_point,
-      size_line,
-      alpha_level,
+      size_point = size_point,
+      size_line = size_line,
+      alpha_level = alpha_level,
       theme_style = style,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       colors = colors,
       dot_alpha_level = dot_alpha_level,
       show_dots = show_dots
@@ -113,6 +134,9 @@ plot.see_check_model <- function(x,
     p$BINNED_RESID <- plot.see_binned_residuals(
       x$BINNED_RESID,
       style = style,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       colors = colors[c(2, 3, 1)],
       adjust_legend = TRUE,
       check_model = TRUE,
@@ -124,6 +148,9 @@ plot.see_check_model <- function(x,
     p$OVERDISPERSION <- .plot_diag_overdispersion(
       x$OVERDISPERSION,
       style = style,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       colors = colors[c(1, 2)],
       size_line = size_line,
       type = overdisp_type
@@ -133,10 +160,13 @@ plot.see_check_model <- function(x,
   if ("HOMOGENEITY" %in% names(x) && !is.null(x$HOMOGENEITY) && any(c("homogeneity", "all") %in% check)) {
     p$HOMOGENEITY <- .plot_diag_homogeneity(
       x$HOMOGENEITY,
-      size_point,
-      size_line,
-      alpha_level,
+      size_point = size_point,
+      size_line = size_line,
+      alpha_level = alpha_level,
       theme_style = style,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       colors = colors,
       dot_alpha_level = dot_alpha_level,
       show_dots = show_dots
@@ -149,7 +179,11 @@ plot.see_check_model <- function(x,
       show_labels = show_labels,
       size_text = size_text,
       size_line = size_line,
+      size_point = size_point,
       theme_style = style,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
+      base_size = base_size,
       colors = colors,
       dot_alpha_level = dot_alpha_level,
       show_dots = show_dots
@@ -162,6 +196,9 @@ plot.see_check_model <- function(x,
       size_point = 1.5 * size_point,
       size_line = size_line,
       theme_style = style,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       colors = colors,
       ci_data = attributes(x$VIF)$CI,
       is_check_model = TRUE
@@ -173,21 +210,27 @@ plot.see_check_model <- function(x,
       p$QQ <- plot(
         x$QQ,
         size_line = size_line,
-        size_point = size_point,
+        size_point = 0.9 * size_point,
         alpha = alpha_level,
         dot_alpha = dot_alpha_level,
         colors = colors,
         detrend = detrend,
-        style = style
+        style = style,
+        base_size = base_size,
+        size_axis_title = size_axis_title,
+        size_title = size_title
       )
     } else {
       p$QQ <- .plot_diag_qq(
         x$QQ,
-        size_point,
-        size_line,
+        size_point = size_point,
+        size_line = size_line,
+        size_axis_title = size_axis_title,
+        size_title = size_title,
         alpha_level = alpha_level,
         detrend = detrend,
         theme_style = style,
+        base_size = base_size,
         colors = colors,
         dot_alpha_level = dot_alpha_level,
         show_dots = TRUE, # qq-plots w/o dots makes no sense
@@ -200,9 +243,12 @@ plot.see_check_model <- function(x,
   if ("NORM" %in% names(x) && !is.null(x$NORM) && any(c("normality", "all") %in% check)) {
     p$NORM <- .plot_diag_norm(
       x$NORM,
-      size_line,
+      size_line = size_line,
       alpha_level = alpha_level,
       theme_style = style,
+      base_size = base_size,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       colors = colors
     )
   }
@@ -212,8 +258,11 @@ plot.see_check_model <- function(x,
       x$REQQ,
       size_point,
       size_line,
+      size_axis_title = size_axis_title,
+      size_title = size_title,
       alpha_level = alpha_level,
       theme_style = style,
+      base_size = base_size,
       colors = colors,
       dot_alpha_level = dot_alpha_level,
       show_dots = TRUE # qq-plots w/o dots makes no sense
@@ -227,18 +276,21 @@ plot.see_check_model <- function(x,
   if (panel) {
     pw <- plots(p, n_columns = n_columns)
     .safe_print_plots(pw, ...)
-    invisible(pw)
+    return(invisible(pw))
+  } else {
+    return(p)
   }
-
-  p
 }
 
 
 .plot_diag_linearity <- function(x,
                                  size_point,
                                  size_line,
+                                 size_axis_title = 10,
+                                 size_title = 12,
                                  alpha_level = 0.2,
                                  theme_style = theme_lucid,
+                                 base_size = 10,
                                  colors = unname(social_colors(c("green", "blue", "red"))),
                                  dot_alpha_level = 0.8,
                                  show_dots = TRUE) {
@@ -270,8 +322,10 @@ plot.see_check_model <- function(x,
       subtitle = "Reference line should be flat and horizontal"
     ) +
     theme_style(
-      base_size = 10,
+      base_size = base_size,
       plot.title.space = 3,
-      axis.title.space = 5
+      axis.title.space = 5,
+      axis.title.size = size_axis_title,
+      plot.title.size = size_title
     )
 }

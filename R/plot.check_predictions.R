@@ -1,5 +1,19 @@
 #' @export
 data_plot.performance_pp_check <- function(x, type = "density", ...) {
+  # for data from "bayesplot::pp_check()", data is already in shape
+  if (isTRUE(attributes(x)$is_stan) && type != "density") {
+    class(x) <- c("data_plot", "see_performance_pp_check", "data.frame")
+    attr(x, "info") <- list(
+      xlab = attr(x, "response_name"),
+      ylab = ifelse(identical(type, "density"), "Density", "Counts"),
+      title = "Posterior Predictive Check",
+      check_range = attr(x, "check_range"),
+      bandwidth = attr(x, "bandwidth"),
+      model_info = attr(x, "model_info")
+    )
+    return(x)
+  }
+
   columns <- colnames(x)
   dataplot <- stats::reshape(
     x,
@@ -75,8 +89,11 @@ data_plot.performance_pp_check <- function(x, type = "density", ...) {
 print.see_performance_pp_check <- function(x,
                                            size_line = 0.5,
                                            size_point = 2,
-                                           line_alpha = 0.15,
                                            size_bar = 0.7,
+                                           size_axis_title = base_size,
+                                           size_title = 12,
+                                           base_size = 10,
+                                           line_alpha = 0.15,
                                            style = theme_lucid,
                                            colors = unname(social_colors(c("green", "blue"))),
                                            type = c("density", "discrete_dots", "discrete_interval", "discrete_both"),
@@ -85,6 +102,7 @@ print.see_performance_pp_check <- function(x,
   orig_x <- x
   check_range <- isTRUE(attributes(x)$check_range)
   plot_type <- attributes(x)$type
+  is_stan <- attributes(x)$is_stan
 
   if (missing(type) && !is.null(plot_type) && plot_type %in% c("density", "discrete_dots", "discrete_interval", "discrete_both")) {
     type <- plot_type
@@ -98,13 +116,17 @@ print.see_performance_pp_check <- function(x,
 
   p1 <- .plot_pp_check(
     x,
-    size_line,
-    size_point,
-    line_alpha,
+    size_line = size_line,
+    size_point = size_point,
+    line_alpha = line_alpha,
     theme_style = style,
     colors = colors,
+    base_size = base_size,
+    size_title = size_title,
+    size_axis_title = size_axis_title,
     type = type,
     x_limits = x_limits,
+    is_stan = is_stan,
     ...
   )
 
@@ -124,8 +146,11 @@ print.see_performance_pp_check <- function(x,
 plot.see_performance_pp_check <- function(x,
                                           size_line = 0.5,
                                           size_point = 2,
-                                          line_alpha = 0.15,
                                           size_bar = 0.7,
+                                          size_axis_title = base_size,
+                                          size_title = 12,
+                                          base_size = 10,
+                                          line_alpha = 0.15,
                                           style = theme_lucid,
                                           colors = unname(social_colors(c("green", "blue"))),
                                           type = c("density", "discrete_dots", "discrete_interval", "discrete_both"),
@@ -134,6 +159,7 @@ plot.see_performance_pp_check <- function(x,
   orig_x <- x
   check_range <- isTRUE(attributes(x)$check_range)
   plot_type <- attributes(x)$type
+  is_stan <- attributes(x)$is_stan
 
   if (missing(type) && !is.null(plot_type) && plot_type %in% c("density", "discrete_dots", "discrete_interval", "discrete_both")) { # nolint
     type <- plot_type
@@ -147,13 +173,17 @@ plot.see_performance_pp_check <- function(x,
 
   p1 <- .plot_pp_check(
     x,
-    size_line,
-    size_point,
-    line_alpha,
+    size_line = size_line,
+    size_point = size_point,
+    line_alpha = line_alpha,
     theme_style = style,
+    base_size = base_size,
+    size_axis_title = size_axis_title,
+    size_title = size_title,
     colors = colors,
     type = type,
     x_limits = x_limits,
+    is_stan = is_stan,
     ...
   )
 
@@ -172,11 +202,21 @@ plot.see_performance_pp_check <- function(x,
                            size_point,
                            line_alpha,
                            theme_style,
+                           base_size = 10,
+                           size_axis_title = 10,
+                           size_title = 12,
                            colors,
                            type = "density",
                            x_limits = NULL,
+                           is_stan = NULL,
                            ...) {
   info <- attr(x, "info")
+
+  # discrete plot type from "bayesplot::pp_check()" returns a different data
+  # structure, so we need to handle it differently
+  if (isTRUE(is_stan) && type != "density") {
+    return(.plot_check_predictions_stan_dots(x, colors, info, size_line, size_point, line_alpha, ...))
+  }
 
   # default bandwidth, for smooting
   bandwidth <- info$bandwidth
@@ -204,9 +244,11 @@ plot.see_performance_pp_check <- function(x,
   dots <- list(...)
   if (isTRUE(dots[["check_model"]])) {
     out <- out + theme_style(
-      base_size = 10,
+      base_size = base_size,
       plot.title.space = 3,
-      axis.title.space = 5
+      axis.title.space = 5,
+      axis.title.size = size_axis_title,
+      plot.title.size = size_title
     )
   }
 
@@ -226,7 +268,13 @@ plot.see_performance_pp_check <- function(x,
 }
 
 
-.plot_check_predictions_density <- function(x, colors, info, size_line, line_alpha, bandwidth, ...) {
+.plot_check_predictions_density <- function(x,
+                                            colors,
+                                            info,
+                                            size_line,
+                                            line_alpha,
+                                            bandwidth,
+                                            ...) {
   ggplot2::ggplot(x) +
     ggplot2::stat_density(
       mapping = ggplot2::aes(
@@ -329,7 +377,7 @@ plot.see_performance_pp_check <- function(x,
           color = .data$key
         ),
         position = ggplot2::position_nudge(x = 0.2),
-        size = size_point,
+        size = 0.4 * size_point,
         linewidth = size_line,
         stroke = 0,
         shape = 16
@@ -341,7 +389,7 @@ plot.see_performance_pp_check <- function(x,
           y = .data$count,
           color = .data$key
         ),
-        size = size_point,
+        size = 1.5 * size_point,
         stroke = 0,
         shape = 16
       )
@@ -363,7 +411,7 @@ plot.see_performance_pp_check <- function(x,
       ),
       alpha = line_alpha,
       position = ggplot2::position_jitter(width = 0.1, height = 0.02),
-      size = size_point * 0.8,
+      size = 0.8 * size_point,
       stroke = 0,
       shape = 16
     ) +
@@ -376,7 +424,7 @@ plot.see_performance_pp_check <- function(x,
           group = .data$grp,
           color = .data$key
         ),
-        size = size_point * 0.8
+        size = 0.8 * size_point
       ) +
       ggplot2::geom_point(
         data = x[x$key == "Observed data", ],
@@ -417,6 +465,71 @@ plot.see_performance_pp_check <- function(x,
       alpha = "",
       title = "Posterior Predictive Check",
       subtitle = subtitle
+    ) +
+    ggplot2::guides(
+      color = ggplot2::guide_legend(reverse = TRUE),
+      size = ggplot2::guide_legend(reverse = TRUE)
+    )
+
+  return(p)
+}
+
+
+.plot_check_predictions_stan_dots <- function(x,
+                                              colors,
+                                              info,
+                                              size_line,
+                                              size_point,
+                                              line_alpha,
+                                              ...) {
+  # make sure we have a factor, so "table()" generates frequencies for all levels
+  # for each group - we need tables of same size to bind data frames
+  x$Group[x$Group == "y"] <- "Observed data"
+  x$Group[x$Group == "Mean"] <- "Model-predicted data"
+
+  # sanity check, remove NA rows
+  x <- x[!is.na(x$Count), ]
+
+  p <- ggplot2::ggplot() +
+    ggplot2::geom_pointrange(
+      data = x[x$Group == "Model-predicted data", ],
+      mapping = ggplot2::aes(
+        x = .data$x,
+        y = .data$Count,
+        ymin = .data$CI_low,
+        ymax = .data$CI_high,
+        color = .data$Group
+      ),
+      position = ggplot2::position_nudge(x = 0.2),
+      size = 0.4 * size_point,
+      linewidth = size_line,
+      stroke = 0,
+      shape = 16
+    ) +
+    ggplot2::geom_point(
+      data = x[x$Group == "Observed data", ],
+      mapping = ggplot2::aes(
+        x = .data$x,
+        y = .data$Count,
+        color = .data$Group
+      ),
+      size = 1.5 * size_point,
+      stroke = 0,
+      shape = 16
+    ) +
+    ggplot2::scale_y_continuous() +
+    ggplot2::scale_color_manual(values = c(
+      "Observed data" = colors[1],
+      "Model-predicted data" = colors[2]
+    )) +
+    ggplot2::labs(
+      x = info$xlab,
+      y = info$ylab,
+      color = "",
+      size = "",
+      alpha = "",
+      title = "Posterior Predictive Check",
+      subtitle = "Model-predicted intervals should include observed data points"
     ) +
     ggplot2::guides(
       color = ggplot2::guide_legend(reverse = TRUE),
