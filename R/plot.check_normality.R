@@ -235,7 +235,7 @@ plot.see_check_normality <- function(x,
         shape = 16,
         stroke = 0,
         size = size_point,
-        colour = colors[2] # "#2c3e50"
+        colour = colors[2]
       ),
       ggplot2::geom_qq_line(
         ggplot2::aes(sample = .data$y),
@@ -258,7 +258,7 @@ plot.see_check_normality <- function(x,
         shape = 16,
         stroke = 0,
         size = size_point,
-        colour = colors[2], # "#2c3e50",
+        colour = colors[2],
         alpha = dot_alpha_level,
         detrend = detrend
       ),
@@ -275,6 +275,11 @@ plot.see_check_normality <- function(x,
     }
   } else {
     insight::format_alert("For confidence bands, please install `qqplotr`.")
+
+    # to scale the detrended qq plot
+    N <- length(x$y)
+    SD <- stats::sd(x$y) * sqrt((N - 1) / N)
+    y_range <- round(range(x$y), 1)
 
     gg_init <- ggplot2::ggplot(x, ggplot2::aes(sample = .data$y))
 
@@ -294,13 +299,21 @@ plot.see_check_normality <- function(x,
         )
       },
       ggplot2::geom_qq(
-        mapping = if (detrend) ggplot2::aes(y = ggplot2::after_stat(.data$sample) - ggplot2::after_stat(.data$theoretical)),
+        mapping = if (detrend) {
+          ggplot2::aes(
+            x = ggplot2::after_stat(.data$theoretical * SD),
+            y = ggplot2::after_stat(.data$sample - .data$theoretical * SD)
+          )
+        },
         shape = 16,
         na.rm = TRUE,
         stroke = 0,
         size = size_point,
-        colour = colors[2] # "#2c3e50"
-      )
+        colour = colors[2]
+      ),
+      if (detrend) {
+        ggplot2::ylim(y_range)
+      }
     )
 
     if (detrend) {
@@ -357,7 +370,7 @@ plot.see_check_normality <- function(x,
       qqplotr::stat_pp_point(
         shape = 16, stroke = 0,
         size = size_point,
-        colour = colors[2], # "#2c3e50",
+        colour = colors[2],
         alpha = dot_alpha_level,
         detrend = detrend
       )
@@ -379,7 +392,7 @@ plot.see_check_normality <- function(x,
         colour = colors[2],
         size = size_point,
         alpha = dot_alpha_level
-      ) # "#2c3e50"
+      )
   } else {
     insight::format_error("Package 'qqplotr' OR 'MASS' required for P-P plots. Please install one of them.")
   }

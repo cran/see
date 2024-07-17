@@ -1,3 +1,20 @@
+# see 0.8.5
+
+## Major Changes
+
+* The minimum needed R version has been bumped to `4.0`.
+
+## Minor Changes
+
+* Improved scaling for detrended QQ plots when package `{qqplotr}` is not installed.
+  The normal and the detrended QQ plots are now visually more similar.
+
+* Gets rid of warnings due to API changes in the `{datawizard}` package.
+
+## Bug fixes
+
+* Fixed CRAN test failures.
+
 # see 0.8.4
 
 ## Minor Changes
@@ -613,4 +630,3 @@
 ## Bug fixes
 
 * Fixed issues with color codes in the flat-ui palette.
-
