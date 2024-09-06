@@ -1,3 +1,17 @@
+# see 0.9.0
+
+## Changes
+
+- New `plot()` method for `performance::check_dag()`.
+
+- Minor improvements to `plot()` for methods `p_direction()` and `p_significance()`,
+  which also support forthcoming changes in the *parameters* package.
+
+## Bug fixes
+
+- Fixed issue in `plot()` for `performance::check_model()` when package *qqplotr*
+  is not installed.
+
 # see 0.8.5
 
 ## Major Changes
