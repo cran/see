@@ -50,6 +50,9 @@ data_plot.parameters_simulate <- function(x,
       out$Component[grepl(paste0(i, "$"), out$Parameter)] <- i
       out$Parameter <- gsub(paste0(i, "$"), "", out$Parameter)
     }
+  } else if ("Response" %in% colnames(x)) {
+    out$Component <- rep(x$Response, each = nrow(out) / nrow(x))
+    out$Parameter <- rep(x$Parameter, each = nrow(out) / nrow(x))
   }
 
   out
@@ -87,13 +90,15 @@ plot.see_parameters_simulate <- function(x,
                                          show_intercept = FALSE,
                                          n_columns = NULL,
                                          normalize_height = FALSE,
-                                         size_line = 0.9,
-                                         posteriors_alpha = 0.7,
+                                         linewidth = 0.9,
+                                         alpha_posteriors = 0.7,
                                          centrality = "median",
                                          ci = 0.95,
                                          ...) {
   is_mlm <- !is.null(attributes(x)$object_class) && "mlm" %in% attributes(x)$object_class
-  if (is.null(n_columns) && isTRUE(is_mlm)) n_columns <- 1
+  if (is.null(n_columns) && (isTRUE(is_mlm) || "Response" %in% colnames(x))) {
+    n_columns <- 1
+  }
 
   # check for defaults
   if (missing(centrality) && !is.null(attributes(x)$centrality)) {
@@ -109,8 +114,8 @@ plot.see_parameters_simulate <- function(x,
     stack = stack,
     show_intercept = show_intercept,
     n_columns = n_columns,
-    size_line = size_line,
-    posteriors_alpha = posteriors_alpha,
+    linewidth = linewidth,
+    alpha_posteriors = alpha_posteriors,
     centrality = centrality,
     ci = ci,
     ...

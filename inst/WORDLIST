@@ -1,16 +1,15 @@
 Acyclic
+Anova
 BFs
 BayesFactor
 Biserial
 Blomqvist’s
 Bluebrown
-BossekJakob
 CMD
 Cai
 DAGs
 DOI
 Dasgupta
-Dom
 GGMs
 GeomViolinHalf
 Geoms
@@ -84,7 +83,6 @@ labelled
 labelling
 loadings
 margherita
-mattansb
 mcmc
 metaBMA
 metafor
@@ -95,7 +93,6 @@ modelfit
 multicollinearity
 neapolitan
 nopw
-patilindrajeets
 plotmm
 pre
 pts
@@ -105,7 +102,6 @@ rOpenSci
 rescaled
 rstanarm
 sjPlot
-strengejacke
 subfigures
 survminer
 tidymv

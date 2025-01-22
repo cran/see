@@ -1,3 +1,30 @@
+# see 0.10.0
+
+## Changes
+
+- `plot()` for `p_function()` now checks the values of the `size_length`
+  argument, to give an informative error message when the input is not valid.
+
+- `plot()` for `model_parameters()` now also plots group-levels of random effects
+  (i.e. for mixed models, when `model_parameters(x, ..., group_level = TRUE)`).
+
+- `plot()` for `model_parameters()` gets a `show_direction` argument, to turn
+  off the direction of the effect in the plot.
+
+- `plot()` for `model_parameters()` now gives an informative error message when
+  trying to plot Anova tables (which does not work).
+
+- `plot()` for `simulate_parameters()` now better copes with models that have
+  multiple response levels (e.g. multinomial models).
+
+- Gains `{patchwork}` as a hard dependency given its importance for the package.
+
+## Bug fixes
+
+- Fixed issue in `plot()` for `bayestestR::si()`.
+
+- Fixed issue in `plot()` for `parameters::model_parameters()` for GAM models.
+
 # see 0.9.0
 
 ## Changes
