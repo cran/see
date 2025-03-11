@@ -1,3 +1,31 @@
+# see 0.11.0
+
+## Changes
+
+* All `theme_*()` function get a `...` argument that is passed to
+  `ggplot2::theme()`.
+
+* Arguments that change the size of elements in `theme_*()` functions (like
+  `plot.title.size` or `axis.text.size` now scale with the `base_size` argument,
+  to ensure proper scaling of plots when the base-size is changed.
+
+* Added a new theme, `theme_azurelight()`, with a light-blue character, and
+  reduced use of grid lines.
+
+* `theme_modern()` now recognizes a `show.ticks` argument, to add tick marks
+  to the plot and slightly increase the distance between axis labels and the
+  related axis.
+
+* Color scale functions (those starting with `scale_*()`) get a new `"gradient"`
+  palette, which are simply the color values for blue and orange colors from that
+  palette. Furthermore, color scale functions now automatically select an
+  appropriate palette (usually, `"contrast"` or `"gradient"`) depending on
+  whether discrete or continuous color scales are requested.
+
+## Bug fixes
+
+* Fixed issue with adding prior layers to plots from `estimate_density()`.
+
 # see 0.10.0
 
 ## Changes
