@@ -16,7 +16,10 @@ data_plot.parameters_pca <- function(x, data = NULL, ...) {
     values_to = "y",
     columns = 2:ncol(dataplot)
   )
-  dataplot$Variable <- factor(dataplot$Variable, levels = rev(unique(dataplot$Variable)))
+  dataplot$Variable <- factor(
+    dataplot$Variable,
+    levels = rev(unique(dataplot$Variable))
+  )
 
   # Title
   if (inherits(x, "parameters_efa")) {
@@ -56,10 +59,9 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #'
 #' The `plot()` method for the `parameters::principal_components()` function.
 #'
-#' @param type Character vector, indicating the type of plot.
-#'   Options are three different shapes to represent component loadings;
-#'    `"bar"` (default) for a horizontal bar chart, or
-#'    `"line"` for a horizontal point and line chart.
+#' @param type Character vector, indicating the type of plot. Options are three
+#'   different shapes to represent component loadings; `"bar"` (default) for a
+#'   horizontal bar chart, or `"line"` for a horizontal point and line chart.
 #' @param color_text Character specifying color of text labels.
 #' @inheritParams data_plot
 #' @inheritParams plot.see_bayesfactor_parameters
@@ -76,13 +78,15 @@ data_plot.parameters_efa <- data_plot.parameters_pca
 #' plot(result)
 #'
 #' @export
-plot.see_parameters_pca <- function(x,
-                                    type = c("bar", "line"),
-                                    size_text = 3.5,
-                                    color_text = "black",
-                                    size = 1,
-                                    show_labels = TRUE,
-                                    ...) {
+plot.see_parameters_pca <- function(
+  x,
+  type = c("bar", "line"),
+  size_text = 3.5,
+  color_text = "black",
+  size = 1,
+  show_labels = TRUE,
+  ...
+) {
   type <- match.arg(type)
 
   if (!inherits(x, "data_plot")) {
@@ -90,11 +94,7 @@ plot.see_parameters_pca <- function(x,
   }
 
   if (missing(size)) {
-    size <- switch(type,
-      "bar" = 0.6,
-      "line" = 1,
-      1
-    )
+    size <- switch(type, "bar" = 0.6, "line" = 1, 1)
   }
 
   p <- ggplot(
@@ -110,12 +110,21 @@ plot.see_parameters_pca <- function(x,
   if (type == "bar") {
     p <- p +
       geom_bar(stat = "identity", width = size, colour = NA) +
-      scale_fill_gradientn(colours = c("#cd201f", "#ffffff", "#0077B5"), limits = c(-1, 1))
+      scale_fill_gradientn(
+        colours = c("#cd201f", "#ffffff", "#0077B5"),
+        limits = c(-1, 1)
+      )
   } else {
     p <- p +
-      geom_segment(aes(x = 0, yend = .data$Variable, xend = abs(.data$y)), linewidth = size) +
+      geom_segment(
+        aes(x = 0, yend = .data$Variable, xend = abs(.data$y)),
+        linewidth = size
+      ) +
       geom_point(size = 2 * size) +
-      scale_color_gradientn(colours = c("#cd201f", "#ffffff", "#0077B5"), limits = c(-1, 1))
+      scale_color_gradientn(
+        colours = c("#cd201f", "#ffffff", "#0077B5"),
+        limits = c(-1, 1)
+      )
   }
 
   if (isTRUE(show_labels)) {

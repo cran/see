@@ -6,7 +6,9 @@ data_plot.compare_performance <- function(x, data = NULL, ...) {
   x$Performance_Score <- NULL
 
   # set reference for Bayes factors to 1
-  if ("BF" %in% colnames(x)) x$BF[is.na(x$BF)] <- 1
+  if ("BF" %in% colnames(x)) {
+    x$BF[is.na(x$BF)] <- 1
+  }
 
   # normalize indices, for better comparison
   x <- datawizard::rescale(x, exclude = "Model", to = c(0.1, 1))
@@ -95,18 +97,21 @@ plot.see_compare_performance <- function(x, linewidth = 1, ...) {
     x <- data_plot(x)
   }
 
-  p <- ggplot(x, aes(
-    x = .data$name,
-    y = .data$values,
-    colour = .data$Model,
-    group = .data$Model,
-    fill = .data$Model
-  )) +
-    geom_polygon(linewidth = linewidth, alpha = 0.05) +
+  p <- ggplot2::ggplot(
+    x,
+    ggplot2::aes(
+      x = .data$name,
+      y = .data$values,
+      colour = .data$Model,
+      group = .data$Model,
+      fill = .data$Model
+    )
+  ) +
+    ggplot2::geom_polygon(linewidth = linewidth, alpha = 0.05) +
     coord_radar() +
-    scale_y_continuous(limits = c(0, 1), labels = NULL) +
+    ggplot2::scale_y_continuous(limits = c(0, 1), labels = NULL) +
     add_plot_attributes(x) +
-    guides(fill = "none") +
+    ggplot2::guides(fill = "none") +
     theme_radar() +
     scale_color_see()
 

@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{see_check_normality}(
   x,
-  type = c("qq", "pp", "density"),
+  type = "qq",
   data = NULL,
   linewidth = 0.8,
   size_point = 2,
@@ -71,7 +71,7 @@ m <<- lm(mpg ~ wt + cyl + gear + disp, data = mtcars)
 result <- check_normality(m)
 plot(result)
 
-\dontshow{if (require("qqplotr")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (require("qqplotr")) withAutoprint(\{ # examplesIf}
 plot(result, type = "qq", detrend = TRUE)
 \dontshow{\}) # examplesIf}
 }
