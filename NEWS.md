@@ -1,3 +1,33 @@
+# see 0.13.0
+
+## Breaking Changes
+
+* Data points in `plot()` for objects from `parameters::model_parameters()` were
+  sorted in reverse order when using the `sort` argument. This was fixed, thus,
+  `sort = "ascending"` now sorts the data in ascending order in plot/math logic.
+
+## Major Changes
+
+* Daniel Lüdecke is now the main maintainer of the package.
+
+* Several `plot()` methods gain a `theme` argument, to control the visual
+  themes for plots. This is in particular useful for plots that consist of
+  several single plots, like the one returned by `check_model()`.
+
+## Changes
+
+* `plot()` for `check_model()` now limits the number of data points for models
+  with many observations, to reduce the time for rendering the plot. Use argument
+  `maximum_dots` to define the maximum number of data points to show.
+
+* `plot()` for `check_model()` extracts the `show_ci` attribute from objects
+  returned by `check_model()`, to show or hide confidence intervals.
+
+## Bug fixes
+
+* Fixed issue in the `plot()` method for `estimate_density()` with vector input
+  and `group_by` argument.
+
 # see 0.12.0
 
 ## Major Changes

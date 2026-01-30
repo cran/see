@@ -1,12 +1,12 @@
 Type: Package
 Package: see
 Title: Model Visualisation Toolbox for 'easystats' and 'ggplot2'
-Version: 0.12.0
+Version: 0.13.0
 Authors@R: 
     c(person(given = "Daniel",
              family = "Lüdecke",
-             role = c("aut", "ctb"),
-             email = "d.luedecke@uke.de",
+             role = c("aut", "cre"),
+             email = "officialeasystats@gmail.com",
              comment = c(ORCID = "0000-0002-8895-3206")),
       person(given = "Dominique",
              family = "Makowski",
@@ -15,7 +15,7 @@ Authors@R:
              comment = c(ORCID = "0000-0001-5375-9967")),
       person(given = "Indrajeet",
              family = "Patil",
-             role = c("aut", "cre"),
+             role = c("aut"),
              email = "patilindrajeet.science@gmail.com",
              comment = c(ORCID = "0000-0003-1995-6531")),
       person(given = "Mattan S.",
@@ -51,7 +51,7 @@ Authors@R:
              family = "Bossek",
              role = "rev",
              email = "bossek@wi.uni-muenster.de"))
-Maintainer: Indrajeet Patil <patilindrajeet.science@gmail.com>
+Maintainer: Daniel Lüdecke <officialeasystats@gmail.com>
 Description: Provides plotting utilities supporting packages in the 'easystats'
     ecosystem (<https://github.com/easystats/easystats>) and some extra themes,
     geoms, and scales for 'ggplot2'. Color scales are based on
@@ -62,9 +62,9 @@ URL: https://easystats.github.io/see/
 BugReports: https://github.com/easystats/see/issues
 Depends: graphics, grDevices, R (>= 4.1), stats
 Imports: bayestestR (>= 0.17.0), correlation (>= 0.8.8), datawizard (>=
-        1.2.0), effectsize (>= 1.0.1), ggplot2 (>= 4.0.0), insight (>=
-        1.4.1), modelbased (>= 0.13.0), patchwork (>= 1.3.2),
-        parameters (>= 0.28.1), performance (>= 0.15.1)
+        1.3.0), effectsize (>= 1.0.1), ggplot2 (>= 4.0.1), insight (>=
+        1.4.4), modelbased (>= 0.13.1), patchwork (>= 1.3.2),
+        parameters (>= 0.28.3), performance (>= 0.15.3)
 Suggests: BH, brms, collapse, curl, DHARMa, discovr, emmeans,
         factoextra, Formula, ggdag, ggdist, ggraph, ggrepel, ggridges,
         ggside, glmmTMB, grid, httr2, lavaan, lme4, logspline,
@@ -81,13 +81,12 @@ Config/testthat/parallel: true
 Config/Needs/website: easystats/easystatstemplate
 Config/rcmdcheck/ignore-inconsequential-notes: true
 NeedsCompilation: no
-Packaged: 2025-09-13 19:38:51 UTC; indrajeetpatil
-Author: Daniel Lüdecke [aut, ctb] (ORCID:
+Packaged: 2026-01-30 14:19:56 UTC; DL
+Author: Daniel Lüdecke [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-8895-3206>),
   Dominique Makowski [aut, inv] (ORCID:
     <https://orcid.org/0000-0001-5375-9967>),
-  Indrajeet Patil [aut, cre] (ORCID:
-    <https://orcid.org/0000-0003-1995-6531>),
+  Indrajeet Patil [aut] (ORCID: <https://orcid.org/0000-0003-1995-6531>),
   Mattan S. Ben-Shachar [aut, ctb] (ORCID:
     <https://orcid.org/0000-0002-4287-4801>),
   Brenton M. Wiernik [aut, ctb] (ORCID:
@@ -101,4 +100,4 @@ Author: Daniel Lüdecke [aut, ctb] (ORCID:
   Matthew Smith [rev],
   Jakob Bossek [rev]
 Repository: CRAN
-Date/Publication: 2025-09-14 05:10:02 UTC
+Date/Publication: 2026-01-30 15:30:02 UTC
