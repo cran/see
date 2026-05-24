@@ -1,7 +1,7 @@
 Type: Package
 Package: see
 Title: Model Visualisation Toolbox for 'easystats' and 'ggplot2'
-Version: 0.13.0
+Version: 0.14.0
 Authors@R: 
     c(person(given = "Daniel",
              family = "Lüdecke",
@@ -62,9 +62,9 @@ URL: https://easystats.github.io/see/
 BugReports: https://github.com/easystats/see/issues
 Depends: graphics, grDevices, R (>= 4.1), stats
 Imports: bayestestR (>= 0.17.0), correlation (>= 0.8.8), datawizard (>=
-        1.3.0), effectsize (>= 1.0.1), ggplot2 (>= 4.0.1), insight (>=
-        1.4.4), modelbased (>= 0.13.1), patchwork (>= 1.3.2),
-        parameters (>= 0.28.3), performance (>= 0.15.3)
+        1.3.1), effectsize (>= 1.0.2), ggplot2 (>= 4.0.3), insight (>=
+        1.5.0), modelbased (>= 0.14.0), patchwork (>= 1.3.2),
+        parameters (>= 0.28.3), performance (>= 0.16.0)
 Suggests: BH, brms, collapse, curl, DHARMa, discovr, emmeans,
         factoextra, Formula, ggdag, ggdist, ggraph, ggrepel, ggridges,
         ggside, glmmTMB, grid, httr2, lavaan, lme4, logspline,
@@ -75,13 +75,13 @@ Suggests: BH, brms, collapse, curl, DHARMa, discovr, emmeans,
         1.0.8)
 Encoding: UTF-8
 Language: en-US
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
-Config/testthat/parallel: true
+Config/testthat/parallel: false
 Config/Needs/website: easystats/easystatstemplate
 Config/rcmdcheck/ignore-inconsequential-notes: true
+Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-01-30 14:19:56 UTC; DL
+Packaged: 2026-05-24 12:08:32 UTC; DL
 Author: Daniel Lüdecke [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-8895-3206>),
   Dominique Makowski [aut, inv] (ORCID:
@@ -100,4 +100,4 @@ Author: Daniel Lüdecke [aut, cre] (ORCID:
   Matthew Smith [rev],
   Jakob Bossek [rev]
 Repository: CRAN
-Date/Publication: 2026-01-30 15:30:02 UTC
+Date/Publication: 2026-05-24 13:10:02 UTC
