@@ -85,9 +85,8 @@ scale_fill_colorhex_c(
 )
 }
 \arguments{
-\item{palette}{The numeric code for a palette at \url{https://www.color-hex.com/}.
-For example, \code{1014416} for the
-\href{https://www.color-hex.com/color-palette/1014416}{Josiah color palette (number 1014416)}.}
+\item{palette}{The numeric code for a palette at color-hex.com. For example,
+\code{1014416} for the Josiah color palette (number 1014416).}
 
 \item{discrete}{Boolean indicating whether color aesthetic is discrete or not.}
 
@@ -99,18 +98,18 @@ should be applied to (e.g., \code{c('color', 'fill')}).}
 \item{...}{Additional arguments to pass to \code{\link[=colorRampPalette]{colorRampPalette()}}.}
 }
 \description{
-This function creates color scales based on palettes from \url{https://www.color-hex.com/}.
-This website provides a large number of user-submitted color palettes.
-This function downloads a requested color palette from \url{https://www.color-hex.com/}.
-and creates a \code{{ggplot2}} color scale from the provided hex codes.
+This function creates color scales based on palettes from color-hex.com. This
+website provides a large number of user-submitted color palettes. The
+function downloads a requested color palette from color-hex.com. and creates
+a \code{{ggplot2}} color scale from the provided hex codes.
 
 Use \code{scale_color_colorhex_d} for \emph{discrete} categories and
 \code{scale_color_colorhex_c} for a \emph{continuous} scale.
 }
 \note{
-The default \href{https://www.color-hex.com/color-palette/1014416}{Josiah color palette (number 1014416)}
-is available without an internet connection. All other color palettes require
-an internet connection to download and access.
+The default Josiah color palette (number 1014416) is available without an
+internet connection. All other color palettes require an internet connection
+to download and access.
 }
 \examples{
 library(ggplot2)

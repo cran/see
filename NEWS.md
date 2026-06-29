@@ -1,3 +1,23 @@
+# see 0.14.1
+
+## Changes
+
+* Added plot method for prior predictive checks, from the `performance::check_priors()`
+  function.
+
+* The `plot()` method for `performance::check_dag()` gains a `size_arrow` argument,
+  to control the size of arrows in the DAG.
+
+* Added plot method for `datawizard::means_by_groups()` objects.
+
+## Bug fixes
+
+* The `type` argument in `performance::check_predictions()` was not recognized in
+  the `plot()` method.
+
+* `plot()` for `model_parameters()` with *lavaan* objects did not work when the
+  object contained no `loadings` component.
+
 # see 0.14.0
 
 ## Changes
@@ -300,7 +320,7 @@
 * Updates docs and tests for `{ggplot2}` release (`3.4.0`).
 
 * New function `scale_color_colorhex()` provides color scales based on palettes
-  from <https://www.color-hex.com> (#245).
+  from color-hex.com (#245).
 
 * The default for the smoothing bandwidth from `plot.check_predictions()` has
   changed from `"nrd0"` to `"nrd"`, which seems to produce better fitting plots
