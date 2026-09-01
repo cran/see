@@ -43,7 +43,7 @@ plot.see_check_model <- function(
   panel <- .default_value(x, "panel", TRUE)
   check <- .default_value(x, "check", "all")
   size_point <- .default_value(x, "dot_size", 2)
-  linewidth <- .default_value(x, "line_size", 0.8)
+  size_line <- .default_value(x, "line_size", 0.8)
   show_labels <- .default_value(x, "show_labels", TRUE)
   size_text <- .default_value(x, "text_size")
   base_size <- .default_value(x, "base_size", 10)
@@ -53,6 +53,11 @@ plot.see_check_model <- function(
   alpha_dot <- .default_value(x, "alpha_dot", 0.8)
   show_dots <- .default_value(x, "show_dots", TRUE)
   ppc_range <- .default_value(x, "ppc_range")
+
+  # handle alias
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
+  }
 
   # Check for Confidence Intervals: Backwards compatibility for older package
   # versions
@@ -105,7 +110,7 @@ plot.see_check_model <- function(
     size_title = size_title,
     size_axis_title = size_axis_title,
     size_point = size_point,
-    linewidth = linewidth
+    size_line = size_line
   )
 
   # Each block below checks if the specific diagnostic test is requested in 'check'
@@ -147,7 +152,6 @@ plot.see_check_model <- function(
 
   # Binned Residuals
   if (.should_plot(x, check, "BINNED_RESID", "binned_residuals")) {
-    x$HOMOGENEITY <- NULL # Prevent conflict with standard homogeneity plot
     fun_args <- c(
       list(x$BINNED_RESID),
       common_args,
@@ -303,7 +307,7 @@ plot.see_check_model <- function(
 .plot_diag_linearity <- function(
   x,
   size_point,
-  linewidth,
+  size_line,
   size_axis_title = 10,
   size_title = 12,
   alpha_level = 0.2,
@@ -350,7 +354,7 @@ plot.see_check_model <- function(
       se = show_ci,
       formula = y ~ x,
       alpha = alpha_level,
-      linewidth = linewidth,
+      linewidth = size_line,
       colour = colors[1]
     ) +
     ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +

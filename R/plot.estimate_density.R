@@ -163,7 +163,7 @@ plot.see_estimate_density <- function(
   priors = FALSE,
   alpha_priors = 0.4,
   alpha_posteriors = 0.7,
-  linewidth = 0.9,
+  size_line = 0.9,
   size_point = 2,
   centrality = "median",
   ci = 0.95,
@@ -177,6 +177,12 @@ plot.see_estimate_density <- function(
       NULL
     }
   )
+
+  # handle alias
+  dots <- list(...)
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
+  }
 
   if (!inherits(x, "data_plot")) {
     x <- data_plot(x, data = model, centrality = centrality, ci = ci, ...)
@@ -200,7 +206,7 @@ plot.see_estimate_density <- function(
 
   if (stack) {
     p <- ggplot(x, aes(x = .data$x, y = .data$y, color = .data$Parameter)) +
-      geom_line(linewidth = linewidth) +
+      geom_line(linewidth = size_line) +
       add_plot_attributes(x) +
       scale_color_flat(labels = parameter_labels)
   } else {
@@ -253,7 +259,7 @@ plot.see_estimate_density <- function(
           color = "Posterior"
         ),
         orientation = "y",
-        linewidth = linewidth,
+        linewidth = size_line,
         width = 0
       ) +
       geom_point(
@@ -309,7 +315,7 @@ plot.see_estimate_density_df <- function(
   x,
   stack = TRUE,
   n_columns = 1,
-  linewidth = 0.9,
+  size_line = 0.9,
   ...
 ) {
   x$Parameter <- factor(x$Parameter, levels = rev(unique(x$Parameter)))
@@ -317,7 +323,7 @@ plot.see_estimate_density_df <- function(
 
   if (stack) {
     p <- ggplot(x, aes(x = .data$x, y = .data$y, color = .data$Parameter)) +
-      geom_line(linewidth = linewidth)
+      geom_line(linewidth = size_line)
   } else {
     insight::check_if_installed("ggridges")
 

@@ -32,7 +32,7 @@
 #' @export
 plot.see_performance_simres <- function(
   x,
-  linewidth = 0.8,
+  size_line = 0.8,
   size_point = 2,
   size_title = 12,
   size_axis_title = base_size,
@@ -48,6 +48,12 @@ plot.see_performance_simres <- function(
   # need DHARMa to be installed
   insight::check_if_installed("DHARMa")
   qqplotr_installed <- insight::check_if_installed("qqplotr", quietly = TRUE)
+
+  # handle alias
+  dots <- list(...)
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
+  }
 
   theme <- .set_default_theme(
     x,
@@ -87,7 +93,7 @@ plot.see_performance_simres <- function(
   } else {
     insight::format_error(
       "The transformation specified in `transform` is currently not supported."
-    ) # nolint
+    )
   }
   res <- res[!is.infinite(res) & !is.na(res)]
 
@@ -109,7 +115,7 @@ plot.see_performance_simres <- function(
       qqplotr::stat_qq_line(
         distribution = dfun,
         dparams = dp,
-        linewidth = linewidth,
+        linewidth = size_line,
         colour = colors[1],
         detrend = detrend
       ),
@@ -139,7 +145,7 @@ plot.see_performance_simres <- function(
         colour = colors[2]
       ),
       ggplot2::geom_qq_line(
-        linewidth = linewidth,
+        linewidth = size_line,
         colour = colors[1],
         na.rm = TRUE,
         distribution = dfun,

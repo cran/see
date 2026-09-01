@@ -1,7 +1,7 @@
 #' @export
 plot.see_check_overdisp <- function(
   x,
-  linewidth = 0.8,
+  size_line = 0.8,
   size_title = 12,
   size_axis_title = base_size,
   base_size = 10,
@@ -10,11 +10,17 @@ plot.see_check_overdisp <- function(
   type = 1,
   ...
 ) {
+  # handle alias
+  dots <- list(...)
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
+  }
+
   .plot_diag_overdispersion(
     x,
     theme = theme,
     colors = colors,
-    linewidth = linewidth,
+    size_line = size_line,
     size_title = size_title,
     size_axis_title = size_axis_title,
     base_size = base_size,
@@ -30,7 +36,7 @@ plot.see_check_overdisp <- function(
   size_title = 12,
   base_size = 10,
   colors = c("#3aaf85", "#1b6ca8"),
-  linewidth = 0.8,
+  size_line = 0.8,
   type = 1,
   ...
 ) {
@@ -48,13 +54,13 @@ plot.see_check_overdisp <- function(
       ggplot2::aes(x = .data$Predicted) +
       ggplot2::geom_smooth(
         ggplot2::aes(y = .data$V),
-        linewidth = linewidth,
+        linewidth = size_line,
         color = colors[2],
         se = FALSE
       ) +
       ggplot2::geom_smooth(
         ggplot2::aes(y = .data$Res2),
-        linewidth = linewidth,
+        linewidth = size_line,
         color = colors[1]
       ) +
       ggplot2::labs(

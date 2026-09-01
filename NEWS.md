@@ -1,3 +1,24 @@
+# see 0.14.2
+
+## Changes
+
+* Argument `linewidth` was renamed to `size_line`, to be consistent across the
+  easystats-ecosystem. However, `linewidth` remains as an alias, since this is
+  the name of the corresponding ggplot2-argument.
+
+* `plot()` for `check_heteroscedasticity()` now works for GLM's and models from
+  package *glmmTMB*. Previously, `check_heteroscedasticity()` worked for linear
+  models only.
+
+## Bug fixes
+
+* `plot()` for `check_heteroscedasticity()` now uses Pearson residuals for
+  `glmmTMB` and `MixMod` models. Previously these residuals were divided by a
+  single scalar, which is only correct when the variance function does not
+  depend on the mean; for non-mixed binomial and Poisson models that scalar was
+  1, so the plot could suggest heteroscedasticity for correctly specified
+  models. See easystats/performance#926.
+
 # see 0.14.1
 
 ## Changes
@@ -208,18 +229,18 @@
 
 ## Major changes
 
-- New `plot()` method for simulated residuals (implemented in the _performance_
+* New `plot()` method for simulated residuals (implemented in the _performance_
   package).
 
-- `plot()` for `check_model()` was revised and now includes more accurate Q-Q
+* `plot()` for `check_model()` was revised and now includes more accurate Q-Q
   plots for non-Gaussian models.
 
 ## Minor Changes
 
-- `plot.check_model()` now passes arguments `size_point` and `size_line` to the
+* `plot.check_model()` now passes arguments `size_point` and `size_line` to the
   posterior predictive check plot.
 
-- Minor changes regarding the latest update of _ggplot2_.
+* Minor changes regarding the latest update of _ggplot2_.
 
 # see 0.8.2
 

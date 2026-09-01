@@ -101,7 +101,7 @@ plot.see_parameters_simulate <- function(
   show_intercept = FALSE,
   n_columns = NULL,
   normalize_height = FALSE,
-  linewidth = 0.9,
+  size_line = 0.9,
   alpha_posteriors = 0.7,
   centrality = "median",
   ci = 0.95,
@@ -109,8 +109,15 @@ plot.see_parameters_simulate <- function(
 ) {
   is_mlm <- !is.null(attributes(x)$object_class) &&
     "mlm" %in% attributes(x)$object_class
+
   if (is.null(n_columns) && (isTRUE(is_mlm) || "Response" %in% colnames(x))) {
     n_columns <- 1
+  }
+
+  # handle alias
+  dots <- list(...)
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
   }
 
   # check for defaults
@@ -127,7 +134,7 @@ plot.see_parameters_simulate <- function(
     stack = stack,
     show_intercept = show_intercept,
     n_columns = n_columns,
-    linewidth = linewidth,
+    size_line = size_line,
     alpha_posteriors = alpha_posteriors,
     centrality = centrality,
     ci = ci,

@@ -13,7 +13,7 @@
 #' @details
 #' Produces a faceted plot when there is more than one means-table.
 #'
-#' @examples
+#' @examplesIf insight::check_if_installed("datawizard", minimum_version = "1.3.2", quietly = TRUE)
 #' \dontrun{
 #' group_means_object <-  datawizard::means_by_group(iris$Sepal.Width, iris$Species)
 #' plot(group_means_object, title = "group means", ci = FALSE, caption = FALSE)
@@ -37,6 +37,11 @@ plot.see_dw_groupmeans <- function(
   caption_text <- if (isTRUE(caption)) .build_caption(x) else ""
 
   trimmed <- x[x$Category != "Total", ]
+
+  trimmed$Category <- factor(
+    trimmed$Category,
+    levels = unique(trimmed$Category)
+  )
 
   p <- ggplot2::ggplot(
     trimmed,
@@ -98,8 +103,11 @@ plot.see_dw_groupmeans_list <- function(
   })
 
   x_long <- do.call(rbind, x)
-  trimmed <- trimmed <- x_long[x_long$Category != "Total", ]
-
+  trimmed <- x_long[x_long$Category != "Total", ]
+  trimmed$Category <- factor(
+    trimmed$Category,
+    levels = unique(trimmed$Category)
+  )
   p <- ggplot2::ggplot(
     trimmed,
     ggplot2::aes(x = .data$Category, y = .data$Mean)

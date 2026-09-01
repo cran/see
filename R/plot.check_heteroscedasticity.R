@@ -21,7 +21,7 @@ plot.see_check_heteroscedasticity <- function(
   x,
   data = NULL,
   size_point = 2,
-  linewidth = 0.8,
+  size_line = 0.8,
   size_title = 12,
   size_axis_title = base_size,
   base_size = 10,
@@ -34,17 +34,42 @@ plot.see_check_heteroscedasticity <- function(
     model <- data
   }
 
+  # handle alias
+  dots <- list(...)
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
+  }
+
+  ## TODO: this code, which returns scaled (Pearson) residuals, is
+  #        a duplicate and also present in the performance package.
+  #        we should think about refactoring and move this to
+  #        `insight::get_residuals()`, adding a `standardize` argument. We
+  #        could then. e.g., call `get_residuals(type = "pearson", standardized = TRUE)`
+
   faminfo <- insight::model_info(model)
   r <- tryCatch(
     if (inherits(model, "merMod")) {
       stats::residuals(model, scaled = TRUE)
     } else if (inherits(model, c("glmmTMB", "MixMod"))) {
-      sig <- if (faminfo$is_mixed) {
-        sqrt(insight::get_variance_residual(model))
+      ## Pearson residuals are scaled by the family's variance function V(mu_i),
+      ## which varies across observations. The fallback below divides by a single
+      ## scalar, which is only correct when V() does not depend on mu (e.g.
+      ## gaussian). For non-mixed binomial/poisson models `.sigma_glmmTMB_nonmixed()`
+      ## returns 1, i.e. no standardization at all.
+      r_pearson <- tryCatch(
+        stats::residuals(model, type = "pearson"),
+        error = function(e) NULL
+      )
+      if (is.null(r_pearson) || all(is.na(r_pearson))) {
+        sig <- if (faminfo$is_mixed) {
+          sqrt(insight::get_variance_residual(model))
+        } else {
+          .sigma_glmmTMB_nonmixed(model, faminfo)
+        }
+        stats::residuals(model, type = "response") / sig
       } else {
-        .sigma_glmmTMB_nonmixed(model, faminfo)
+        r_pearson
       }
-      stats::residuals(model) / sig
     } else if (inherits(model, "glm")) {
       stats::rstandard(model, type = "pearson")
     } else {
@@ -83,7 +108,7 @@ plot.see_check_heteroscedasticity <- function(
   .plot_diag_homogeneity(
     dat,
     size_point = size_point,
-    linewidth = linewidth,
+    size_line = size_line,
     base_size = base_size,
     size_title = size_title,
     size_axis_title = size_axis_title,
@@ -99,12 +124,12 @@ plot.see_check_heteroscedasticity <- function(
   ) {
     return(1)
   }
-  betad <- model$fit$par["betad"]
+  betadisp <- model$fit$par["betadisp"]
 
   switch(
     faminfo$family,
-    gaussian = exp(0.5 * betad),
-    Gamma = exp(-0.5 * betad),
-    exp(betad)
+    gaussian = exp(0.5 * betadisp),
+    Gamma = exp(-0.5 * betadisp),
+    exp(betadisp)
   )
 }

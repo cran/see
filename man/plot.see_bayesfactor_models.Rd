@@ -6,8 +6,8 @@
 \usage{
 \method{plot}{see_bayesfactor_models}(
   x,
-  n_pies = c("one", "many"),
-  value = c("none", "BF", "probability"),
+  n_pies = "one",
+  value = "none",
   sort = FALSE,
   log = FALSE,
   prior_odds = NULL,
@@ -17,9 +17,9 @@
 \arguments{
 \item{x}{An object.}
 
-\item{n_pies}{Number of pies.}
+\item{n_pies}{Number of pies. Can be \code{"one"} or \code{"many"}.}
 
-\item{value}{What value to display.}
+\item{value}{What value to display. Can be \code{"none"}, \code{"BF"}, or \code{"probability"}.}
 
 \item{sort}{The behavior of this argument depends on the plotting contexts.
 \itemize{

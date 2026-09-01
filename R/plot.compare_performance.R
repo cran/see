@@ -74,7 +74,7 @@ data_plot.compare_performance <- function(x, data = NULL, ...) {
 #' plot(result)
 #'
 #' @export
-plot.see_compare_performance <- function(x, linewidth = 1, ...) {
+plot.see_compare_performance <- function(x, size_line = 1, ...) {
   # We may think of plotting the "performance scores" as bar plots,
   # however, the "worst" model always has a score of zero, so no bar
   # is shown - this is rather confusing. One option might be to only
@@ -97,6 +97,12 @@ plot.see_compare_performance <- function(x, linewidth = 1, ...) {
     x <- data_plot(x)
   }
 
+  # handle alias
+  dots <- list(...)
+  if (!is.null(dots[["linewidth"]])) {
+    size_line <- dots[["linewidth"]]
+  }
+
   p <- ggplot2::ggplot(
     x,
     ggplot2::aes(
@@ -107,7 +113,7 @@ plot.see_compare_performance <- function(x, linewidth = 1, ...) {
       fill = .data$Model
     )
   ) +
-    ggplot2::geom_polygon(linewidth = linewidth, alpha = 0.05) +
+    ggplot2::geom_polygon(linewidth = size_line, alpha = 0.05) +
     coord_radar() +
     ggplot2::scale_y_continuous(limits = c(0, 1), labels = NULL) +
     add_plot_attributes(x) +

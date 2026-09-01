@@ -7,7 +7,7 @@
 \method{plot}{see_parameters_brms_meta}(
   x,
   size_point = 2,
-  linewidth = 0.8,
+  size_line = 0.8,
   size_text = 3.5,
   alpha_posteriors = 0.7,
   alpha_rope = 0.15,
@@ -22,7 +22,8 @@
 
 \item{size_point}{Numeric specifying size of point-geoms.}
 
-\item{linewidth}{Numeric value specifying size of line geoms.}
+\item{size_line}{Numeric value specifying size of line geoms. \code{linewidth} is
+an alias for \code{size_line}.}
 
 \item{size_text}{Numeric value specifying size of text labels.}
 
