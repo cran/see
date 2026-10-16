@@ -195,6 +195,36 @@ test_that("plot.see_check_model() works with show_dots parameter", {
 })
 
 
+test_that("plot.see_check_model() draws cell means for few fitted values", {
+  # models with only categorical predictors have one fitted value per cell,
+  # so cell means replace the LOESS smoother (#464)
+  model <- lm(mpg ~ factor(am) * factor(vs), data = mtcars)
+
+  expect_doppelganger_with_seed(
+    title = "check_model_cell_means_linearity",
+    fig = plot(performance::check_model(model, check = "linearity"))
+  )
+
+  expect_doppelganger_with_seed(
+    title = "check_model_cell_means_homogeneity",
+    fig = plot(performance::check_model(model, check = "homogeneity"))
+  )
+})
+
+
+test_that("plot.see_check_model() omits trend lines with show_smooth = FALSE", {
+  model <- lm(mpg ~ wt, data = mtcars)
+
+  expect_doppelganger_with_seed(
+    title = "check_model_no_smooth_linearity",
+    fig = plot(
+      performance::check_model(model, check = "linearity"),
+      show_smooth = FALSE
+    )
+  )
+})
+
+
 test_that("plot outliers skips smooth for low N", {
   # fmt: skip
   sdata <- data.frame(
@@ -265,6 +295,31 @@ test_that("check_model() with heterogeneity plots works", {
   m <- glmmTMB::glmmTMB(cbind(y, f) ~ x, family = binomial, data = d)
   expect_doppelganger_with_seed(
     title = "check_model_heterogeneity-2",
+    fig = plot(performance::check_model(m))
+  )
+})
+
+test_that("check_model() RE-normality plots work with uncorrelated RE", {
+  skip_if_not_installed("lme4")
+  data(sleepstudy, package = "lme4")
+  set.seed(123)
+  sleepstudy$mygrp <- sample(1:5, size = 180, replace = TRUE)
+
+  m <- lme4::lmer(
+    Reaction ~ Days + (1 | mygrp) + (1 + Days | Subject),
+    data = sleepstudy
+  )
+  expect_doppelganger_with_seed(
+    title = "check_model_re_qq_noncor-1",
+    fig = plot(performance::check_model(m))
+  )
+
+  m <- lme4::lmer(
+    Reaction ~ Days + (1 | Subject) + (0 + Days | Subject),
+    data = lme4::sleepstudy
+  )
+  expect_doppelganger_with_seed(
+    title = "check_model_re_qq_noncor-2",
     fig = plot(performance::check_model(m))
   )
 })

@@ -68,3 +68,27 @@ test_that("check_predicions - type and x_limits arguments work", {
     ))
   )
 })
+
+test_that("check_predictions, brms-wiener", {
+  skip_if_not_installed("bayestestR", minimum_version = "0.20.0")
+  skip_if_not_installed("performance", minimum_version = "0.18.3")
+
+  skip_on_cran()
+  skip_if_not_installed("curl")
+  skip_if_offline()
+  skip_if_not_installed("httr2")
+  skip_if_not_installed("rstan")
+  skip_if_not_installed("RWiener")
+
+  m <- insight::download_model("brms_wiener_1")
+  skip_if(is.null(m))
+
+  old_opt <- getOption("wiener_backend")
+  options(wiener_backend = "rtdists")
+  on.exit(options(wiener_backend = old_opt))
+
+  expect_doppelganger_with_seed(
+    title = "check_predicions_wiener_1",
+    fig = plot(performance::check_predictions(m))
+  )
+})
